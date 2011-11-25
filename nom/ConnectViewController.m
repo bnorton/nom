@@ -17,9 +17,11 @@
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (!self) { return nil; }
     
-    UIImageView *background = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"connect_background"]];
-    background.frame = CGRectMake(0, 0, 320, 480);
-    [self.view addSubview:background];
+    self.title = NSLocalizedString(@"Activity", @"Activity");
+    self.tabBarItem.image = [UIImage imageNamed:@"icons-gray/259-list.png"];
+    
+    UIImageView *background = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"background4a.png"]];
+    [self.tableView setBackgroundView:background];
     
     labels = [NSArray arrayWithObjects:connect_labels];
     
@@ -102,13 +104,13 @@
     
     switch (indexPath.row) {
         case 0:
-            viewController = [[FollowerListViewController alloc] initWithType:NMFollowersType];
-            break;
-        case 1:
             viewController = [[FollowerListViewController alloc] initWithType:NMFollowingType];
             break;
+        case 1:
+            viewController = [[FollowerListViewController alloc] initWithType:NMFollowersType];
+            break;
         case 2:
-            
+            return;
             break;
         case 3:
             viewController = [[SettingsViewController alloc] initWithType:NMSettingsSourceConnect];

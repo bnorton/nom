@@ -8,8 +8,12 @@
 
 #import "NMAppDelegate.h"
 
+#import "NMInitialConnectViewController.h"
 #import "NMActivityViewController.h"
 #import "ConnectViewController.h"
+#import "currentUser.h"
+
+#import "Util.h"
 
 @implementation NMAppDelegate
 
@@ -18,6 +22,9 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    
+    [[UIApplication sharedApplication] setStatusBarStyle: UIStatusBarStyleBlackTranslucent];
+    
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
     UIViewController *activity = [[NMActivityViewController alloc] init];
@@ -25,6 +32,7 @@
     
     self.tabBarController = [[UITabBarController alloc] init];
     self.tabBarController.viewControllers = [NSArray arrayWithObjects:activity, connect, nil];
+    [self.tabBarController.tabBar setBackgroundImage:[UIImage imageNamed:@"tab_bar4a.png"]];
     
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:self.tabBarController];
 
@@ -32,6 +40,27 @@
     
     self.window.rootViewController = nav;
     [self.window makeKeyAndVisible];
+    
+//    [nav.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4c.png"] 
+//                            forBarMetrics:UIBarMetricsDefault];
+    [nav.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] 
+                            forBarMetrics:UIBarMetricsDefault];
+
+    NSLog(@"logged in or connected %d", [currentUser getBooleanForKey:@"logged_in_or_connected"]);
+    [currentUser setBoolean:NO ForKey:@"logged_in_or_connected"];
+    
+    if ( ! [currentUser getBooleanForKey:@"logged_in_or_connected"]) {
+        UIViewController *initialConnect = [[NMInitialConnectViewController alloc] init];
+        UINavigationController *isnav = [[UINavigationController alloc] initWithRootViewController:initialConnect];
+        
+        [isnav.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] 
+                                  forBarMetrics:UIBarMetricsDefault];
+
+        [nav performBlock:^{
+            [nav presentModalViewController:isnav animated:YES];
+        } afterDelay:1.2];
+    }
+    
     return YES;
 }
 

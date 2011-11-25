@@ -28,16 +28,29 @@
                    failure:(void (^)(NSDictionary * response))failure {
         
     if (!parameters) { parameters = [[NSMutableDictionary alloc] initWithCapacity:4]; }
-    [parameters setObject:[currentUser getStringForKey:@"user_nid"] forKey:@"user_nid"];
-    [parameters setObject:[currentUser getStringForKey:@"auth_token"] forKey:@"auth_token"];
-    [parameters setObject:[NSNumber numberWithFloat:[currentLocation lat]] forKey:@"lat"];
-    [parameters setObject:[NSNumber numberWithFloat:[currentLocation lng]] forKey:@"lng"];
+    
+    NSString *user_nid = [currentUser getStringForKey:@"user_nid"];
+    if (user_nid) { [parameters setObject:user_nid forKey:@"user_nid"]; }
+    
+    NSString *auth_token = [currentUser getStringForKey:@"auth_token"];
+    if (auth_token) { [parameters setObject:auth_token forKey:@"auth_token"]; }
+    
+    NSNumber *lat = [NSNumber numberWithFloat:[currentLocation lat]];
+    if (lat) { [parameters setObject:lat forKey:@"lat"]; }
+    
+    NSNumber *lng = [NSNumber numberWithFloat:[currentLocation lng]];
+    if (lat) { [parameters setObject:lng forKey:@"lng"]; }
     
     NSMutableURLRequest *request = [HTTPClient requestWithMethod:method path:path parameters:parameters];
     
     [self showInfo:path params:parameters request:request];
-        
-    [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSURLResponse *response, id JSON) {
+    if (success) {
+        NSLog(@"HAVE A success block");
+    } else {
+        NSLog(@"DONT HAVE A success block");
+    }
+    AFJSONRequestOperation * operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request 
+      success:^(NSURLRequest *request, NSURLResponse *response, id JSON) {
         if (success) { NSLog(@"INFO: success callback for %@",path); 
             success(JSON); 
         }
@@ -46,7 +59,9 @@
         if (failure) { NSLog(@"INFO failure callback for %@",path);
             failure(JSON);
         } else {NSLog(@"WARN: %@ has no failure callback registered for patameters %@", path, parameters);}
-    }];  
+    }];
+    
+    [HTTPQueue addOperation:operation];
 }
 
 /**
@@ -73,9 +88,11 @@
                   success:(void (^)(NSDictionary * response))success
                   failure:(void (^)(NSDictionary * response))failure {
     
-    NSArray *items  = [NSArray arrayWithObjects:email,password,screen_name,nil];
-    NSArray *params = [NSArray arrayWithObjects:@"email", @"password", @"screen_name",nil];
-    NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjects:items forKeys:params];
+    NSMutableDictionary *parameters = [[NSMutableDictionary alloc] initWithCapacity:3];
+    
+    if (email)       { [parameters setObject:email forKey:@"email"]; }
+    if (password)    { [parameters setObject:password forKey:@"password"]; }
+    if (screen_name) { [parameters setObject:screen_name forKey:@"screen_name"]; }
     
     [NMHTTPClient enqueueRequestWithMethod:@"POST" path:@"/users/register.json" parameters:parameters success:success failure:failure];
 }
@@ -244,7 +261,7 @@
                 success:(void (^)(NSDictionary * response))success
                 failure:(void (^)(NSDictionary * response))failure {
     
-    [NMHTTPClient thumbValue:value path:[NSString stringWithFormat:@"/locations/%@/thumbs/new",location_nid] 
+    [NMHTTPClient thumbValue:value path:[NSString stringWithFormat:@"/locations/%@/thumbs/create.json",location_nid] 
                 success:success failure:failure];
     
 }
@@ -253,7 +270,7 @@
                 success:(void (^)(NSDictionary * response))success
                 failure:(void (^)(NSDictionary * response))failure {
     
-    [NMHTTPClient thumbValue:value path:[NSString stringWithFormat:@"/users/%@/thumbs/new",their_user_nid] 
+    [NMHTTPClient thumbValue:value path:[NSString stringWithFormat:@"/users/%@/thumbs/create.json",their_user_nid] 
                      success:success failure:failure];
     
 }
@@ -415,7 +432,7 @@
     NSArray *params = [NSArray arrayWithObjects:@"other_user_nid", nil];
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjects:items forKeys:params];
     
-    [NMHTTPClient enqueueRequestWithMethod:@"POST" path:@"/followers/new.json" parameters:parameters success:success failure:failure];
+    [NMHTTPClient enqueueRequestWithMethod:@"POST" path:@"/followers/create.json" parameters:parameters success:success failure:failure];
     
 }
 
@@ -423,7 +440,7 @@
        success:(void (^)(NSDictionary * response))success
        failure:(void (^)(NSDictionary * response))failure {
     
-    [NMHTTPClient followAction:@"/followers/new.json" otherUserId:other_user_nid success:success failure:failure];
+    [NMHTTPClient followAction:@"/followers/create.json" otherUserId:other_user_nid success:success failure:failure];
     
 }
 
@@ -475,7 +492,7 @@
     NSArray *params = [NSArray arrayWithObjects:@"location_nid",@"parent_nid", nil];
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjects:items forKeys:params];
     
-    [NMHTTPClient enqueueRequestWithMethod:@"POST" path:@"/comments/new.json" parameters:parameters success:success failure:failure];
+    [NMHTTPClient enqueueRequestWithMethod:@"POST" path:@"/comments/create.json" parameters:parameters success:success failure:failure];
     
 }
 
@@ -487,7 +504,7 @@
     NSArray *params = [NSArray arrayWithObjects:@"location_nid",@"parent_nid", nil];
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjects:items forKeys:params];
     
-    [NMHTTPClient enqueueRequestWithMethod:@"POST" path:@"/comments/new.json" parameters:parameters success:success failure:failure];
+    [NMHTTPClient enqueueRequestWithMethod:@"POST" path:@"/comments/create.json" parameters:parameters success:success failure:failure];
     
 }
 
@@ -499,7 +516,7 @@
     NSArray *params = [NSArray arrayWithObjects:@"recommendation_nid",@"parent_nid", nil];
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjects:items forKeys:params];
     
-    [NMHTTPClient enqueueRequestWithMethod:@"POST" path:@"/comments/new.json" parameters:parameters success:success failure:failure];
+    [NMHTTPClient enqueueRequestWithMethod:@"POST" path:@"/comments/create.json" parameters:parameters success:success failure:failure];
     
 }
 
@@ -529,7 +546,7 @@
 + (void)activitiesWithSuccess:(void (^)(NSDictionary * response))success
                       failure:(void (^)(NSDictionary * response))failure {
  
-    [NMHTTPClient enqueueRequestWithMethod:@"GET" path:@"/activities" parameters:nil success:success failure:failure];
+    [NMHTTPClient enqueueRequestWithMethod:@"GET" path:@"/activities.json" parameters:nil success:success failure:failure];
     
 }
 

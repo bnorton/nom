@@ -23,7 +23,9 @@
     self.title = NSLocalizedString(@"Recommend", @"Publishing");
     self.tabBarItem.image = [UIImage imageNamed:@"activity.png"];
     
-    [self.view setBackgroundColor:[UIColor whiteColor]];
+    UIImageView *background = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 480)];
+    [background setImage:[UIImage imageNamed:@"background4b.png"]];
+    [self.view addSubview:background];
 
     textView = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, 320, 216)];
     [textView setBackgroundColor:[UIColor lightGrayColor]];

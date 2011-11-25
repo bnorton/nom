@@ -7,10 +7,23 @@
 //
 
 #import "currentUser.h"
-
+#import "NSNull+length.h"
 @implementation currentUser
 
 static NSUserDefaults *defaults = nil;
+static NSMutableDictionary *user = nil;
+
++ (void)loadCurrentUser {
+    if ([[defaults objectForKey:@"auth_token"] length] > 0) { [user setObject:[defaults objectForKey:@"auth_token"] forKey:@"auth_token"]; }
+    if ([[defaults objectForKey:@"user_nid"] length] > 0)   { [user setObject:[defaults objectForKey:@"user_nid"] forKey:@"user_nid"]; }
+    if ([[defaults objectForKey:@"email"] length] > 0)      { [user setObject:[defaults objectForKey:@"email"] forKey:@"email"]; }
+    if ([[defaults objectForKey:@"last_seen"] length] > 0)  { [user setObject:[defaults objectForKey:@"last_seen"] forKey:@"last_seen"]; }
+    if ([[defaults objectForKey:@"name"] length] > 0)       { [user setObject:[defaults objectForKey:@"name"] forKey:@"name"]; }
+    if ([[defaults objectForKey:@"screen_name"] length] > 0){ [user setObject:[defaults objectForKey:@"screen_name"] forKey:@"screen_name"]; }
+    if ([[defaults objectForKey:@"image_url"] length] > 0)  { [user setObject:[defaults objectForKey:@"image_url"] forKey:@"image_url"]; }
+    if ([[defaults objectForKey:@"created_at"] length] > 0) { [user setObject:[defaults objectForKey:@"created_at"] forKey:@"created_at"]; }
+    if ([[defaults objectForKey:@"city"] length] > 0)       { [user setObject:[defaults objectForKey:@"city"] forKey:@"city"]; }
+}
 
 + (void)initialize
 {
@@ -19,6 +32,13 @@ static NSUserDefaults *defaults = nil;
     {
         initialized = YES;
         defaults = [NSUserDefaults standardUserDefaults];
+        
+        user = [[NSMutableDictionary alloc] initWithCapacity:20];
+        
+        [currentUser loadCurrentUser];
+        [currentUser setLoggedIn];
+        
+        NSLog(@"INIT currentUser %@", user);
     }
 }
 
@@ -36,7 +56,7 @@ static NSUserDefaults *defaults = nil;
 }
 
 + (void)setString:(NSString *)string ForKey:(NSString *)key {
-    [defaults setObject:string forKey:key];
+    [defaults setObject:[string copy] forKey:key];
     [defaults synchronize];
 }
 
@@ -58,4 +78,63 @@ static NSUserDefaults *defaults = nil;
     [defaults synchronize];    
 }
 
++ (void)setUser:(NSDictionary *)_user {
+    if (user != nil) {
+        
+        if ([[_user objectForKey:@"auth_token"] length] > 0) { [defaults setObject:[_user objectForKey:@"auth_token"] forKey:@"auth_token"]; }
+        if ([[_user objectForKey:@"user_nid"] length] > 0)   { [defaults setObject:[_user objectForKey:@"user_nid"] forKey:@"user_nid"]; }
+        if ([[_user objectForKey:@"email"] length] > 0)      { [defaults setObject:[_user objectForKey:@"email"] forKey:@"email"]; }
+        if ([[_user objectForKey:@"last_seen"] length] > 0)  { [defaults setObject:[_user objectForKey:@"last_seen"] forKey:@"last_seen"]; }
+        if ([[_user objectForKey:@"name"] length] > 0)       { [defaults setObject:[_user objectForKey:@"name"] forKey:@"name"]; }
+        if ([[_user objectForKey:@"screen_name"] length] > 0){ [defaults setObject:[_user objectForKey:@"screen_name"] forKey:@"screen_name"]; }
+        if ([[_user objectForKey:@"image_url"] length] > 0)  { [defaults setObject:[_user objectForKey:@"image_url"] forKey:@"image_url"]; }
+        if ([[_user objectForKey:@"created_at"] length] > 0) { [defaults setObject:[_user objectForKey:@"created_at"] forKey:@"created_at"]; }
+        if ([[_user objectForKey:@"city"] length] > 0)       { [defaults setObject:[_user objectForKey:@"city"] forKey:@"city"]; }
+        
+        [defaults synchronize];
+        
+        [currentUser loadCurrentUser];
+    }
+    
+    [currentUser setLoggedIn];
+}
+
++ (NSDictionary *)getUser {
+    return user;
+}
+
++ (void)setLoggedIn {
+    if ([user objectForKey:@"auth_token"]) {
+        [currentUser setBoolean:YES ForKey:@"user_logged_in"];
+        [currentUser setBoolean:YES ForKey:@"logged_in_or_connected"];
+    } else {
+        [currentUser setBoolean:NO ForKey:@"user_logged_in"];
+        [currentUser setBoolean:NO ForKey:@"logged_in_or_connected"];
+    }
+}
+
 @end
+
+/*
+{
+    "auth_token" = 995b5fc73c400b0eb8a878caec0c49778e8c2322feaccd30ca6e0904ff8b0c9e;
+    city = "San Francisco";
+    country = "US";
+    "created_at" = "2011-11-24T21:07:39Z";
+    description = "<null>";
+    email = "hey.i.am.brian@gmail.com";
+    facebook = "<null>";
+    "follower_count" = "<null>";
+    "has_joined" = 1;
+    id = 5;
+    "image_url" = "http://img.justnom.it.s3.aws.etc/image_file.png";
+    "last_seen" = "2011-11-24 21:07:39";
+    name = "<null>";
+    nid = 4eceb21beef0a652cb000001;
+    phone = "<null>";
+    "screen_name" = "<null>";
+    street = "<null>";
+    twitter = "<null>";
+    url = "<null>";
+} 
+*/

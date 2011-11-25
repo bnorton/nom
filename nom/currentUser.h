@@ -22,5 +22,9 @@
 + (void)setDate:(NSDate *)date forKey:(NSString *)key;
 + (NSDate *)getDateForKey:(NSString *)key;
 
++ (void)setUser:(NSDictionary *)user;
++ (NSDictionary *)getUser;
+
++ (void)setLoggedIn;
 
 @end

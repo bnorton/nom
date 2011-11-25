@@ -14,5 +14,6 @@
     UIButton *useEmail;
 }
 
+- (id)init;
 
 @end

@@ -7,32 +7,63 @@
 //
 
 #import "FollowerListViewController.h"
+#import "Util.h"
 
+#import "FollowCell.h"
 
 @implementation FollowerListViewController
 
 
 - (id)initWithType:(NMFollower)_type {
-    type = _type;
-    return [self init];
     
+    self = [self init];
+    type = _type;
+    
+    if (type == NMFollowersType) {
+        self.title = NSLocalizedString(@"Followers", @"Followers");
+    } else if (type == NMFollowingType) {
+        self.title = NSLocalizedString(@"Following", @"Following");
+    }
+    return self;
 }
+
 - (id)init
 {
     self = [super initWithStyle:UITableViewStylePlain];
     if (!self) { return nil; }
     
-    
+    UIImageView *background = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"background4a.png"]];
+    [self.tableView setBackgroundView:background];
     
     return self;
 }
 
+- (void)updateComplete {
+    [self performSelector:@selector(doneLoadingTableViewData) withObject:nil afterDelay:3.0];
+}
+
+- (void)updateFollowers {
+    [NMHTTPClient followersWithSuccess:^(NSDictionary *response) {
+        
+        [self updateComplete];
+    } failure:^(NSDictionary *response) {
+        
+        [self updateComplete];
+    }];
+}
+
+- (void)updateFollowing {
+    [NMHTTPClient followingWithSuccess:^(NSDictionary *response) {
+        
+        [self updateComplete];
+    } failure:^(NSDictionary *response) {
+        
+        [self updateComplete];
+    }];
+}
+
 - (void)didReceiveMemoryWarning
-{
-    // Releases the view if it doesn't have a superview.
-    [super didReceiveMemoryWarning];
-    
-    // Release any cached data, images, etc that aren't in use.
+{ [super didReceiveMemoryWarning];
 }
 
 #pragma mark - View lifecycle
@@ -50,63 +81,77 @@
 	
 	//  update the last update date
 	[_refreshHeaderView refreshLastUpdatedDate];
-    
 	
 }
 - (void)viewDidUnload
-{
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
+{ [super viewDidUnload];
 }
 
 - (void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
+{ [super viewWillAppear:animated];
 }
 
 - (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
+{ [super viewDidAppear:animated];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
-{
-    [super viewWillDisappear:animated];
+{ [super viewWillDisappear:animated];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
-{
-    [super viewDidDisappear:animated];
+{ [super viewDidDisappear:animated];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+{ return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-    return 0;
+{ return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return 0;
+    NSArray *people = nil;
+    if (type == NMFollowersType) {
+        people = [currentData followers];
+    } else if (type == NMFollowingType) {
+        people = [currentData following];
+    }
+    return [people count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *CellIdentifier = @"Cell";
     
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    FollowCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        cell = [[FollowCell alloc] initWithReuseIdentifier:CellIdentifier];
+    }
+    NSArray *people = nil;
+    
+    if (type == NMFollowersType) {
+        people = [currentData followers];
+    } else if (type == NMFollowingType) {
+        people = [currentData following];
     }
     
+    NSLog(@"FOLLOWERS: for row %d", indexPath.row);
+    if ([people count] > indexPath.row) {
+        NSLog(@"FOLLOWERS: IN");
+        id _person = [people objectAtIndex:indexPath.row];
+        if ([_person isKindOfClass:[NSDictionary class]]) {
+            NSLog(@"FOLLOWERS: IN2");
+            NSDictionary *person = (NSDictionary *)_person;
+            [((FollowCell *)cell) setFollower:person];
+            NSLog(@"FOLLOWERS: done setting up cell");
+        }
+    }
+
     return cell;
 }
 
@@ -114,6 +159,9 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    
+    // go to detail of the user
+    
     // Navigation logic may go here. Create and push another view controller.
     /*
      <#DetailViewController#> *detailViewController = [[<#DetailViewController#> alloc] initWithNibName:@"<#Nib name#>" bundle:nil];
@@ -126,16 +174,23 @@
 #pragma mark -
 #pragma mark Data Source Loading / Reloading Methods
 
-- (void)reloadTableViewDataSource{
+- (void)reloadTableViewDataSource {
 	
 	//  should be calling your tableviews data source model to reload
 	//  put here just for demo
 	_reloading = YES;
+    if (type == NMFollowersType) {
+        NSLog(@"FOLLOWERS: updating followers");
+        [self updateFollowers];
+    } else if (type == NMFollowingType) {
+        NSLog(@"FOLLOWERS: updating following");
+        [self updateFollowing];
+    }
 	
 }
 
-- (void)doneLoadingTableViewData{
-	
+- (void)doneLoadingTableViewData {
+	NSLog(@"FOLLOWERS: doneLoadingTableViewData");
 	//  model should call this when its done loading
 	_reloading = NO;
 	[_refreshHeaderView egoRefreshScrollViewDataSourceDidFinishedLoading:self.tableView];
@@ -163,9 +218,8 @@
 #pragma mark EGORefreshTableHeaderDelegate Methods
 
 - (void)egoRefreshTableHeaderDidTriggerRefresh:(EGORefreshTableHeaderView*)view{
-	
+	NSLog(@"FOLLOWERS: egoRefreshTableHeaderDidTriggerRefresh");
 	[self reloadTableViewDataSource];
-	[self performSelector:@selector(doneLoadingTableViewData) withObject:nil afterDelay:3.0];
 	
 }
 

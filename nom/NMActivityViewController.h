@@ -20,6 +20,8 @@
 - (void)reloadTableViewDataSource;
 - (void)doneLoadingTableViewData;
 
+- (void)fetchActivities;
+
 @property (nonatomic, readwrite, copy) NSArray *activity_items;
 
 - (id)init;

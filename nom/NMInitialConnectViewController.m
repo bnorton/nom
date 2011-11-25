@@ -7,7 +7,8 @@
 //
 
 #import "NMInitialConnectViewController.h"
-#import "AFHTTPClient.h"
+#import "LoginViewController.h"
+#import "NMHTTPClient.h"
 
 @implementation NMInitialConnectViewController
 
@@ -17,19 +18,21 @@
     if (!self) { return nil; }
     
     background = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 480)];
-    [background setImage:[UIImage imageNamed:@"initial_background.png"]];
+    [background setImage:[UIImage imageNamed:@"background4b.png"]];
     [self.view addSubview:background];
     
     facebook = [UIButton buttonWithType:UIButtonTypeCustom];
-    [facebook setFrame:CGRectMake(20, 200, 160, 50)];
-    [facebook setImage:[UIImage imageNamed:@"fb_register1a.png"] forState:UIControlStateNormal];
+    [facebook setFrame:CGRectMake(0, 170, 320, 100)];
+    [facebook setImage:[UIImage imageNamed:@"fb_register1b.png"] forState:UIControlStateNormal];
     [facebook addTarget:self action:@selector(facebook) forControlEvents:UIControlEventTouchUpInside];
     
     useEmail = [UIButton buttonWithType:UIButtonTypeCustom];
-    [useEmail setFrame:CGRectMake(20, 260, 280, 40)];
-    [useEmail.titleLabel setFont:[UIFont fontWithName:@"Helvetica" size:18]];
-    [useEmail.titleLabel setTextColor:[UIColor blueColor]];
-    [useEmail.titleLabel setText:@"Use my email instead"];
+    [useEmail setFrame:CGRectMake(20, 270, 280, 40)];
+    [useEmail setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
+    [useEmail setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
+    [useEmail setTitleColor:[UIColor blackColor] forState:UIControlStateSelected];
+    [useEmail setTitle:@"Use my email address instead" forState:UIControlStateNormal];
+    [useEmail addTarget:self action:@selector(use_email) forControlEvents:UIControlEventTouchUpInside];
     
     [self.view addSubview:facebook];
     [self.view addSubview:useEmail];
@@ -37,8 +40,14 @@
     return self;
 }
 
--(void)facebook {
+- (void)facebook {
     NSLog(@"Facebook in NMInitialConnect");
+}
+
+- (void)use_email {
+    NSLog(@"use_email in NMInitialConnect");
+    LoginViewController *login = [[LoginViewController alloc] init];
+    [self.navigationController pushViewController:login animated:YES];
 }
 
 - (void)didReceiveMemoryWarning

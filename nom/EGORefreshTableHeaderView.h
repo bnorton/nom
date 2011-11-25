@@ -47,8 +47,11 @@ typedef enum{
 
 }
 
+- (void)setBackgroundViewWithImage:(UIImage *)image;
+
 @property(nonatomic,assign) id <EGORefreshTableHeaderDelegate> delegate;
 
+- (id)initWithFrame:(CGRect)frame arrowImageName:(NSString *)arrow textColor:(UIColor *)textColor backgroundColor:(UIColor *)backgroundColor;
 - (id)initWithFrame:(CGRect)frame arrowImageName:(NSString *)arrow textColor:(UIColor *)textColor;
 
 - (void)refreshLastUpdatedDate;

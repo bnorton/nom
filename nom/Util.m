@@ -28,6 +28,7 @@ static NSOperationQueue *sharedQueue = nil;
     static BOOL initialized = NO;
     if(!initialized)
     {
+        NSLog(@"UTIL initialize");
         initialized = YES;
         sharedClient = [[AFHTTPClient alloc] initWithBaseURL:[NSURL URLWithString:@"https://justnom.it"]];
         sharedQueue = [[NSOperationQueue alloc] init];

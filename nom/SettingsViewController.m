@@ -23,6 +23,9 @@
     labels = [NSArray arrayWithObjects:settings_labels];
     links = [NSArray arrayWithObjects:settings_links];
     
+    UIImageView *background = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"background4a.png"]];
+    [self.tableView setBackgroundView:background];
+    
     return self;
 }
 

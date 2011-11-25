@@ -22,14 +22,20 @@
     self.title = NSLocalizedString(@"Activity", @"Activity");
     self.tabBarItem.image = [UIImage imageNamed:@"icons-gray/259-list.png"];
     
+    UIImageView *background = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"background4a.png"]];
+    [self.tableView setBackgroundView:background];
+    
     currently_visible_rows = 0;
     activity_items = nil;
+    
+    [self fetchActivities];
     
     return self;
 }
 
 - (void)fetchActivities {
     [NMHTTPClient activitiesWithSuccess:^(NSDictionary *response) {
+        NSLog(@"activity fetch success");
         activity_items = [response objectForKey:@"activities"];
         
         [currentData setActivities:activity_items];
@@ -56,7 +62,10 @@
                                            initWithFrame:CGRectMake(0.0f, 0.0f - self.tableView.bounds.size.height, 
                                                                     self.view.frame.size.width, 
                                                                     self.tableView.bounds.size.height)];
-		view.delegate = self;
+        
+//        [view setBackgroundViewWithImage:[UIImage imageNamed:@"background4b.png"]];
+		
+        view.delegate = self;
 		[self.tableView addSubview:view];
 		_refreshHeaderView = view;
 	}

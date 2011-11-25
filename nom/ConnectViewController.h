@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-#define connect_labels @"Following", @"Followers", @"Facebook", @"User Settings", nil
+#define connect_labels @"Following", @"Followers", @"  Facebook", @"User Settings", nil
 
 #define img_frame CGRectMake(10, 5, 40, 40)
 
