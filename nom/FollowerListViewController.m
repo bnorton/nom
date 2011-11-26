@@ -7,8 +7,9 @@
 //
 
 #import "FollowerListViewController.h"
+#import "UserDetailViewController.h"
 #import "Util.h"
-
+#import "current.h"
 #import "FollowCell.h"
 
 @implementation FollowerListViewController
@@ -21,9 +22,12 @@
     
     if (type == NMFollowersType) {
         self.title = NSLocalizedString(@"Followers", @"Followers");
+        [self updateFollowers];
     } else if (type == NMFollowingType) {
         self.title = NSLocalizedString(@"Following", @"Following");
+        [self updateFollowing];
     }
+    
     return self;
 }
 
@@ -38,26 +42,53 @@
     return self;
 }
 
+- (NSString *)type_str {
+    if (type == NMFollowersType)
+        return @"followers";
+    else if (type == NMFollowingType)
+        return @"following";
+
+    return @"";
+}
+
 - (void)updateComplete {
-    [self performSelector:@selector(doneLoadingTableViewData) withObject:nil afterDelay:3.0];
+    [self doneLoadingTableViewData];
 }
 
 - (void)updateFollowers {
+    NSLog(@"INFO: begin updateFollowers");
     [NMHTTPClient followersWithSuccess:^(NSDictionary *response) {
-        
+        NSLog(@"INFO: updateFollowers success %@",response);
+        if ([response objectForKey:@"status"] > 0) {
+            NSLog(@"INFO followers had status");
+            if ([[response objectForKey:@"results"] count] > 0) {
+                [currentData setFollowers:[response objectForKey:@"results"]];
+                NSLog(@"current followers %@", [currentData followers]);
+            }
+        }
         [self updateComplete];
+        [self.tableView reloadData];
     } failure:^(NSDictionary *response) {
-        
+        NSLog(@"INFO: updateFollowers failure");
         [self updateComplete];
     }];
 }
 
 - (void)updateFollowing {
+    NSLog(@"INFO: begin updateFollowing");
     [NMHTTPClient followingWithSuccess:^(NSDictionary *response) {
-        
+        NSLog(@"INFO: updateFollowing success");
+        if ([response objectForKey:@"status"] > 0) {
+            if ([[response objectForKey:@"results"] count] > 0) {
+                [currentData setFollowing:[response objectForKey:@"results"]];
+                NSLog(@"current followers %@", [currentData following]);
+//                [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationTop];                
+            }
+        }
         [self updateComplete];
+        [self.tableView reloadData];
     } failure:^(NSDictionary *response) {
-        
+        NSLog(@"INFO: updateFollowing failure");
         [self updateComplete];
     }];
 }
@@ -107,6 +138,10 @@
 { return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 80;
+}
+
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -121,7 +156,9 @@
     } else if (type == NMFollowingType) {
         people = [currentData following];
     }
-    return [people count];
+    NSInteger ct = [people count];
+    NSLog(@"INFO number of Followers %d",ct);
+    return ct;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -159,16 +196,18 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    NSArray *people = nil;
     
-    // go to detail of the user
+    if (type == NMFollowersType) {
+        people = [currentData followers];
+    } else if (type == NMFollowingType) {
+        people = [currentData following];
+    }
     
-    // Navigation logic may go here. Create and push another view controller.
-    /*
-     <#DetailViewController#> *detailViewController = [[<#DetailViewController#> alloc] initWithNibName:@"<#Nib name#>" bundle:nil];
-     // ...
-     // Pass the selected object to the new view controller.
-     [self.navigationController pushViewController:detailViewController animated:YES];
-     */
+    if ([people count] > indexPath.row) {
+        UserDetailViewController *user = [[UserDetailViewController alloc] initWithUser:[people objectAtIndex:indexPath.row]];
+        [self.navigationController pushViewController:user animated:YES];
+    }
 }
 
 #pragma mark -
@@ -190,9 +229,9 @@
 }
 
 - (void)doneLoadingTableViewData {
-	NSLog(@"FOLLOWERS: doneLoadingTableViewData");
 	//  model should call this when its done loading
 	_reloading = NO;
+    [currentUser setDate:[NSDate date] forKey:[NSString stringWithFormat:@"current_user_date_for_follow_type_%@", [self type_str]]];
 	[_refreshHeaderView egoRefreshScrollViewDataSourceDidFinishedLoading:self.tableView];
 	
 }
@@ -218,7 +257,6 @@
 #pragma mark EGORefreshTableHeaderDelegate Methods
 
 - (void)egoRefreshTableHeaderDidTriggerRefresh:(EGORefreshTableHeaderView*)view{
-	NSLog(@"FOLLOWERS: egoRefreshTableHeaderDidTriggerRefresh");
 	[self reloadTableViewDataSource];
 	
 }
@@ -231,7 +269,9 @@
 
 - (NSDate*)egoRefreshTableHeaderDataSourceLastUpdated:(EGORefreshTableHeaderView*)view{
 	
-	return [NSDate date]; // should return date data source was last changed
+    // should return date data source was last changed
+    return [currentUser getDateForKey:[NSString stringWithFormat:@"current_user_date_for_follow_type_%@", [self type_str]]];
+	
 	
 }
 

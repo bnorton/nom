@@ -27,6 +27,10 @@ typedef enum {
 - (void)reloadTableViewDataSource;
 - (void)doneLoadingTableViewData;
 
+- (void)updateFollowers;
+- (void)updateFollowing;
+
+
 - (id)initWithType:(NMFollower)type;
 
 @end

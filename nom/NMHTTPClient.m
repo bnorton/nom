@@ -43,12 +43,13 @@
     
     NSMutableURLRequest *request = [HTTPClient requestWithMethod:method path:path parameters:parameters];
     
-    [self showInfo:path params:parameters request:request];
+/*    [self showInfo:path params:parameters request:request];
     if (success) {
         NSLog(@"HAVE A success block");
     } else {
         NSLog(@"DONT HAVE A success block");
     }
+*/
     AFJSONRequestOperation * operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request 
       success:^(NSURLRequest *request, NSURLResponse *response, id JSON) {
         if (success) { NSLog(@"INFO: success callback for %@",path); 
@@ -549,5 +550,15 @@
     [NMHTTPClient enqueueRequestWithMethod:@"GET" path:@"/activities.json" parameters:nil success:success failure:failure];
     
 }
+
++ (void)usersActivities:(NSString *)user withSuccess:(void (^)(NSDictionary * response))success
+                failure:(void (^)(NSDictionary * response))failure {
+    
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:@"by_user"];
+    [params setObject:user forKey:@"by_user_nid"];
+    [NMHTTPClient enqueueRequestWithMethod:@"GET" path:@"/activities.json" parameters:params success:success failure:failure];
+    
+}
+
 
 @end

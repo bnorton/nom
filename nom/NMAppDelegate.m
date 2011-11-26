@@ -27,7 +27,7 @@
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
-    UIViewController *activity = [[NMActivityViewController alloc] init];
+    UIViewController *activity = [[NMActivityViewController alloc] initWithType:NMActivityTypeByFollowing];
     UIViewController *connect  = [[ConnectViewController alloc] init];
     
     self.tabBarController = [[UITabBarController alloc] init];
@@ -41,13 +41,11 @@
     self.window.rootViewController = nav;
     [self.window makeKeyAndVisible];
     
-//    [nav.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4c.png"] 
-//                            forBarMetrics:UIBarMetricsDefault];
     [nav.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] 
                             forBarMetrics:UIBarMetricsDefault];
 
     NSLog(@"logged in or connected %d", [currentUser getBooleanForKey:@"logged_in_or_connected"]);
-    [currentUser setBoolean:NO ForKey:@"logged_in_or_connected"];
+//    [currentUser setBoolean:NO ForKey:@"logged_in_or_connected"];
     
     if ( ! [currentUser getBooleanForKey:@"logged_in_or_connected"]) {
         UIViewController *initialConnect = [[NMInitialConnectViewController alloc] init];

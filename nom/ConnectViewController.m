@@ -8,6 +8,7 @@
 
 #import "ConnectViewController.h"
 #import "FollowerListViewController.h"
+#import "NMActivityViewController.h"
 #import "SettingsViewController.h"
 
 @implementation ConnectViewController
@@ -27,11 +28,12 @@
     
     UIImage *followers = [UIImage imageNamed:followers_image];
     UIImage *following = [UIImage imageNamed:following_image];
+    UIImage *activity  = [UIImage imageNamed:activity_image];
     UIImage *fb        = [UIImage imageNamed:fb_image];
     UIImage *settings  = [UIImage imageNamed:settings_image];
     
     
-    images = [NSArray arrayWithObjects:followers,following,fb,settings,nil];
+    images = [NSArray arrayWithObjects:followers,following,activity,fb,settings,nil];
     
     return self;
 }
@@ -77,7 +79,7 @@
 { return 1; }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{ return 4; }
+{ return 5; }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -110,9 +112,12 @@
             viewController = [[FollowerListViewController alloc] initWithType:NMFollowersType];
             break;
         case 2:
-            return;
+            viewController = [[NMActivityViewController alloc] initWithType:NMActivityTypeByUser];
             break;
         case 3:
+            return;
+            break;
+        case 4:
             viewController = [[SettingsViewController alloc] initWithType:NMSettingsSourceConnect];
             break;
         default:

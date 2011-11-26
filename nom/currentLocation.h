@@ -9,10 +9,12 @@
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
 
+
 @interface currentLocation : NSObject <CLLocationManagerDelegate>
 
 + (void)startUpdating;
 + (void)stopUpdating;
+
 + (CGFloat)lat;
 + (CGFloat)lng;
 + (CGFloat)altitude;

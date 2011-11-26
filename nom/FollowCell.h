@@ -20,6 +20,8 @@
 - (id)initWithReuseIdentifier:(NSString *)reuseIdentifier;
 - (void)setFollower:(NSDictionary *)person;
 
+@property (nonatomic, readwrite, copy) NSString *user_nid;
+@property (nonatomic, readwrite, copy) NSString *created_at;
 
 @end
 

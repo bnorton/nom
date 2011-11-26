@@ -12,11 +12,11 @@
 #import "UIActionSheet+MKBlockAdditions.h"
 #import "MKInfoPanel.h"
 
-#import "currentData.h"
-#import "currentLocation.h"
-#import "currentUser.h"
-
 #import "NMHTTPClient.h"
+
+#import "TTTOrdinalNumberFormatter.h"
+#import "TTTLocationFormatter.h"
+#import "TTTTimeIntervalFormatter.h"
 
 #define HTTPClient [util http_client]
 #define HTTPQueue [util queue]
@@ -25,7 +25,13 @@
 
 @interface util : NSObject
 
-+(AFHTTPClient *)http_client;
-+(NSOperationQueue *)queue;
++ (AFHTTPClient *)http_client;
++ (NSOperationQueue *)queue;
+
++ (TTTLocationFormatter *)format_location;
++ (TTTOrdinalNumberFormatter *)format_ordinal;
++ (TTTTimeIntervalFormatter *)format_time;
+
++ (NSString *)distanceFromLat:(CGFloat)lat Long:(CGFloat)lng;
 
 @end

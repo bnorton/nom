@@ -22,16 +22,16 @@
     [self.view addSubview:background];
     
     facebook = [UIButton buttonWithType:UIButtonTypeCustom];
-    [facebook setFrame:CGRectMake(0, 170, 320, 100)];
+    [facebook setFrame:CGRectMake(0, 130, 320, 100)];
     [facebook setImage:[UIImage imageNamed:@"fb_register1b.png"] forState:UIControlStateNormal];
     [facebook addTarget:self action:@selector(facebook) forControlEvents:UIControlEventTouchUpInside];
     
     useEmail = [UIButton buttonWithType:UIButtonTypeCustom];
-    [useEmail setFrame:CGRectMake(20, 270, 280, 40)];
+    [useEmail setFrame:CGRectMake(20, 230, 280, 40)];
     [useEmail setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
-    [useEmail setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
-    [useEmail setTitleColor:[UIColor blackColor] forState:UIControlStateSelected];
-    [useEmail setTitle:@"Use my email address instead" forState:UIControlStateNormal];
+    [useEmail setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
+    [useEmail setTitleColor:[UIColor lightGrayColor] forState:UIControlStateSelected];
+    [useEmail setTitle:@"Register with email instead" forState:UIControlStateNormal];
     [useEmail addTarget:self action:@selector(use_email) forControlEvents:UIControlEventTouchUpInside];
     
     [self.view addSubview:facebook];

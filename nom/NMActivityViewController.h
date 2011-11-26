@@ -9,12 +9,22 @@
 #import <UIKit/UIKit.h>
 #import "EGORefreshTableHeaderView.h"
 
+typedef enum {
+    NMActivityTypeByUser,
+    NMActivityTypeByFollowing
+}NMActivityType;
+
 @interface NMActivityViewController : UITableViewController <EGORefreshTableHeaderDelegate, UITableViewDelegate, UITableViewDataSource> {
     NSUInteger currently_visible_rows;
-    NSArray *activity_items;
+    NSArray *thumbs;
+    NSArray *recommends;
 
+    NSMutableArray *activities;
+    
 	EGORefreshTableHeaderView *_refreshHeaderView;
 	BOOL _reloading;
+    
+    NMActivityType type;
 }
 
 - (void)reloadTableViewDataSource;
@@ -23,7 +33,10 @@
 - (void)fetchActivities;
 
 @property (nonatomic, readwrite, copy) NSArray *activity_items;
+@property (nonatomic, copy) NSString *user_nid;
+@property (nonatomic, copy) NSString *name;
 
-- (id)init;
+- (id)initWithType:(NMActivityType)_type userNid:(NSString *)_user_nid name:(NSString *)_name;
+- (id)initWithType:(NMActivityType)_type;
 
 @end

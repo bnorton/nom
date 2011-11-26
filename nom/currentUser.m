@@ -48,7 +48,9 @@ static NSMutableDictionary *user = nil;
 
 + (NSDate *)getDateForKey:(NSString *)key {
     CGFloat then = [currentUser getNumberForKey:key];
-    return [NSDate dateWithTimeInterval:then sinceDate:[NSDate date]];
+    NSDate *is_now = [NSDate date];
+    CGFloat now = [is_now timeIntervalSince1970];
+    return [NSDate dateWithTimeInterval:(now - then) sinceDate:is_now];
 }
 
 + (NSString *)getStringForKey:(NSString *)key {
@@ -82,7 +84,7 @@ static NSMutableDictionary *user = nil;
     if (user != nil) {
         
         if ([[_user objectForKey:@"auth_token"] length] > 0) { [defaults setObject:[_user objectForKey:@"auth_token"] forKey:@"auth_token"]; }
-        if ([[_user objectForKey:@"user_nid"] length] > 0)   { [defaults setObject:[_user objectForKey:@"user_nid"] forKey:@"user_nid"]; }
+        if ([[_user objectForKey:@"nid"] length] > 0)        { [defaults setObject:[_user objectForKey:@"nid"] forKey:@"user_nid"]; }
         if ([[_user objectForKey:@"email"] length] > 0)      { [defaults setObject:[_user objectForKey:@"email"] forKey:@"email"]; }
         if ([[_user objectForKey:@"last_seen"] length] > 0)  { [defaults setObject:[_user objectForKey:@"last_seen"] forKey:@"last_seen"]; }
         if ([[_user objectForKey:@"name"] length] > 0)       { [defaults setObject:[_user objectForKey:@"name"] forKey:@"name"]; }

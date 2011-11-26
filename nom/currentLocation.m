@@ -74,7 +74,6 @@ static NSTimer *scheduledTimer = nil;
         
         
     }
-    
 }
 
 - (void)locationManager:(CLLocationManager *)manager 

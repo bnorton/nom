@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 
 #import "AFImageCache.h"
+#import "UIImage+resize.h"
 
 static inline NSString * AFImageCacheKeyFromURLAndCacheName(NSURL *url, NSString *cacheName) {
     return [[url absoluteString] stringByAppendingFormat:@"#%@", cacheName];
@@ -57,6 +58,11 @@ static inline NSString * AFImageCacheKeyFromURLAndCacheName(NSURL *url, NSString
                 forURL:(NSURL *)url
              cacheName:(NSString *)cacheName
 {
+//    UIImage *image = [UIImage imageWithData:imageData];
+//    NSLog(@"scaling the image");
+//    image = [image scaleAndRotateImageToMaxResolution:12];
+//    imageData = UIGraphicsP
+//    imageData = UIImagePNGRepresentation(image);
     [self setObject:[NSPurgeableData dataWithData:imageData] forKey:AFImageCacheKeyFromURLAndCacheName(url, cacheName)];
 }
 

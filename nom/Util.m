@@ -10,11 +10,15 @@
 #import "AFHTTPClient.h"
 #import "AFJSONRequestOperation.h"
 
+#import "current.h"
 
 @implementation util
 
 static AFHTTPClient *sharedClient = nil;
 static NSOperationQueue *sharedQueue = nil;
+static TTTOrdinalNumberFormatter *_ordinal_formatter;
+static TTTLocationFormatter *_location_formatter;
+static TTTTimeIntervalFormatter *_time_formatter;
 
 - (id)init {
     self = [super init];
@@ -32,6 +36,9 @@ static NSOperationQueue *sharedQueue = nil;
         initialized = YES;
         sharedClient = [[AFHTTPClient alloc] initWithBaseURL:[NSURL URLWithString:@"https://justnom.it"]];
         sharedQueue = [[NSOperationQueue alloc] init];
+        _ordinal_formatter = [[TTTOrdinalNumberFormatter alloc] init];
+        _location_formatter = [[TTTLocationFormatter alloc] init];
+        _time_formatter = [[TTTTimeIntervalFormatter alloc] init];
     }
 }
 
@@ -45,6 +52,22 @@ static NSOperationQueue *sharedQueue = nil;
 
 +(NSOperationQueue *)queue {
     return sharedQueue;
+}
+
++ (TTTLocationFormatter *)format_location {
+    return _location_formatter;
+}
+
++ (TTTOrdinalNumberFormatter *)format_ordinal {
+    return _ordinal_formatter;
+}
+
++ (TTTTimeIntervalFormatter *)format_time {
+    return _time_formatter;
+}
+
++ (NSString *)distanceFromLat:(CGFloat)lat Long:(CGFloat)lng {
+    
 }
 
 @end

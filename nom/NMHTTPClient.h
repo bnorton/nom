@@ -152,4 +152,7 @@
 + (void)activitiesWithSuccess:(void (^)(NSDictionary * response))success
                       failure:(void (^)(NSDictionary * response))failure;
 
++ (void)usersActivities:(NSString *)user withSuccess:(void (^)(NSDictionary * response))success
+                        failure:(void (^)(NSDictionary * response))failure;
+
 @end
