@@ -10,6 +10,7 @@
 
 #import "NMInitialConnectViewController.h"
 #import "NMActivityViewController.h"
+#import "LocationsViewController.h"
 #import "ConnectViewController.h"
 #import "currentUser.h"
 
@@ -28,10 +29,11 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
     UIViewController *activity = [[NMActivityViewController alloc] initWithType:NMActivityTypeByFollowing];
+    UIViewController *locations= [[LocationsViewController alloc] init];
     UIViewController *connect  = [[ConnectViewController alloc] init];
     
     self.tabBarController = [[UITabBarController alloc] init];
-    self.tabBarController.viewControllers = [NSArray arrayWithObjects:activity, connect, nil];
+    self.tabBarController.viewControllers = [NSArray arrayWithObjects:activity, locations, connect, nil];
     [self.tabBarController.tabBar setBackgroundImage:[UIImage imageNamed:@"tab_bar4a.png"]];
     
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:self.tabBarController];

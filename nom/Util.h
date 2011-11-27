@@ -32,6 +32,4 @@
 + (TTTOrdinalNumberFormatter *)format_ordinal;
 + (TTTTimeIntervalFormatter *)format_time;
 
-+ (NSString *)distanceFromLat:(CGFloat)lat Long:(CGFloat)lng;
-
 @end

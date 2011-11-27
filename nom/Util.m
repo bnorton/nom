@@ -66,8 +66,4 @@ static TTTTimeIntervalFormatter *_time_formatter;
     return _time_formatter;
 }
 
-+ (NSString *)distanceFromLat:(CGFloat)lat Long:(CGFloat)lng {
-    
-}
-
 @end

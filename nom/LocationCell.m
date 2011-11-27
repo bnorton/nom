@@ -51,7 +51,25 @@
     [nom_rank setNumberOfLines:1];
     [nom_rank setTextAlignment:UITextAlignmentLeft];
     [nom_rank setTextColor:[UIColor darkGrayColor]];
-    
+
+    up = [[UILabel alloc] initWithFrame:CGRectMake(90, 7, 220, 24)];
+    [up setBackgroundColor:[UIColor darkGrayColor]];
+    [up setFont:[UIFont fontWithName:@"TrebuchetMS" size:20]];
+    [up setMinimumFontSize:14];
+    [up setLineBreakMode:UILineBreakModeTailTruncation];
+    [up setNumberOfLines:1];
+    [up setTextAlignment:UITextAlignmentLeft];
+    [up setTextColor:[UIColor darkGrayColor]];
+
+    meh = [[UILabel alloc] initWithFrame:CGRectMake(90, 7, 220, 24)];
+    [meh setBackgroundColor:[UIColor darkGrayColor]];
+    [meh setFont:[UIFont fontWithName:@"TrebuchetMS" size:20]];
+    [meh setMinimumFontSize:14];
+    [meh setLineBreakMode:UILineBreakModeTailTruncation];
+    [meh setNumberOfLines:1];
+    [meh setTextAlignment:UITextAlignmentLeft];
+    [meh setTextColor:[UIColor darkGrayColor]];
+
     image_border = [[UIImageView alloc] initWithFrame:CGRectMake(10, 5, 300, 160)];
     [image_border setImage:[UIImage imageNamed:@"image_frame1a.png"]];
     
@@ -67,11 +85,16 @@
     [self addSubview:nom_rank];
     
     [self setSelectionStyle:UITableViewCellSelectionStyleGray];
-    
     return self;
 }
 
 - (void)setLocation:(NSDictionary *)location {
+    
+    name.text = [location objectForKey:@"name"];
+    nom_rank.text = [location objectForKey:@"rank"];
+    
+    NSLog(@"INFO: setLocation %@, %@\n%@",name.text,nom_rank.text,location);
+    
     NSString *str;
     NSString *tmp;
     
@@ -94,23 +117,24 @@
         cross_street = [location objectForKey:@"city"];
     }
     
-    name.text = [location objectForKey:@"name"];
-    
     NSDictionary *geolocation = [location objectForKey:@"geolocation"];
     CGFloat lat;
     CGFloat lng;
     if (((lat = [[geolocation objectForKey:@"lat"] floatValue]) != 0.0f) && 
        ((lng = [[geolocation objectForKey:@"lng"] floatValue]) != 0.0f)) {
         
-        distance.text = [util distanceFromLat:lat Long:lng];
+        distance.text = [currentLocation howFarFromLat:lat Long:lng];
     }
+    
+    NSDictionary *thumb_count = [location objectForKey:@"thumb_count"];
+    up.text = [thumb_count objectForKey:@"up"];
+    meh.text = [thumb_count objectForKey:@"meh"];
+    NSLog(@"INFO: did get thmbs %@",thumb_count);
+/*    
     if ([(tmp = [location objectForKey:@""]) length] > 0) {
-        name.text = tmp;
+        blah.text = tmp;
     }
-    if ([(tmp = [location objectForKey:@""]) length] > 0) {
-        name.text = tmp;
-    }
-
+*/
 }
 
 - (void)setImageURL:(NSString *)url {

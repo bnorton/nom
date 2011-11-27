@@ -7,6 +7,8 @@
 //
 
 #import "currentLocation.h"
+#import "current.h"
+#import "Util.h"
 
 static CLLocationManager *locationManager = nil;
 static BOOL isScheduledForStop = false;
@@ -24,7 +26,7 @@ static NSTimer *scheduledTimer = nil;
     }
 }
 
--(id)init {
+- (id)init {
     self = [super init];
     if (!self) return nil;
     
@@ -61,6 +63,14 @@ static NSTimer *scheduledTimer = nil;
 + (CGFloat)lng { return locationManager.location.coordinate.longitude;    }
 + (CGFloat)altitude { return locationManager.location.altitude;           }
 + (CGFloat)accuracy { return locationManager.location.horizontalAccuracy; }
+
++ (NSString *)howFarFromLat:(CGFloat)lat Long:(CGFloat)lng {
+    CLLocation *old = [[CLLocation alloc] initWithLatitude:lat longitude:lng];
+    CLLocation *now = [[CLLocation alloc] initWithLatitude:[currentLocation lat] longitude:[currentLocation lng]];
+    NSString *format = [[util format_location] stringFromDistanceAndBearingFromLocation:now toLocation:old];
+    NSLog(@"INFO how far from %@", format);
+    return format;
+}
 
 #pragma mark CLLocation Manager Delegate methods
 

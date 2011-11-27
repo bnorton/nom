@@ -20,4 +20,6 @@
 + (CGFloat)altitude;
 + (CGFloat)accuracy;
 
++ (NSString *)howFarFromLat:(CGFloat)lat Long:(CGFloat)lng;
+
 @end

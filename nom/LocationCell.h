@@ -13,8 +13,13 @@
     UILabel *cross_street;
     UILabel *distance;
     UILabel *nom_rank;
+    UILabel *up;
+    UILabel *meh;
     
     UIImageView *badge;
+    UIImageView *up_image;
+    UIImageView *meh_image;
+    
     UIImageView *image_border;
     UIImageView *image;
 }
