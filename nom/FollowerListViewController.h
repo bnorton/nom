@@ -14,7 +14,7 @@ typedef enum {
     NMFollowingType
 } NMFollower;
 
-@interface FollowerListViewController : UITableViewController <EGORefreshTableHeaderDelegate, UITableViewDelegate, UITableViewDataSource>{
+@interface FollowerListViewController : UITableViewController <EGORefreshTableHeaderDelegate, UITableViewDelegate, UITableViewDataSource> {
     NMFollower type;
 	
     EGORefreshTableHeaderView *_refreshHeaderView;

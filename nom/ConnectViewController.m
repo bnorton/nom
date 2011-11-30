@@ -10,6 +10,7 @@
 #import "FollowerListViewController.h"
 #import "NMActivityViewController.h"
 #import "SettingsViewController.h"
+#import "Util.h"
 
 @implementation ConnectViewController
 
@@ -45,28 +46,14 @@
 
 #pragma mark - View lifecycle
 
-- (void)viewDidLoad
-{ [super viewDidLoad];
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [util viewDidAppear:self.view];
 }
 
-- (void)viewDidUnload
-{ [super viewDidUnload];
-}
-
-- (void)viewWillAppear:(BOOL)animated
-{ [super viewWillAppear:animated];
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{ [super viewDidAppear:animated];
-}
-
-- (void)viewWillDisappear:(BOOL)animated
-{ [super viewWillDisappear:animated];
-}
-
-- (void)viewDidDisappear:(BOOL)animated
-{ [super viewDidDisappear:animated];
+- (void)viewWillAppear:(BOOL)animated { 
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:YES animated:NO];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation

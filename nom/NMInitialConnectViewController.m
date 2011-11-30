@@ -22,8 +22,8 @@
     [self.view addSubview:background];
     
     facebook = [UIButton buttonWithType:UIButtonTypeCustom];
-    [facebook setFrame:CGRectMake(0, 130, 320, 100)];
-    [facebook setImage:[UIImage imageNamed:@"fb_register1b.png"] forState:UIControlStateNormal];
+    [facebook setFrame:CGRectMake(50, 130, 220, 40)];
+    [facebook setImage:[UIImage imageNamed:@"assets/fb_connect1a.png"] forState:UIControlStateNormal];
     [facebook addTarget:self action:@selector(facebook) forControlEvents:UIControlEventTouchUpInside];
     
     useEmail = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -31,17 +31,42 @@
     [useEmail setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
     [useEmail setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
     [useEmail setTitleColor:[UIColor lightGrayColor] forState:UIControlStateSelected];
-    [useEmail setTitle:@"Register with email instead" forState:UIControlStateNormal];
+    [useEmail setTitle:@"or, just Register via Email" forState:UIControlStateNormal];
     [useEmail addTarget:self action:@selector(use_email) forControlEvents:UIControlEventTouchUpInside];
     
     [self.view addSubview:facebook];
     [self.view addSubview:useEmail];
+    
+    NSString *buttonText = @"cancel";
+    UIImage *buttonImage = [[UIImage imageNamed:@"assets/bar_button1c.png"] stretchableImageWithLeftCapWidth:5 topCapHeight:0];
+    UIButton* button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.frame = CGRectMake(0.0, 0.0, 54, 30);
+    button.titleLabel.font = [UIFont boldSystemFontOfSize:[UIFont smallSystemFontSize]];
+    button.titleLabel.textColor = [UIColor blackColor];
+    button.titleLabel.shadowOffset = CGSizeMake(0,-1);
+    button.titleLabel.shadowColor = [UIColor darkGrayColor];
+    
+    [button setTitle:buttonText forState:UIControlStateNormal];
+    [button setBackgroundImage:buttonImage forState:UIControlStateNormal];
+    [button addTarget:self.navigationController action:@selector(dismissModalViewControllerAnimated:) forControlEvents:UIControlEventTouchUpInside];
+    /*[button setBackgroundImage:buttonPressedImage forState:UIControlStateHighlighted];
+    [button setBackgroundImage:buttonPressedImage forState:UIControlStateSelected]; */
+    button.adjustsImageWhenHighlighted = NO;
+
+    
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
     
     return self;
 }
 
 - (void)facebook {
     NSLog(@"Facebook in NMInitialConnect");
+    [[util fbmodel] authorizeWithSuccess:^{
+        NSLog(@"INFO: initial connect callback success");
+        [self.navigationController dismissModalViewControllerAnimated:YES];
+    } failure:^{
+        
+    }];
 }
 
 - (void)use_email {
@@ -50,32 +75,7 @@
     [self.navigationController pushViewController:login animated:YES];
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-}
-
 #pragma mark - View lifecycle
-
-/*
-// Implement loadView to create a view hierarchy programmatically, without using a nib.
-- (void)loadView
-{
-}
-*/
-
-/*
-// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-}
-*/
-
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
-}
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {

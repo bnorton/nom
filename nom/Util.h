@@ -18,8 +18,17 @@
 #import "TTTLocationFormatter.h"
 #import "TTTTimeIntervalFormatter.h"
 
+#import "Facebook.h"
+#import "NMFBModel.h"
+#import "JSON.h"
+
 #define HTTPClient [util http_client]
 #define HTTPQueue [util queue]
+
+#define FBAPPID  @"204823436250707"
+#define FBSECRET @"c9b05af2f817dcd39ef53e49ab44265c"
+
+#define PERMS @"user_checkins", @"publish_stream", @"offline_access", @"friends_location", @"email", nil
 
 @class AFHTTPClient;
 
@@ -32,4 +41,14 @@
 + (TTTOrdinalNumberFormatter *)format_ordinal;
 + (TTTTimeIntervalFormatter *)format_time;
 
++ (NMFBModel *)fbmodel;
++ (Facebook *)facebook;
++ (NSArray *)perms;
+
++ (SBJsonWriter *)JSONWriter;
+
++ (void)showInfoInView:(UIView *)in_view isError:(BOOL)error message:(NSString *)message subMessage:(NSString *)sub;
+
++ (void)shouldShowMessage:(NSString *)message subMessage:(NSString *)sub_message isError:(BOOL)error;
++ (void)viewDidAppear:(UIView *)the_view;
 @end

@@ -99,6 +99,16 @@
 
 #pragma mark - View lifecycle
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [util viewDidAppear:self.view];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:NO animated:NO];    
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 	
@@ -113,25 +123,6 @@
 	//  update the last update date
 	[_refreshHeaderView refreshLastUpdatedDate];
 	
-}
-- (void)viewDidUnload
-{ [super viewDidUnload];
-}
-
-- (void)viewWillAppear:(BOOL)animated
-{ [super viewWillAppear:animated];
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{ [super viewDidAppear:animated];
-}
-
-- (void)viewWillDisappear:(BOOL)animated
-{ [super viewWillDisappear:animated];
-}
-
-- (void)viewDidDisappear:(BOOL)animated
-{ [super viewDidDisappear:animated];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation

@@ -16,68 +16,85 @@
     self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
     if (! self) { return nil; }
 
-    name = [[UILabel alloc] initWithFrame:CGRectMake(90, 7, 220, 24)];
-    [name setBackgroundColor:[UIColor darkGrayColor]];
-    [name setFont:[UIFont fontWithName:@"TrebuchetMS" size:20]];
+    name = [[UILabel alloc] initWithFrame:CGRectMake(20, 12, 265, 28)];
+    [name setBackgroundColor:[UIColor clearColor]];
+    [name setFont:[UIFont fontWithName:@"TrebuchetMS" size:26]];
     [name setMinimumFontSize:14];
+    [name setAdjustsFontSizeToFitWidth:YES];
     [name setLineBreakMode:UILineBreakModeTailTruncation];
     [name setNumberOfLines:1];
     [name setTextAlignment:UITextAlignmentLeft];
-    [name setTextColor:[UIColor darkGrayColor]];
+    [name setTextColor:[UIColor whiteColor]];
     
-    cross_street = [[UILabel alloc] initWithFrame:CGRectMake(90, 34, 220, 18)];
+    cross_street = [[UILabel alloc] initWithFrame:CGRectMake(10, 187, 300, 18)];
     [cross_street setBackgroundColor:[UIColor lightGrayColor]];
-    [cross_street setFont:[UIFont fontWithName:@"TrebuchetMS" size:17]];
-    [cross_street setMinimumFontSize:12];
+    [cross_street setFont:[UIFont fontWithName:@"TrebuchetMS" size:14]];
+    [cross_street setAdjustsFontSizeToFitWidth:YES];
+    [cross_street setMinimumFontSize:9];
     [cross_street setLineBreakMode:UILineBreakModeTailTruncation];
     [cross_street setNumberOfLines:1];
     [cross_street setTextAlignment:UITextAlignmentLeft];
     [cross_street setTextColor:[UIColor darkGrayColor]];
 
-    distance = [[UILabel alloc] initWithFrame:CGRectMake(90, 7, 220, 24)];
-    [distance setBackgroundColor:[UIColor darkGrayColor]];
-    [distance setFont:[UIFont fontWithName:@"TrebuchetMS" size:20]];
+    distance = [[UILabel alloc] initWithFrame:CGRectMake(10, 207, 300, 18)];
+    [distance setBackgroundColor:[UIColor lightGrayColor]];
+    [distance setFont:[UIFont fontWithName:@"TrebuchetMS" size:16]];
     [distance setMinimumFontSize:14];
     [distance setLineBreakMode:UILineBreakModeTailTruncation];
     [distance setNumberOfLines:1];
     [distance setTextAlignment:UITextAlignmentLeft];
     [distance setTextColor:[UIColor darkGrayColor]];
 
-    nom_rank = [[UILabel alloc] initWithFrame:CGRectMake(90, 7, 220, 24)];
-    [nom_rank setBackgroundColor:[UIColor darkGrayColor]];
-    [nom_rank setFont:[UIFont fontWithName:@"TrebuchetMS" size:20]];
+    nom_rank = [[UILabel alloc] initWithFrame:CGRectMake(200, 166  , 50, 18)];
+    [nom_rank setBackgroundColor:[UIColor lightGrayColor]];
+    [nom_rank setFont:[UIFont fontWithName:@"TrebuchetMS" size:16]];
     [nom_rank setMinimumFontSize:14];
     [nom_rank setLineBreakMode:UILineBreakModeTailTruncation];
     [nom_rank setNumberOfLines:1];
     [nom_rank setTextAlignment:UITextAlignmentLeft];
     [nom_rank setTextColor:[UIColor darkGrayColor]];
 
-    up = [[UILabel alloc] initWithFrame:CGRectMake(90, 7, 220, 24)];
-    [up setBackgroundColor:[UIColor darkGrayColor]];
-    [up setFont:[UIFont fontWithName:@"TrebuchetMS" size:20]];
-    [up setMinimumFontSize:14];
+    up = [[UILabel alloc] initWithFrame:CGRectMake(40, 166, 55, 18)];
+    [up setBackgroundColor:[UIColor clearColor]];
+    [up setFont:[UIFont fontWithName:@"TrebuchetMS" size:17]];
+    [up setMinimumFontSize:10];
     [up setLineBreakMode:UILineBreakModeTailTruncation];
     [up setNumberOfLines:1];
     [up setTextAlignment:UITextAlignmentLeft];
     [up setTextColor:[UIColor darkGrayColor]];
 
-    meh = [[UILabel alloc] initWithFrame:CGRectMake(90, 7, 220, 24)];
-    [meh setBackgroundColor:[UIColor darkGrayColor]];
-    [meh setFont:[UIFont fontWithName:@"TrebuchetMS" size:20]];
-    [meh setMinimumFontSize:14];
+    meh = [[UILabel alloc] initWithFrame:CGRectMake(128, 166, 55, 18)];
+    [meh setBackgroundColor:[UIColor clearColor]];
+    [meh setFont:[UIFont fontWithName:@"TrebuchetMS" size:17]];
+    [meh setMinimumFontSize:10];
     [meh setLineBreakMode:UILineBreakModeTailTruncation];
     [meh setNumberOfLines:1];
     [meh setTextAlignment:UITextAlignmentLeft];
     [meh setTextColor:[UIColor darkGrayColor]];
 
-    image_border = [[UIImageView alloc] initWithFrame:CGRectMake(10, 5, 300, 160)];
-    [image_border setImage:[UIImage imageNamed:@"image_frame1a.png"]];
+    image_border = [[UIImageView alloc] initWithFrame:CGRectMake(10, 5, 300, 180)];
+    [image_border setImage:[UIImage imageNamed:@"assets/image_frame3a.png"]];
     
-    image = [[UIImageView alloc] initWithFrame:CGRectMake(10, 5, 300, 160)];
+    image = [[UIImageView alloc] initWithFrame:CGRectMake(10, 4, 300, 161)];
     [image setImage:[UIImage imageNamed:@"placeholder.png"]];
+    
+    shadow = [[UIImageView alloc] initWithFrame:CGRectMake(12, 7, 296, 60)];
+    [shadow setImage:[UIImage imageNamed:@"assets/frame_shadow1a.png"]];
+
+    up_image = [[UIImageView alloc] initWithFrame:CGRectMake(15, 164, 18, 22)];
+    [up_image setImage:[UIImage imageNamed:@"assets/thumb_up1c.png"]];
+    
+    meh_image = [[UIImageView alloc] initWithFrame:CGRectMake(102, 165, 23, 19)];
+    [meh_image setImage:[UIImage imageNamed:@"assets/thumb_meh1a.png"]];
     
     [self addSubview:image];
     [self addSubview:image_border];
+    
+    [self addSubview:shadow];
+    [self addSubview:up_image];
+    [self addSubview:meh_image];
+    [self addSubview:up];
+    [self addSubview:meh];
     
     [self addSubview:name];
     [self addSubview:cross_street];
@@ -89,15 +106,15 @@
 }
 
 - (void)setLocation:(NSDictionary *)location {
-    
-    name.text = [location objectForKey:@"name"];
-    nom_rank.text = [location objectForKey:@"rank"];
-    
-    NSLog(@"INFO: setLocation %@, %@\n%@",name.text,nom_rank.text,location);
-    
+
     NSString *str;
     NSString *tmp;
-    
+    if ([(str = [location objectForKey:@"name"]) length] > 0){
+        name.text = str;
+    }
+    if ([(str = [location objectForKey:@"rank"]) length] > 0){
+        nom_rank.text = str;
+    }
     if ([(str = [location objectForKey:@"cross_street"]) length] > 0) {
         if ([(tmp = [location objectForKey:@"neighborhoods"]) length] > 0) {
             cross_street.text = [NSString stringWithFormat:@"%@ in %@", str, tmp];
@@ -127,14 +144,18 @@
     }
     
     NSDictionary *thumb_count = [location objectForKey:@"thumb_count"];
-    up.text = [thumb_count objectForKey:@"up"];
-    meh.text = [thumb_count objectForKey:@"meh"];
-    NSLog(@"INFO: did get thmbs %@",thumb_count);
+    up.text = [NSString stringWithFormat:@"%d",[[thumb_count objectForKey:@"up"] integerValue]];
+    meh.text = [NSString stringWithFormat:@"%d",[[thumb_count objectForKey:@"meh"] integerValue]];
+//    NSLog(@"INFO: did get thmbs %@",thumb_count);
 /*    
     if ([(tmp = [location objectForKey:@""]) length] > 0) {
         blah.text = tmp;
     }
 */
+    NSString *url;
+    if ([(url = [location objectForKey:@"url"]) length] > 0) {
+        [image setImageWithURL:[NSURL URLWithString:url]];
+    }
 }
 
 - (void)setImageURL:(NSString *)url {
@@ -161,7 +182,10 @@ a_location = {
     "cost": "$$$",
     "country": "United States",
     "location_hash": "316712a878c8dadb02097d22b6f0ac038212017748bb23f0e1cb0dcd62aa4fab",
-    "ranking": { },
+    "ranking": { 
+        "average": 2,
+        "total": 4
+    },
     "creator": null,
     "updated_at": "2011-11-20T19:26:17Z",
     "json_encode": null,

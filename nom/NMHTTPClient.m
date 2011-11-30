@@ -8,7 +8,7 @@
 
 #import "NMHTTPClient.h"
 #import "NSData+SSToolkitAdditions.h"
-
+#import "JSON.h"
 @implementation NMHTTPClient
 
 - (id)init {
@@ -43,21 +43,17 @@
     
     NSMutableURLRequest *request = [HTTPClient requestWithMethod:method path:path parameters:parameters];
     
-/*    [self showInfo:path params:parameters request:request];
-    if (success) {
-        NSLog(@"HAVE A success block");
-    } else {
-        NSLog(@"DONT HAVE A success block");
-    }
-*/
+    [self showInfo:path params:parameters request:request];
+
     AFJSONRequestOperation * operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request 
       success:^(NSURLRequest *request, NSURLResponse *response, id JSON) {
-        if (success) { NSLog(@"INFO: success callback for %@",path); 
+        if (success) { 
+            NSLog(@"INFO: success callback for %@",path);
             success(JSON); 
         }
         else {NSLog(@"WARN: %@ has no success callback registered for patameters %@", path, parameters);}
     } failure:^(NSURLRequest *request, NSURLResponse *response, NSError *error, id JSON) {
-        if (failure) { NSLog(@"INFO failure callback for %@",path);
+        if (failure) { NSLog(@"INFO failure callback %@ for %@ and %@",error, path, JSON);
             failure(JSON);
         } else {NSLog(@"WARN: %@ has no failure callback registered for patameters %@", path, parameters);}
     }];
@@ -101,10 +97,15 @@
 + (void)registerUserFacebook:(NSDictionary *)facebook
                   success:(void (^)(NSDictionary * response))success
                   failure:(void (^)(NSDictionary * response))failure {
+    id fb;
+    @try { fb = [[util JSONWriter] stringWithObject:facebook]; }
+    @catch (NSException *ex) { fb = facebook; }
     
-    NSArray *items  = [NSArray arrayWithObjects:facebook, @"regtype", nil];
-    NSArray *params = [NSArray arrayWithObjects:@"fbHash", @"facebook", nil];
+    NSArray *items  = [NSArray arrayWithObjects:fb, @"facebook", nil];
+    NSArray *params = [NSArray arrayWithObjects:@"fbhash", @"regtype", nil];
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjects:items forKeys:params];
+    
+    [parameters setObject:[currentUser getStringForKey:@"fb_access_token"] forKey:@"fb_access_token"];
     
     [NMHTTPClient enqueueRequestWithMethod:@"POST" path:@"/users/register.json" parameters:parameters success:success failure:failure];
     
@@ -139,7 +140,6 @@
 }
 
 
-
 /**
  * Location Based Services
  
@@ -164,10 +164,11 @@
     NSMutableArray *items  = [[NSMutableArray alloc] initWithCapacity:3];
     NSMutableArray *params = [[NSMutableArray alloc] initWithCapacity:3];
     /* @optional */
-    if (distance != 0.0){
-        [items addObject:[NSString stringWithFormat:@"%f", distance]];
-        [params addObject:@"dist"];
-    }
+    if (distance < 0.25) { distance = 0.5f; }
+    if (distance > 5.0f) { distance = 5.0f; }
+    
+    [items addObject:[NSString stringWithFormat:@"%f", distance]];
+    [params addObject:@"dist"];
     /* @optional */
     if (categories) {
         [items addObject:[categories componentsSeparatedByString:@","]];
@@ -382,7 +383,7 @@
     /**
      * Construct and begin the request with callbacks
      */
-    NSMutableURLRequest *request = [HTTPClient multipartFormRequestWithMethod:@"POST" path:@"/recommendations/new.json" parameters:parameters constructingBodyWithBlock: ^(id <AFMultipartFormData>formData) {
+    NSMutableURLRequest *request = [HTTPClient multipartFormRequestWithMethod:@"POST" path:@"/recommendations/create.json" parameters:parameters constructingBodyWithBlock: ^(id <AFMultipartFormData>formData) {
         if (image_flag) { 
            [formData appendPartWithFileData:image_data name:@"image[image]" fileName:file_name mimeType:@"image/png"];
         }
@@ -560,5 +561,74 @@
     
 }
 
+/**
+ * Upload Arbitrary Image
+ ############################################################################
+ #####  Image  ##############################################################
+ ############################################################################
+ 
+ ############################################################################
+ */
++ (void)imageUpload:(NSString *)location_nid
+          success:(void (^)(NSDictionary * response))success
+          failure:(void (^)(NSDictionary * response))failure
+         progress:(void (^)(NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite))progress {
+    
+    NSArray *items  = [NSArray arrayWithObjects:location_nid,[NSNumber numberWithBool:YES], nil];
+    NSArray *params = [NSArray arrayWithObjects:@"location_nid",@"image_attachment_present", nil];
+    NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjects:items forKeys:params];
+    
+    /**
+     * Build the image and the image metadata
+     */
+    BOOL image_flag = FALSE;
+    NSData *image_data = nil;
+    NSString *file_name = nil;
+    
+    if ([currentUser getBooleanForKey:@"image_attachment_present?"]) {
+        UIImage *attachment = [UIImage imageNamed:[currentUser getStringForKey:@"image_attachment"]];
+        if (attachment) {
+            image_data = UIImagePNGRepresentation(attachment);
+            
+            if ([image_data length] > 0) {
+                image_flag = TRUE;
+                file_name = [NSString stringWithFormat:@"%@.png", [image_data SHA1Sum]];
+                [parameters setObject:[NSNumber numberWithBool:YES] forKey:@"image_attachment_present"];
+            }
+        }
+    } else {
+        if (failure) {
+            failure(nil);
+        }
+    }
+    
+    /**
+     * Construct and begin the request with callbacks
+     */
+    NSMutableURLRequest *request = [HTTPClient multipartFormRequestWithMethod:@"POST" path:@"/images/create.json" parameters:parameters constructingBodyWithBlock: ^(id <AFMultipartFormData>formData) {
+        if (image_flag) { 
+            [formData appendPartWithFileData:image_data name:@"image[image]" fileName:file_name mimeType:@"image/png"];
+        }
+    }];
+    
+    AFJSONRequestOperation *operation = [[AFJSONRequestOperation alloc] initWithRequest:request];
+    [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) { NSLog(@"DONE %@", responseObject);
+        if (success) {
+            success(responseObject);
+        }
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) { NSLog(@"FAIL %@", error);
+        if (failure) {
+            failure([(AFJSONRequestOperation *)operation responseJSON]);
+        }
+    }];
+    [operation setUploadProgressBlock:^(NSInteger bytesWritten, NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite) {
+        NSLog(@" %d Sent %d of %d bytes",bytesWritten, totalBytesWritten, totalBytesExpectedToWrite);
+        if (progress) {
+            progress(totalBytesWritten,totalBytesExpectedToWrite);
+        }
+    }];
+    
+    [HTTPQueue addOperation:operation];
+}
 
 @end

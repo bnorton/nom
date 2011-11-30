@@ -7,7 +7,7 @@
 //
 
 #import "UserDetailViewController.h"
-
+#import "Util.h"
 
 @implementation UserDetailViewController
 
@@ -27,6 +27,11 @@
 }
 
 #pragma mark - View lifecycle
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [util viewDidAppear:self.view];
+}
 
 - (void)viewDidLoad
 { [super viewDidLoad];

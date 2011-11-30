@@ -115,6 +115,16 @@ static NSMutableDictionary *user = nil;
     }
 }
 
++ (id)getObjectForKey:(NSString *)key{
+    return [defaults objectForKey:key];
+}
+
++ (void)setObject:(id)obj forKey:(NSString *)key{
+    [defaults setObject:obj forKey:key];
+    [defaults synchronize];    
+}
+
+
 @end
 
 /*

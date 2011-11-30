@@ -46,20 +46,22 @@
     [nav.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] 
                             forBarMetrics:UIBarMetricsDefault];
 
+    [currentUser setString:nil ForKey:@"fb_access_token"];
+    [currentUser setObject:nil forKey:@"fb_expiration_date"];
+
     NSLog(@"logged in or connected %d", [currentUser getBooleanForKey:@"logged_in_or_connected"]);
 //    [currentUser setBoolean:NO ForKey:@"logged_in_or_connected"];
     
-    if ( ! [currentUser getBooleanForKey:@"logged_in_or_connected"]) {
+//    if ( ! [currentUser getBooleanForKey:@"logged_in_or_connected"]) {
         UIViewController *initialConnect = [[NMInitialConnectViewController alloc] init];
         UINavigationController *isnav = [[UINavigationController alloc] initWithRootViewController:initialConnect];
-        
         [isnav.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] 
                                   forBarMetrics:UIBarMetricsDefault];
 
         [nav performBlock:^{
             [nav presentModalViewController:isnav animated:YES];
         } afterDelay:1.2];
-    }
+//    }
     
     return YES;
 }
@@ -117,5 +119,10 @@
 {
 }
 */
+
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url
+  sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+    return [[util facebook] handleOpenURL:url]; 
+}
 
 @end

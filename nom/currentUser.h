@@ -27,4 +27,8 @@
 
 + (void)setLoggedIn;
 
++ (id)getObjectForKey:(NSString *)key;
++ (void)setObject:(id)obj forKey:(NSString *)key;
+
+
 @end

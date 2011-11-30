@@ -50,13 +50,21 @@
     return [self initWithType:_type userNid:[currentUser getStringForKey:@"user_nid"] name:aname];
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [util viewDidAppear:self.view];
+}
+
+- (void) viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:YES animated:NO];
+}
+
 - (void)process_activity_list {
     [activities removeAllObjects];
     [activities addObjectsFromArray:thumbs];
     [activities addObjectsFromArray:recommends];
     
-    __block NSDate *one = nil;
-    __block NSDate *two = nil;
     [activities sortUsingComparator:^NSComparisonResult(id obj1, id obj2) {
         NSDate *one = nil;
         NSDate *two = nil;

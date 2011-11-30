@@ -11,6 +11,7 @@
 #import "currentUser.h"
 #import "publishToView.h"
 #import "UIActionSheet+MKBlockAdditions.h"
+#import "Util.h"
 
 @implementation NMPublishingController
 
@@ -112,6 +113,11 @@
         [publishBar.facebook setBackgroundImage:facebook_dark forState:UIControlStateHighlighted];
         [publishBar.facebook setBackgroundImage:facebook forState:UIControlStateNormal];
     }
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [util viewDidAppear:self.view];
 }
 
 - (void)viewDidUnload

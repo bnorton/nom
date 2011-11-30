@@ -7,8 +7,8 @@
 //
 
 #import "SettingsViewController.h"
-#import "currentUser.h"
-
+#import "current.h"
+#import "Util.h"
 @implementation SettingsViewController
 
 - (id)initWithType:(NMSettingsSource)_source {
@@ -29,11 +29,22 @@
     return self;
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [util viewDidAppear:self.view];
+}
+
+-(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:NO animated:NO];
+}
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
 }
 
 #pragma mark - View lifecycle
+
 
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation

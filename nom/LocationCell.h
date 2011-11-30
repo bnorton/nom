@@ -17,6 +17,7 @@
     UILabel *meh;
     
     UIImageView *badge;
+    UIImageView *shadow;
     UIImageView *up_image;
     UIImageView *meh_image;
     
