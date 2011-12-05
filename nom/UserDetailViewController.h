@@ -10,6 +10,12 @@
 
 @interface UserDetailViewController : UITableViewController {
     NSArray *items;
+    UIImageView *user_image;
+    
+    UILabel *user_name;
+    UILabel *last_seen;
+    UILabel *first;
+    
 }
 
 - (id)initWithUser:(NSDictionary *)user;

@@ -7,18 +7,20 @@
 //
 
 #import "FollowerListViewController.h"
-#import "UserDetailViewController.h"
+#import "ConnectViewController.h"
+#import "FollowCell.h"
 #import "Util.h"
 #import "current.h"
-#import "FollowCell.h"
 
 @implementation FollowerListViewController
 
+@synthesize user_nid;
 
-- (id)initWithType:(NMFollower)_type {
+- (id)initWithType:(NMFollower)_type userNid:(NSString *)_user_nid {
     
     self = [self init];
     type = _type;
+    user_nid = _user_nid;
     
     if (type == NMFollowersType) {
         self.title = NSLocalizedString(@"Followers", @"Followers");
@@ -53,48 +55,43 @@
 
 - (void)updateComplete {
     [self doneLoadingTableViewData];
+    [self.tableView reloadData];
 }
 
 - (void)updateFollowers {
-    NSLog(@"INFO: begin updateFollowers");
-    [NMHTTPClient followersWithSuccess:^(NSDictionary *response) {
+    NSLog(@"INFO: begin updateFollowers for %@", user_nid);
+    [NMHTTPClient followersFor:user_nid withSuccess:^(NSDictionary *_response) {
         NSLog(@"INFO: updateFollowers success %@",response);
+        response = _response;
         if ([response objectForKey:@"status"] > 0) {
-            NSLog(@"INFO followers had status");
-            if ([[response objectForKey:@"results"] count] > 0) {
-                [currentData setFollowers:[response objectForKey:@"results"]];
-                NSLog(@"current followers %@", [currentData followers]);
-            }
+            follows = [response objectForKey:@"results"];
         }
         [self updateComplete];
-        [self.tableView reloadData];
-    } failure:^(NSDictionary *response) {
-        NSLog(@"INFO: updateFollowers failure");
+    } failure:^(NSDictionary *_response) {
+        response = _response;
+        follows = nil;
+        NSLog(@"INFO: updateFollowers failure for %@", user_nid);
         [self updateComplete];
+        [util showErrorInView:self.view message:@"Couldn't load followers"];
     }];
 }
 
 - (void)updateFollowing {
-    NSLog(@"INFO: begin updateFollowing");
-    [NMHTTPClient followingWithSuccess:^(NSDictionary *response) {
+    NSLog(@"INFO: begin updateFollowing for %@", user_nid);
+    [NMHTTPClient followingFor:user_nid withSuccess:^(NSDictionary *_response) {
+        response = _response;
         NSLog(@"INFO: updateFollowing success");
         if ([response objectForKey:@"status"] > 0) {
-            if ([[response objectForKey:@"results"] count] > 0) {
-                [currentData setFollowing:[response objectForKey:@"results"]];
-                NSLog(@"current followers %@", [currentData following]);
-//                [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationTop];                
-            }
+            follows = [response objectForKey:@"results"];
         }
         [self updateComplete];
-        [self.tableView reloadData];
-    } failure:^(NSDictionary *response) {
-        NSLog(@"INFO: updateFollowing failure");
+    } failure:^(NSDictionary *_response) {
+        NSLog(@"INFO: updateFollowing failure %@", user_nid);
+        response = _response;
+        follows = nil;
         [self updateComplete];
+        [util showErrorInView:self.view message:@"Couldn't load following"];
     }];
-}
-
-- (void)didReceiveMemoryWarning
-{ [super didReceiveMemoryWarning];
 }
 
 #pragma mark - View lifecycle
@@ -106,7 +103,7 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.navigationController setNavigationBarHidden:NO animated:NO];    
+    [self.navigationController setNavigationBarHidden:NO animated:YES];    
 }
 
 - (void)viewDidLoad {
@@ -125,8 +122,8 @@
 	
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{ return (interfaceOrientation == UIInterfaceOrientationPortrait);
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation { 
+    return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -135,48 +132,47 @@
 
 #pragma mark - Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{ return 1;
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView { 
+    return 1;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
-    NSArray *people = nil;
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+/*  NSArray *people = nil;
     if (type == NMFollowersType) {
         people = [currentData followers];
     } else if (type == NMFollowingType) {
         people = [currentData following];
     }
     NSInteger ct = [people count];
-    NSLog(@"INFO number of Followers %d",ct);
+    NSLog(@"INFO number of Follows %d",ct);
     return ct;
+ */
+    return [follows count];
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *CellIdentifier = @"Cell";
     
     FollowCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[FollowCell alloc] initWithReuseIdentifier:CellIdentifier];
     }
-    NSArray *people = nil;
-    
+/*
+    NSArray *people = nil;    
     if (type == NMFollowersType) {
         people = [currentData followers];
     } else if (type == NMFollowingType) {
         people = [currentData following];
     }
+*/
     
     NSLog(@"FOLLOWERS: for row %d", indexPath.row);
-    if ([people count] > indexPath.row) {
-        NSLog(@"FOLLOWERS: IN");
-        id _person = [people objectAtIndex:indexPath.row];
+    if ([follows count] > indexPath.row) {
+        id _person = [follows objectAtIndex:indexPath.row];
         if ([_person isKindOfClass:[NSDictionary class]]) {
-            NSLog(@"FOLLOWERS: IN2");
+            NSLog(@"INFO: follower is a dictionary");
             NSDictionary *person = (NSDictionary *)_person;
             [((FollowCell *)cell) setFollower:person];
-            NSLog(@"FOLLOWERS: done setting up cell");
         }
     }
 
@@ -185,10 +181,9 @@
 
 #pragma mark - Table view delegate
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+/*
     NSArray *people = nil;
-    
     if (type == NMFollowersType) {
         people = [currentData followers];
     } else if (type == NMFollowingType) {
@@ -196,8 +191,25 @@
     }
     
     if ([people count] > indexPath.row) {
-        UserDetailViewController *user = [[UserDetailViewController alloc] initWithUser:[people objectAtIndex:indexPath.row]];
+        NSArray *people = nil;    
+        if (type == NMFollowersType) {
+            people = [currentData followers];
+        } else if (type == NMFollowingType) {
+            people = [currentData following];
+        }
+        UserDetailViewController *user = [[UserDetailViewController alloc] initWithUser:[people objectAtIndex:indexPath.row]]; 
+ */
+        
+    @try {
+        NSDictionary *follower = [follows objectAtIndex:indexPath.row];
+        NSLog(@"INFO init the user for detail fro followers");
+        NSLog(@"INFO: person looks like %@", follower);
+        ConnectViewController *user = [[ConnectViewController alloc] 
+                                       initWithType:NMUserProfileTypeOther 
+                                       user_nid:[follower objectForKey:@"user_nid"]];
         [self.navigationController pushViewController:user animated:YES];
+    } @catch (NSException *ex) {
+        [util showErrorInView:self.view message:@"Couldn't parse User for detail"];
     }
 }
 

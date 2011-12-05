@@ -72,6 +72,31 @@ static NSTimer *scheduledTimer = nil;
     return format;
 }
 
++ (NSString *)primaryImageUrlFromImages:(NSArray *)images {
+    NSDictionary *right;
+    @try {
+        if (([images count] > 0) && (right = [images objectAtIndex:0])) {
+            NSString *url;
+            if ([(url = [right objectForKey:@"url"]) length] > 0) {
+                return url;
+            }
+        }
+    } @catch (NSException *ex) {}
+    return nil;
+}
+
++ (NSArray *)imageUrlsFromLocation:(NSArray *)images {
+    NSMutableArray *arr = nil;
+    NSString *url;
+    @try {
+        for (NSDictionary *img in images) {
+            if ([(url = [img objectForKey:@"url"]) length] > 0)
+                [arr addObject:url];
+        }
+    } @catch (NSException *ex) {}
+    return arr;
+}
+
 #pragma mark CLLocation Manager Delegate methods
 
 - (void)locationManager:(CLLocationManager *)manager 

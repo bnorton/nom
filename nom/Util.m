@@ -21,6 +21,8 @@ static NSOperationQueue *sharedQueue = nil;
 static TTTOrdinalNumberFormatter *_ordinal_formatter;
 static TTTLocationFormatter *_location_formatter;
 static TTTTimeIntervalFormatter *_time_formatter;
+static NSDateFormatter *_date_formatter;
+
 static Facebook *_facebook;
 static NSArray *_perms;
 static NMFBModel *_fbmodel;
@@ -32,6 +34,7 @@ static BOOL is_error_message;
 static NSString *display_message;
 static NSString *display_sub_message;
 
+static UIView *currently_set_view;
 
 - (id)init {
     self = [super init];
@@ -60,6 +63,8 @@ static NSString *display_sub_message;
         _ordinal_formatter = [[TTTOrdinalNumberFormatter alloc] init];
         _location_formatter = [[TTTLocationFormatter alloc] init];
         _time_formatter = [[TTTTimeIntervalFormatter alloc] init];
+        _date_formatter = [[NSDateFormatter alloc] init];
+        
         _perms = [NSArray arrayWithObjects:PERMS];
         [_location_formatter setUnitSystem:TTTImperialSystem];
         _writer = [[SBJsonWriter alloc] init];
@@ -69,6 +74,8 @@ static NSString *display_sub_message;
         is_error_message = NO;
         display_message = nil;
         display_sub_message = nil;
+        
+        currently_set_view = nil;
     }
 }
 
@@ -96,6 +103,15 @@ static NSString *display_sub_message;
     return _time_formatter;
 }
 
++ (NSString *)timeAgoFromRailsString:(NSString *)str {
+    @try { 
+        [_date_formatter setDateFormat:@"yyyy-MM-ddTHH:mm:ssZ"];
+        NSDate *date = [_date_formatter dateFromString:str]; 
+        return [_time_formatter stringForTimeIntervalFromDate:[NSDate date] toDate:date];
+    } @catch (NSException *ex) {;}
+    return nil;
+}
+
 + (NMFBModel *)fbmodel {
     return _fbmodel;
 }
@@ -111,25 +127,53 @@ static NSString *display_sub_message;
     return _writer;
 }
 
++ (void)showInfoInView:(UIView *)in_view message:(NSString *)message {
+    [self showInfoInView:in_view isError:NO message:message subMessage:nil];
+}
+
++ (void)showErrorInView:(UIView *)in_view message:(NSString *)message {
+    [self showInfoInView:in_view isError:YES message:message subMessage:nil];
+}
+
 + (void)showInfoInView:(UIView *)in_view isError:(BOOL)error message:(NSString *)message subMessage:(NSString *)sub {
     MKInfoPanelType type = error ? MKInfoPanelTypeError : MKInfoPanelTypeInfo;
-    [MKInfoPanel showPanelInView:in_view type:type title:message subtitle:sub hideAfter:3.5];
+    [MKInfoPanel showPanelInView:in_view type:type title:message subtitle:sub hideAfter:3.25];
 }
 
 + (void)viewDidAppear:(UIView *)the_view {
-    if (should_display_message) {
-        should_display_message = NO;
-        [util showInfoInView:the_view isError:is_error_message message:display_message subMessage:display_sub_message];
-        display_message = nil;
-        display_sub_message = nil;
+    @synchronized (self) {
+        if ( ! [currently_set_view isEqual:the_view]) {
+            currently_set_view = the_view;
+        }
+        if (should_display_message) {
+            should_display_message = NO;
+            [util showInfoInView:the_view isError:is_error_message message:display_message subMessage:display_sub_message];
+            display_message = nil;
+            display_sub_message = nil;
+        }
     }
 }
 
 + (void)shouldShowMessage:(NSString *)message subMessage:(NSString *)sub_message isError:(BOOL)error {
-    display_message = message;
-    display_sub_message = sub_message;
-    should_display_message = YES;
-    is_error_message = error;
+    @synchronized (self) {
+        display_message = message;
+        display_sub_message = sub_message;
+        should_display_message = YES;
+        is_error_message = error;
+    }
+    /* test to see if we have a good handle to a view */
+    if (currently_set_view != nil && currently_set_view.window != nil) {
+        [util viewDidAppear:currently_set_view];
+    }
+}
+
++ (NSString *)textForThumb:(NSInteger)value {
+    if (value == 1) {
+        return @"Thumb up";
+    } else if (value == 2) {
+        return @"meh";
+    }
+    return nil;
 }
 
 @end

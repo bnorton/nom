@@ -20,6 +20,9 @@
     UIImageView *shadow;
     UIImageView *up_image;
     UIImageView *meh_image;
+    UIImageView *sticky_note;
+    
+    UIGestureRecognizer *sticky_click;
     
     UIImageView *image_border;
     UIImageView *image;

@@ -121,14 +121,18 @@
 
 - (void)hudWasHidden:(MBProgressHUD *)hud {
     NSLog(@"hudWasHidden");
+    [util shouldShowMessage:@"OK, Thanks for Registering - Nom away" subMessage:nil isError:NO];
+    [self.navigationController dismissModalViewControllerAnimated:YES];
+    /*
     if ([currentUser getBooleanForKey:@"user_logged_in"]) {
         NSLog(@"hudWasHidden : user_logged_in");
-        [self.navigationController dismissModalViewControllerAnimated:YES];
+        
         [MKInfoPanel showPanelInView:self.parentViewController.view type:MKInfoPanelTypeInfo 
-                               title:@"OK, Thanks for Registering - Nom away" 
+                               title: 
                             subtitle:nil hideAfter:1.5];
 
     }
+     */
 }
 
 - (void)didReceiveMemoryWarning

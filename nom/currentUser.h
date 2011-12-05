@@ -10,6 +10,8 @@
 
 @interface currentUser : NSObject
 
++ (NSDictionary *)user;
+
 + (NSString *)getStringForKey:(NSString *)key;
 + (void)setNumber:(CGFloat)num ForKey:(NSString *)key;
 

@@ -53,7 +53,7 @@
     [[util facebook] setSessionDelegate:self];
     if (_me == nil) {
         me_success = success;
-        me_failure = failure;        
+        me_failure = failure;
         [[util facebook] requestWithGraphPath:FB_ME
                                   andDelegate:self];
     } else {
@@ -82,6 +82,7 @@
     
     [currentUser setString:[[util facebook] accessToken] ForKey:@"fb_access_token"];
     [currentUser setObject:[[util facebook] expirationDate] forKey:@"fb_expiration_date"];
+    [currentUser setBoolean:YES ForKey:@"user_facebook_connected"];
     
     NSLog(@"INFO fbDidLogin access_token %@", [currentUser getStringForKey:@"fb_access_token"]);
     NSLog(@"INFO fbDidLogin expiration_date %@", [currentUser getObjectForKey:@"fb_expiration_date"]);
@@ -93,7 +94,9 @@
     }
     
     NSLog(@"INFO fbDidLogin calling /me");
-    [self meWithSuccess:nil failure:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self meWithSuccess:nil failure:nil];
+    });
 }
 
 -(void)fbDidNotLogin:(BOOL)cancelled {
@@ -142,6 +145,9 @@
         
         [NMHTTPClient registerUserFacebook:result success:^(NSDictionary *response) {
             NSLog(@"INFO registerUserFacebook success %@", response);
+            @try {
+                [currentUser setUser:[[response objectForKey:@"results"] objectAtIndex:0]];
+            } @catch (NSException *ex) {;}
             if (me_success) {
                 me_success(result);
             }

@@ -7,13 +7,25 @@
 //
 
 #import "UIActionSheet+MKBlockAdditions.h"
+#import "MBProgressHUD.h"
 
 static DismissBlock _dismissBlock;
 static CancelBlock _cancelBlock;
 static PhotoPickedBlock _photoPickedBlock;
 static UIViewController *_presentVC;
+static UIView *view_for_spinner;
+static MBProgressHUD *hud;
 
 @implementation UIActionSheet (MKBlockAdditions)
+
++ (void)initialize
+{
+    static BOOL initialized = NO;
+    if(!initialized)
+    {
+        initialized = YES;
+    }
+}
 
 +(void) actionSheetWithTitle:(NSString*) title
                      message:(NSString*) message
@@ -46,7 +58,7 @@ static UIViewController *_presentVC;
     _dismissBlock  = [dismissed copy];
 
     UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:title 
-                                                             delegate:[self class] 
+                                                             delegate:self
                                                     cancelButtonTitle:nil
                                                destructiveButtonTitle:destructiveButtonTitle 
                                                     otherButtonTitles:nil];
@@ -79,6 +91,8 @@ static UIViewController *_presentVC;
                 onPhotoPicked:(PhotoPickedBlock) photoPicked                   
                      onCancel:(CancelBlock) cancelled
 {
+    view_for_spinner = nil;
+
     [_cancelBlock release];
     _cancelBlock  = [cancelled copy];
     
@@ -91,7 +105,7 @@ static UIViewController *_presentVC;
     int cancelButtonIndex = -1;
 
     UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:title 
-                                                             delegate:[self class] 
+                                                             delegate:self
 													cancelButtonTitle:nil
 											   destructiveButtonTitle:nil
 													otherButtonTitles:nil];
@@ -112,9 +126,18 @@ static UIViewController *_presentVC;
 	
     actionSheet.tag = kPhotoActionSheetTag;
 	actionSheet.cancelButtonIndex = cancelButtonIndex;		 
-
-	if([view isKindOfClass:[UIView class]])
+        
+	if([view isKindOfClass:[UIView class]]){
+        NSLog(@"INFO: setting the view_for_spinner");
+        view_for_spinner = view;
+        if (view_for_spinner != nil && view_for_spinner.window != nil) {
+            NSLog(@"INFO: showing the hud for an Image Picked");
+            hud = [[MBProgressHUD alloc] initWithView:view_for_spinner];
+            [view_for_spinner addSubview:hud];
+            [hud show:YES];
+        }
         [actionSheet showInView:view];
+    }
     
     if([view isKindOfClass:[UITabBar class]])
         [actionSheet showFromTabBar:(UITabBar*) view];
@@ -131,8 +154,12 @@ static UIViewController *_presentVC;
 	UIImage *editedImage = (UIImage*) [info valueForKey:UIImagePickerControllerEditedImage];
     if(!editedImage)
         editedImage = (UIImage*) [info valueForKey:UIImagePickerControllerOriginalImage];
-    
+
     _photoPickedBlock(editedImage);
+    
+    NSLog(@"INFO: hiding the hud");
+    [hud hide:YES];
+    
 	[picker dismissModalViewControllerAnimated:YES];	
 	[picker autorelease];
 }
@@ -168,7 +195,7 @@ static UIViewController *_presentVC;
             
             
             UIImagePickerController *picker = [[UIImagePickerController alloc] init];
-            picker.delegate = [self class];
+            picker.delegate = self;
             picker.allowsEditing = YES;
             
             if(buttonIndex == 1) 

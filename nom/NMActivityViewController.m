@@ -18,7 +18,7 @@
     self = [super initWithStyle:UITableViewStylePlain];
     if (!self) { return nil; }
     
-    self.title = NSLocalizedString(name, @"User Name who's activity this is");    
+    self.title = NSLocalizedString(@"Timeline", @"All things Nom");
     type = _type;
     
     user_nid = _user_nid;
@@ -57,7 +57,7 @@
 
 - (void) viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.navigationController setNavigationBarHidden:YES animated:NO];
+    [self.navigationController setNavigationBarHidden:NO animated:NO];
 }
 
 - (void)process_activity_list {
@@ -255,32 +255,34 @@
 {    
 "recommendations": [
   {
-    "location_nid": "4ec8b9d2eef0a679f80008a1",
-    "created_at": "2011-11-26T07:23:31Z",
-    "title": null,
-    "recommendation_nid": "4ed093f3eef0a66455000001",
-    "token": "10000000000",
-    "text": "I recommended King of Thai Noodle via Nom.",
-    "lng": null,
-    "image_nid": null,
-    "lat": null,
-    "location_city": "San Francisco",
-    "location_name": "King of Thai Noodle",
-    "user_nid": "4eccc0fbeef0a64dcf000001"
+        "location_nid": "4ec8b9d2eef0a679f80008a1",
+        "created_at": "2011-11-26T07:23:31Z",
+        "title": null,
+        "recommendation_nid": "4ed093f3eef0a66455000001",
+        "token": "10000000000",
+        "text": "I recommended King of Thai Noodle via Nom.",
+        "lng": null,
+        "image_nid": null,
+        "lat": null,
+        "location_city": "San Francisco",
+        "location_name": "King of Thai Noodle",
+        "user_name": Brian Norton,
+        "user_nid": "4eccc0fbeef0a64dcf000001"
   },
   {
-    "location_nid": "4ec8b8fdeef0a679f80002b3",
-    "created_at": "2011-11-26T08:26:37Z",
-    "title": null,
-    "recommendation_nid": "4ed0a2bdeef0a66634000002",
-    "token": "d0n5ky7pwh",
-    "text": "I really like 15 Romolo and recommended it via Nom. justnom.it/r/d0n5ky7pwh",
-    "lng": null,
-    "image_nid": null,
-    "lat": null,
-    "location_city": "San Francisco",
-    "location_name": "15 Romolo",
-    "user_nid": "4eccc0fbeef0a64dcf000001"
+        "location_nid": "4ec8b8fdeef0a679f80002b3",
+        "created_at": "2011-11-26T08:26:37Z",
+        "title": null,
+        "recommendation_nid": "4ed0a2bdeef0a66634000002",
+        "token": "d0n5ky7pwh",
+        "text": "I really like 15 Romolo and recommended it via Nom. justnom.it/r/d0n5ky7pwh",
+        "lng": null,
+        "image_nid": null,
+        "lat": null,
+        "location_city": "San Francisco",
+        "location_name": "15 Romolo",
+        "user_name": Brian Norton,
+        "user_nid": "4eccc0fbeef0a64dcf000001"
   }
 ],
 "thumbs": [

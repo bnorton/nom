@@ -7,6 +7,7 @@
 //
 
 #import "LocationsViewController.h"
+#import "LocationDetailViewController.h"
 #import "current.h"
 #import "Util.h"
 #import "LocationCell.h"
@@ -30,7 +31,8 @@
     distance_values = [NSArray arrayWithObjects:__distances_vals];
     distance = NMFilterDistanceHalf;
     
-    self.tabBarItem.image = [UIImage imageNamed:@"icons-gray/259-list.png"];
+    self.tabBarItem.image = [UIImage imageNamed:@"icons-gray/73-radar.png"];
+    self.title = NSLocalizedString(@"Nearby", @"Places close to here");
     
     UIImageView *background = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"background4a.png"]];
     [self.tableView setBackgroundView:background];
@@ -68,7 +70,7 @@
 
 - (void) viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.navigationController setNavigationBarHidden:YES animated:NO];
+    [self.navigationController setNavigationBarHidden:YES animated:YES];
 }
 
 - (void)updateComplete {
@@ -88,13 +90,14 @@
                    NSLog(@"INFO: here success callback : %@", response);
                    current_response = response;
                    locations = [response objectForKey:@"results"];
-                   filter = NMLocationsFilterCost;
-                   [self filter_by_cost:@"$$"];
+                   filter = NMLocationsFilterAll;
+//                   [self filter_by_cost:@"$$"];
                    [self updateComplete];
                    [self.tableView reloadData];
                } 
                failure:^(NSDictionary *response) {
                    [self updateComplete];
+                   [util showErrorInView:self.view message:@"Failed to load items around here"];
                    NSLog(@"INFO: here failure callback");
                }];
     
@@ -143,6 +146,26 @@
     
 }
 
+- (NSArray *)currentLocations {
+    NSArray *current;
+    switch (filter) {
+        case NMLocationsFilterAll:
+            current = locations;
+            break;
+        case NMLocationsFilterCost:
+            current = filtered_by_cost;
+            break;
+        case NMLocationsFilterDistance:
+            current = filtered_by_distance;
+            break;
+        case NMLocationsFilterCategory:
+            current = filtered_by_current_category;
+            break;
+        default:
+            current = nil;
+    }
+    return current;
+}
 
 
 - (void)didReceiveMemoryWarning
@@ -206,39 +229,18 @@
     return count;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *CellIdentifier = @"Cell";
-    
-//    NSLog(@"INFO: cellForRowAtIndexPath %d, count : %d", indexPath.row, [locations count]);
-    
     LocationCell *cell = (LocationCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[LocationCell alloc] initWithReuseIdentifier:CellIdentifier];
     }
-    NSArray *current;
-    switch (filter) {
-        case NMLocationsFilterAll:
-            current = locations;
-            break;
-        case NMLocationsFilterCost:
-            current = filtered_by_cost;
-            break;
-        case NMLocationsFilterDistance:
-            current = filtered_by_distance;
-            break;
-        case NMLocationsFilterCategory:
-            current = filtered_by_current_category;
-            break;
-        default:
-            return nil;
-    }
+    NSArray *current = [self currentLocations];
 
     NSLog(@"INFO locations controller set %d", indexPath.row);
     if ([current count] > indexPath.row) {
         [cell setLocation:[current objectAtIndex:indexPath.row]];
     }
-    NSLog(@"done setting up location cell");
     
     return cell;
 }
@@ -249,17 +251,12 @@
 
 #pragma mark - Table view delegate
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Navigation logic may go here. Create and push another view controller.
-    /*
-     <#DetailViewController#> *detailViewController = [[<#DetailViewController#> alloc] initWithNibName:@"<#Nib name#>" bundle:nil];
-     // ...
-     // Pass the selected object to the new view controller.
-     [self.navigationController pushViewController:detailViewController animated:YES];
-     */
-    if (indexPath.row == 100) {
-        [self.navigationController setNavigationBarHidden:NO animated:YES];
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSArray *current = [self currentLocations];
+    if ([current count] > indexPath.row) {
+        NSDictionary *locat = [current objectAtIndex:indexPath.row];
+        LocationDetailViewController *loc = [[LocationDetailViewController alloc] initWithLocation:locat];
+        [self.navigationController pushViewController:loc animated:YES];
     }
 }
 
@@ -267,35 +264,26 @@
 #pragma mark Data Source Loading / Reloading Methods
 
 - (void)reloadTableViewDataSource {
-	
-	//  should be calling your tableviews data source model to reload
-	//  put here just for demo
 	_reloading = YES;
     [self fetchLocations];
 }
 
 - (void)doneLoadingTableViewData {
-	//  model should call this when its done loading
 	_reloading = NO;
     [currentUser setDate:[NSDate date] forKey:[NSString stringWithFormat:@"locations_updated_at_date"]];
 	[_refreshHeaderView egoRefreshScrollViewDataSourceDidFinishedLoading:self.tableView];
-	
 }
 
 
 #pragma mark -
 #pragma mark UIScrollViewDelegate Methods
 
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView{	
-	
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView{
 	[_refreshHeaderView egoRefreshScrollViewDidScroll:scrollView];
-    
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate{
-	
 	[_refreshHeaderView egoRefreshScrollViewDidEndDragging:scrollView];
-	
 }
 
 
@@ -304,21 +292,14 @@
 
 - (void)egoRefreshTableHeaderDidTriggerRefresh:(EGORefreshTableHeaderView*)view{
 	[self reloadTableViewDataSource];
-	
 }
 
 - (BOOL)egoRefreshTableHeaderDataSourceIsLoading:(EGORefreshTableHeaderView*)view{
-	
-	return _reloading; // should return if data source model is reloading
-	
+	return _reloading;
 }
 
 - (NSDate*)egoRefreshTableHeaderDataSourceLastUpdated:(EGORefreshTableHeaderView*)view{
-	
-    // should return date data source was last changed
-    return [currentUser getDateForKey:@"locations_updated_at_date"];
-	
-	
+    return [currentUser getDateForKey:@"locations_updated_at_date"];	
 }
 
 

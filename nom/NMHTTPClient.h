@@ -115,11 +115,11 @@
                     success:(void (^)(NSDictionary * response))success
                     failure:(void (^)(NSDictionary * response))failure;
 
-+ (void)followersWithSuccess:(void (^)(NSDictionary * response))success
-                    failure:(void (^)(NSDictionary * response))failure;
++ (void)followersFor:(NSString *)user_nid withSuccess:(void (^)(NSDictionary * response))success
+             failure:(void (^)(NSDictionary * response))failure;
 
-+ (void)followingWithSuccess:(void (^)(NSDictionary * response))success
-                    failure:(void (^)(NSDictionary * response))failure;
++ (void)followingFor:(NSString *)user_nid withSuccess:(void (^)(NSDictionary * response))success
+             failure:(void (^)(NSDictionary * response))failure;
 
 /* ########################### END FOLLOWERS #############################
  *
@@ -154,5 +154,10 @@
 
 + (void)usersActivities:(NSString *)user withSuccess:(void (^)(NSDictionary * response))success
                         failure:(void (^)(NSDictionary * response))failure;
+
++ (void)imageUpload:(NSString *)location_nid
+            success:(void (^)(NSDictionary * response))success
+            failure:(void (^)(NSDictionary * response))failure
+           progress:(void (^)(NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite))progress;
 
 @end

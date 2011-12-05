@@ -34,6 +34,8 @@ typedef enum {
     NSMutableArray *filtered_by_current_category;
     NSMutableArray *filtered_by_distance;
     
+    NSMutableDictionary *cell_cache;
+    
     NMLocationsFilter filter;
     
     NMFilterDistance distance;

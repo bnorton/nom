@@ -14,4 +14,9 @@
     return 0;
 }
 
+- (BOOL)isEqualToString:(NSString *)aString {
+    NSLog(@"NSNull isEqual to string");
+    return [aString isKindOfClass:[NSNull class]] ? YES : NO;
+}
+
 @end

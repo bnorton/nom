@@ -3,23 +3,37 @@
 //  nom
 //
 //  Created by Brian Norton on 11/15/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 Nom Inc. All rights reserved.
 //
 
 #import "NMHTTPClient.h"
 #import "NSData+SSToolkitAdditions.h"
-#import "JSON.h"
+#import "AFHTTPRequestOperation.h"
 @implementation NMHTTPClient
-
-- (id)init {
-    self = [super init];
-    if (!self) { return nil; }
-        
-    return self;
-}
 
 + (void)showInfo:(NSString *)path params:(NSDictionary *)params request:(NSMutableURLRequest*)request {
     NSLog(@"INFO: calling out to %@ with params %@ \n and request object %@\n\n================================",path,params,request);
+}
+
++ (void)addDefaultParams:(NSMutableDictionary *)params {
+    /**
+     * Setup default params if we dont already have them
+     */
+    if( ! [params objectForKey:@"user_nid"]) {
+        NSString *user_nid = [currentUser getStringForKey:@"user_nid"];
+        if (user_nid) { [params setObject:user_nid forKey:@"user_nid"]; }
+        
+        /* Add the auth_token of the user_nid comes from current_user */
+        NSString *auth_token = [currentUser getStringForKey:@"auth_token"];
+        if (auth_token) { [params setObject:auth_token forKey:@"auth_token"]; }
+    }
+        
+    NSNumber *lat = [NSNumber numberWithFloat:[currentLocation lat]];
+    if (lat) { [params setObject:lat forKey:@"lat"]; }
+    
+    NSNumber *lng = [NSNumber numberWithFloat:[currentLocation lng]];
+    if (lat) { [params setObject:lng forKey:@"lng"]; }
+
 }
 
 + (void)enqueueRequestWithMethod:(NSString *)method path:(NSString *)path 
@@ -29,17 +43,7 @@
         
     if (!parameters) { parameters = [[NSMutableDictionary alloc] initWithCapacity:4]; }
     
-    NSString *user_nid = [currentUser getStringForKey:@"user_nid"];
-    if (user_nid) { [parameters setObject:user_nid forKey:@"user_nid"]; }
-    
-    NSString *auth_token = [currentUser getStringForKey:@"auth_token"];
-    if (auth_token) { [parameters setObject:auth_token forKey:@"auth_token"]; }
-    
-    NSNumber *lat = [NSNumber numberWithFloat:[currentLocation lat]];
-    if (lat) { [parameters setObject:lat forKey:@"lat"]; }
-    
-    NSNumber *lng = [NSNumber numberWithFloat:[currentLocation lng]];
-    if (lat) { [parameters setObject:lng forKey:@"lng"]; }
+    [NMHTTPClient addDefaultParams:parameters];
     
     NSMutableURLRequest *request = [HTTPClient requestWithMethod:method path:path parameters:parameters];
     
@@ -136,7 +140,7 @@
 
 +(void)userDetail:(NSString *)user_nid success:(void (^)(NSDictionary * response))success 
                failure:(void (^)(NSDictionary * response))failure {
-    [NMHTTPClient enqueueRequestWithMethod:@"POST" path:[NSString stringWithFormat:@"/users/%@/detail.json", user_nid] parameters:nil success:success failure:failure];
+    [NMHTTPClient enqueueRequestWithMethod:@"GET" path:[NSString stringWithFormat:@"/users/%@/detail.json", user_nid] parameters:nil success:success failure:failure];
 }
 
 
@@ -161,14 +165,16 @@
                 success:(void (^)(NSDictionary * response))success
                 failure:(void (^)(NSDictionary * response))failure {
     
-    NSMutableArray *items  = [[NSMutableArray alloc] initWithCapacity:3];
-    NSMutableArray *params = [[NSMutableArray alloc] initWithCapacity:3];
+    NSMutableArray *items  = [[NSMutableArray alloc] initWithCapacity:4];
+    NSMutableArray *params = [[NSMutableArray alloc] initWithCapacity:4];
     /* @optional */
     if (distance < 0.25) { distance = 0.5f; }
     if (distance > 5.0f) { distance = 5.0f; }
     
     [items addObject:[NSString stringWithFormat:@"%f", distance]];
     [params addObject:@"dist"];
+    [items addObject:[NSString stringWithFormat:@"%d", 50]];
+    [params addObject:@"limit"];
     /* @optional */
     if (categories) {
         [items addObject:[categories componentsSeparatedByString:@","]];
@@ -371,7 +377,6 @@
         UIImage *attachment = [UIImage imageNamed:[currentUser getStringForKey:@"image_attachment"]];
         if (attachment) {
             image_data = UIImagePNGRepresentation(attachment);
-        
             if ([image_data length] > 0) {
                 image_flag = TRUE;
                 file_name = [NSString stringWithFormat:@"%@.png", [image_data SHA1Sum]];
@@ -405,8 +410,8 @@
             progress(totalBytesWritten,totalBytesExpectedToWrite);
         }
     }];
-
-    [HTTPQueue addOperation:operation];
+    [[[NSOperationQueue alloc] init] addOperation:operation];
+//    [HTTPQueue addOperation:operation];
 }
 
 /**
@@ -434,7 +439,7 @@
     NSArray *params = [NSArray arrayWithObjects:@"other_user_nid", nil];
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjects:items forKeys:params];
     
-    [NMHTTPClient enqueueRequestWithMethod:@"POST" path:@"/followers/create.json" parameters:parameters success:success failure:failure];
+    [NMHTTPClient enqueueRequestWithMethod:@"POST" path:path parameters:parameters success:success failure:failure];
     
 }
 
@@ -454,18 +459,27 @@
     
 }
 
-+ (void)followersWithSuccess:(void (^)(NSDictionary * response))success
-     failure:(void (^)(NSDictionary * response))failure {
-        
-    [NMHTTPClient enqueueRequestWithMethod:@"GET" path:@"/followers.json" parameters:nil success:success failure:failure];
++ (void)followFor:(NSString *)user_nid path:(NSString *)path success:(void (^)(NSDictionary * response))success
+          failure:(void (^)(NSDictionary * response))failure {
+    
+    NSMutableDictionary *params = nil;
+    if ( ! [user_nid isEqualToString:[currentUser getStringForKey:@"user_nid"]]) {
+        params = [NSMutableDictionary dictionaryWithObject:user_nid forKey:@"user_nid"];
+    }
+    [NMHTTPClient enqueueRequestWithMethod:@"GET" path:path parameters:params success:success failure:failure];
     
 }
 
-+ (void)followingWithSuccess:(void (^)(NSDictionary * response))success
-                     failure:(void (^)(NSDictionary * response))failure {
++ (void)followersFor:(NSString *)user_nid withSuccess:(void (^)(NSDictionary * response))success
+             failure:(void (^)(NSDictionary * response))failure {
     
-    [NMHTTPClient enqueueRequestWithMethod:@"GET" path:@"/following.json" parameters:nil success:success failure:failure];
+    [NMHTTPClient followFor:user_nid path:@"/followers.json" success:success failure:failure];
+}
+
++ (void)followingFor:(NSString *)user_nid withSuccess:(void (^)(NSDictionary * response))success
+             failure:(void (^)(NSDictionary * response))failure {
     
+    [NMHTTPClient followFor:user_nid path:@"/following.json" success:success failure:failure];    
 }
 
 /**
@@ -561,6 +575,45 @@
     
 }
 
+/*
++ (void)imageUpload:(NSString *)location_nid
+            success:(void (^)(NSDictionary * response))success
+            failure:(void (^)(NSDictionary * response))failure
+           progress:(void (^)(NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite))progress {
+
+    NSMutableDictionary *params = [[NSMutableDictionary alloc] initWithCapacity:3];
+    [params setObject:@"user1" forKey:@"user_nid"];
+    [params setObject:@"location1" forKey:@"location_nid"];
+    NSData *data = UIImageJPEGRepresentation([UIImage imageNamed:@"blue_brian.jpg"], 0.5);
+
+//    [params setObject:[NSString stringWithFormat:@"%@.jpg", [data SHA1Sum]] forKey:@"image[original_filename]"];
+//    [params setObject:@"image/jpeg" forKey:@"image[content_type]"];
+//    [params setObject:[NSNumber numberWithInteger:[data length]] forKey:@"image[file_size]"];
+
+
+    NSMutableURLRequest *request = [HTTPClient multipartFormRequestWithMethod:@"POST" path:@"/image/create.json" parameters:params constructingBodyWithBlock: ^(id <AFMultipartFormData>formData) {
+        [formData appendPartWithFileData:data name:@"image[image]" fileName:[NSString stringWithFormat:@"%@.jpg", [data SHA1Sum]] mimeType:@"image/jpeg"];
+    }];
+
+    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSURLResponse *response, id JSON) {
+        NSLog(@"INFO: image upload done: %@", JSON);
+    } failure:^(NSURLRequest *request, NSURLResponse *response, NSError *error, id JSON) {
+        NSLog(@"failure callback for imageUpload %@", JSON);
+    }];
+
+    
+//    AFHTTPRequestOperation *operation = [AFHTTPRequestOperation operationWithRequest:request completion:^(NSURLRequest *request, NSHTTPURLResponse *response, NSData *data, NSError *error) {
+//        NSLog(@"Upload Complete");
+//    }];
+
+    [operation setUploadProgressBlock:^(NSInteger bytesWritten, NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite) {
+        NSLog(@"Sent %d of %d bytes", totalBytesWritten, totalBytesExpectedToWrite);
+    }];
+    
+    
+}
+*/
+
 /**
  * Upload Arbitrary Image
  ############################################################################
@@ -578,57 +631,68 @@
     NSArray *params = [NSArray arrayWithObjects:@"location_nid",@"image_attachment_present", nil];
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjects:items forKeys:params];
     
+    [NMHTTPClient addDefaultParams:parameters];
+    NSLog(@"formdata params %@", parameters);
+    
     /**
      * Build the image and the image metadata
      */
     BOOL image_flag = FALSE;
     NSData *image_data = nil;
-    NSString *file_name = nil;
+    NSString *target_file_name = nil;
+    NSString *image_presence_key = [NSString stringWithFormat:@"%@_image_present?",location_nid];
+    __block NSString *image_filepath_key = [NSString stringWithFormat:@"%@_image_path",location_nid];
     
-    if ([currentUser getBooleanForKey:@"image_attachment_present?"]) {
-        UIImage *attachment = [UIImage imageNamed:[currentUser getStringForKey:@"image_attachment"]];
-        if (attachment) {
-            image_data = UIImagePNGRepresentation(attachment);
-            
-            if ([image_data length] > 0) {
-                image_flag = TRUE;
-                file_name = [NSString stringWithFormat:@"%@.png", [image_data SHA1Sum]];
-                [parameters setObject:[NSNumber numberWithBool:YES] forKey:@"image_attachment_present"];
-            }
+    if ([currentUser getBooleanForKey:image_presence_key]) {
+        NSString *path = [currentUser getStringForKey:image_filepath_key];
+        NSFileManager *filemgr = [NSFileManager defaultManager];
+        image_data = [filemgr contentsAtPath: path ];
+        NSLog(@"data size %d", [image_data length]);
+        
+        if ([image_data length] > 0) {
+            image_flag = TRUE;
+            target_file_name = [NSString stringWithFormat:@"%@.png", [image_data SHA1Sum]];
         }
-    } else {
+    } 
+    if (! image_flag) {
         if (failure) {
             failure(nil);
+            return;
         }
     }
-    
     /**
      * Construct and begin the request with callbacks
      */
-    NSMutableURLRequest *request = [HTTPClient multipartFormRequestWithMethod:@"POST" path:@"/images/create.json" parameters:parameters constructingBodyWithBlock: ^(id <AFMultipartFormData>formData) {
-        if (image_flag) { 
-            [formData appendPartWithFileData:image_data name:@"image[image]" fileName:file_name mimeType:@"image/png"];
-        }
+    NSMutableURLRequest *request = [HTTPClient multipartFormRequestWithMethod:@"POST" path:@"/image/create.json" 
+                    parameters:parameters constructingBodyWithBlock: ^(id <AFMultipartFormData>formData) {
+        [formData appendPartWithFileData:image_data name:@"image[image]" fileName:target_file_name mimeType:@"image/png"];
     }];
     
-    AFJSONRequestOperation *operation = [[AFJSONRequestOperation alloc] initWithRequest:request];
-    [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) { NSLog(@"DONE %@", responseObject);
-        if (success) {
-            success(responseObject);
+    NSLog(@"Image Upload Request %@", request);
+    
+    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSURLResponse *response, id JSON) {
+        NSLog(@"INFO: image upload done: %@", JSON);
+        NSFileManager *filemgr = [NSFileManager defaultManager];
+        NSString *path = [currentUser getStringForKey:image_filepath_key];
+        if ([filemgr removeItemAtPath: path error: NULL]  == YES) {
+            NSLog (@"Remove successful"); 
+        } else {
+            NSLog (@"Remove failed"); 
         }
-    } failure:^(AFHTTPRequestOperation *operation, NSError *error) { NSLog(@"FAIL %@", error);
-        if (failure) {
-            failure([(AFJSONRequestOperation *)operation responseJSON]);
-        }
+    
+    } failure:^(NSURLRequest *request, NSURLResponse *response, NSError *error, id JSON) {
+            NSLog(@"failure callback for imageUpload %@", JSON);
     }];
+        
     [operation setUploadProgressBlock:^(NSInteger bytesWritten, NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite) {
         NSLog(@" %d Sent %d of %d bytes",bytesWritten, totalBytesWritten, totalBytesExpectedToWrite);
         if (progress) {
             progress(totalBytesWritten,totalBytesExpectedToWrite);
         }
     }];
-    
+
     [HTTPQueue addOperation:operation];
+
 }
 
 @end

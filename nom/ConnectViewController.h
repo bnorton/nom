@@ -7,22 +7,49 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "MBProgressHUD.h"
 
-#define connect_labels @"Following", @"Followers", @" Recent activity", @" Facebook", @"Settings", nil
-
+#define me_connect_labels @"Following", @"Followers", @" Recent activity", @" Facebook", @"Settings", nil
+#define other_connect_labels @"Following", @"Followers", @" Recent activity", nil
 #define img_frame CGRectMake(10, 5, 40, 40)
 
+#define FB_CONNECTED @" Facebook              Connected"
+#define FB_NOT_CONNECTED @" Connect Facebook"
 #define fb_image @"icons-gray/208-facebook.png"
 #define followers_image @"icons-gray/112-group.png"
 #define activity_image @"icons-gray/259-list.png"
 #define following_image @"icons-gray/112-group.png"
 #define settings_image @"icons-gray/123-id-card.png"
 
-@interface ConnectViewController : UITableViewController {
+@class MBProgressHUD;
+
+typedef enum {
+    NMUserProfileTypeMe,
+    NMUserProfileTypeOther
+} NMUserProfileType;
+
+@interface ConnectViewController : UITableViewController <MBProgressHUDDelegate> {
     NSArray *labels;
     NSArray *images;
+    NMUserProfileType type;
+    
+    UIImageView *user_image;
+    UILabel *user_name;
+    UILabel *user_location;
+    UILabel *last_seen;
+    UILabel *follower_count;
+    
+    UIView *header;
+    
+    MBProgressHUD *hud;
 }
 
+@property (nonatomic, copy) NSString *user_nid;
+
 - (id)init;
+- (id)initWithType:(NMUserProfileType)type user:(NSDictionary *)user;
+- (id)initWithType:(NMUserProfileType)type user_nid:(NSString *)user_nid;
+
+- (void)setupUserContent:(NSDictionary *)user;
 
 @end

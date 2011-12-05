@@ -42,27 +42,19 @@ static inline NSString * AFImageCacheKeyFromURLAndCacheName(NSURL *url, NSString
 
 #if __IPHONE_OS_VERSION_MIN_REQUIRED
 - (UIImage *)cachedImageForURL:(NSURL *)url
-                     cacheName:(NSString *)cacheName
-{
+                     cacheName:(NSString *)cacheName {
     return [UIImage imageWithData:[self objectForKey:AFImageCacheKeyFromURLAndCacheName(url, cacheName)]];
 }
 #elif __MAC_OS_X_VERSION_MIN_REQUIRED
 - (NSImage *)cachedImageForURL:(NSURL *)url
-                     cacheName:(NSString *)cacheName
-{
+                     cacheName:(NSString *)cacheName {
     return [[[NSImage alloc] initWithData:[self objectForKey:AFImageCacheKeyFromURLAndCacheName(url, cacheName)]] autorelease];
 }
 #endif
 
 - (void)cacheImageData:(NSData *)imageData
                 forURL:(NSURL *)url
-             cacheName:(NSString *)cacheName
-{
-//    UIImage *image = [UIImage imageWithData:imageData];
-//    NSLog(@"scaling the image");
-//    image = [image scaleAndRotateImageToMaxResolution:12];
-//    imageData = UIGraphicsP
-//    imageData = UIImagePNGRepresentation(image);
+             cacheName:(NSString *)cacheName {
     [self setObject:[NSPurgeableData dataWithData:imageData] forKey:AFImageCacheKeyFromURLAndCacheName(url, cacheName)];
 }
 

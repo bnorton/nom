@@ -75,15 +75,14 @@
         NSData *imageData = UIImagePNGRepresentation(currentImageAttachement);
         NSString *path = NSTemporaryDirectory();
         NSString *tmpPathToFile = [NSString stringWithFormat:@"%@/%@_attached.png", path, location_nid];
-        NSString *presence_key = [NSString stringWithFormat:@"%@_present?", location_nid];
+        NSString *presence_key = [NSString stringWithFormat:@"%@_image_present?", location_nid];
                     
         [currentUser setBoolean:FALSE ForKey:presence_key];
         
         if([imageData writeToFile:tmpPathToFile atomically:YES]){
-            [currentUser setString:tmpPathToFile ForKey:[NSString stringWithFormat:@"%@_path",location_nid]];
-            [currentUser setDate:[NSDate date] forKey:[NSString stringWithFormat:@"%@_date", location_nid]];
-            
-            [currentUser setBoolean:TRUE ForKey:presence_key];
+            [currentUser setString:tmpPathToFile ForKey:[NSString stringWithFormat:@"%@_image_path",location_nid]];
+            [currentUser setDate:[NSDate date] forKey:[NSString stringWithFormat:@"%@_image_date", location_nid]];
+            [currentUser setBoolean:YES ForKey:presence_key];
         }
 
     } onCancel:^{

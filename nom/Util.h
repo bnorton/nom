@@ -40,6 +40,7 @@
 + (TTTLocationFormatter *)format_location;
 + (TTTOrdinalNumberFormatter *)format_ordinal;
 + (TTTTimeIntervalFormatter *)format_time;
++ (NSString *)timeAgoFromRailsString:(NSString *)str;
 
 + (NMFBModel *)fbmodel;
 + (Facebook *)facebook;
@@ -47,8 +48,13 @@
 
 + (SBJsonWriter *)JSONWriter;
 
++ (NSString *)textForThumb:(NSInteger)value;
+
++ (void)showInfoInView:(UIView *)in_view message:(NSString *)message;
++ (void)showErrorInView:(UIView *)in_view message:(NSString *)message;
 + (void)showInfoInView:(UIView *)in_view isError:(BOOL)error message:(NSString *)message subMessage:(NSString *)sub;
 
 + (void)shouldShowMessage:(NSString *)message subMessage:(NSString *)sub_message isError:(BOOL)error;
 + (void)viewDidAppear:(UIView *)the_view;
+
 @end

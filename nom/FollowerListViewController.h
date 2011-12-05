@@ -19,10 +19,16 @@ typedef enum {
 	
     EGORefreshTableHeaderView *_refreshHeaderView;
 	
+    NSString *user_nid;
+    id response;
+    NSArray *follows;
+    
 	//  Reloading var should really be your tableviews datasource
 	//  Putting it here for demo purposes 
 	BOOL _reloading;
 }
+
+@property (nonatomic, copy) NSString *user_nid;
 
 - (void)reloadTableViewDataSource;
 - (void)doneLoadingTableViewData;
@@ -31,6 +37,6 @@ typedef enum {
 - (void)updateFollowing;
 
 
-- (id)initWithType:(NMFollower)type;
+- (id)initWithType:(NMFollower)_type userNid:(NSString *)user_nid;
 
 @end

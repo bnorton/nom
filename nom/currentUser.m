@@ -23,6 +23,8 @@ static NSMutableDictionary *user = nil;
     if ([[defaults objectForKey:@"image_url"] length] > 0)  { [user setObject:[defaults objectForKey:@"image_url"] forKey:@"image_url"]; }
     if ([[defaults objectForKey:@"created_at"] length] > 0) { [user setObject:[defaults objectForKey:@"created_at"] forKey:@"created_at"]; }
     if ([[defaults objectForKey:@"city"] length] > 0)       { [user setObject:[defaults objectForKey:@"city"] forKey:@"city"]; }
+    if ([[defaults objectForKey:@"follower_count"] length] > 0){ [user setObject:[defaults objectForKey:@"follower_count"] forKey:@"follower_count"]; }
+
 }
 
 + (void)initialize
@@ -40,6 +42,10 @@ static NSMutableDictionary *user = nil;
         
         NSLog(@"INIT currentUser %@", user);
     }
+}
+
++ (NSDictionary *)user {
+    return user;
 }
 
 + (void)setDate:(NSDate *)date forKey:(NSString *)key {
@@ -81,10 +87,11 @@ static NSMutableDictionary *user = nil;
 }
 
 + (void)setUser:(NSDictionary *)_user {
-    if (user != nil) {
-        
+    NSLog(@"setting user in currentUser with %@", _user);
+    if (_user != nil) {
+        NSLog(@"setting user in currentUser IN");
         if ([[_user objectForKey:@"auth_token"] length] > 0) { [defaults setObject:[_user objectForKey:@"auth_token"] forKey:@"auth_token"]; }
-        if ([[_user objectForKey:@"nid"] length] > 0)        { [defaults setObject:[_user objectForKey:@"nid"] forKey:@"user_nid"]; }
+        if ([[_user objectForKey:@"user_nid"] length] > 0)   { [defaults setObject:[_user objectForKey:@"user_nid"] forKey:@"user_nid"]; }
         if ([[_user objectForKey:@"email"] length] > 0)      { [defaults setObject:[_user objectForKey:@"email"] forKey:@"email"]; }
         if ([[_user objectForKey:@"last_seen"] length] > 0)  { [defaults setObject:[_user objectForKey:@"last_seen"] forKey:@"last_seen"]; }
         if ([[_user objectForKey:@"name"] length] > 0)       { [defaults setObject:[_user objectForKey:@"name"] forKey:@"name"]; }
@@ -92,13 +99,15 @@ static NSMutableDictionary *user = nil;
         if ([[_user objectForKey:@"image_url"] length] > 0)  { [defaults setObject:[_user objectForKey:@"image_url"] forKey:@"image_url"]; }
         if ([[_user objectForKey:@"created_at"] length] > 0) { [defaults setObject:[_user objectForKey:@"created_at"] forKey:@"created_at"]; }
         if ([[_user objectForKey:@"city"] length] > 0)       { [defaults setObject:[_user objectForKey:@"city"] forKey:@"city"]; }
+        if ([[_user objectForKey:@"follower_count"] length] > 0){ [defaults setObject:[_user objectForKey:@"follower_count"] forKey:@"follower_count"]; }
         
         [defaults synchronize];
         
         [currentUser loadCurrentUser];
+        [currentUser setLoggedIn];
     }
     
-    [currentUser setLoggedIn];
+    
 }
 
 + (NSDictionary *)getUser {
