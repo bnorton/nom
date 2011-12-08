@@ -19,7 +19,7 @@
     name = [[UILabel alloc] initWithFrame:CGRectMake(20, 9, 265, 28)];
     [name setBackgroundColor:[UIColor clearColor]];
     [name setFont:[UIFont fontWithName:@"TrebuchetMS" size:26]];
-    [name setMinimumFontSize:14];
+    [name setMinimumFontSize:13];
     [name setAdjustsFontSizeToFitWidth:YES];
     [name setLineBreakMode:UILineBreakModeTailTruncation];
     [name setContentMode:UIViewContentModeTop];
@@ -28,7 +28,7 @@
     [name setTextColor:[UIColor whiteColor]];
     
     cross_street = [[UILabel alloc] initWithFrame:CGRectMake(12, 168, 220, 18)];
-    [cross_street setBackgroundColor:[UIColor lightGrayColor]];
+    [cross_street setBackgroundColor:[UIColor clearColor]];
     [cross_street setFont:[UIFont fontWithName:@"TrebuchetMS" size:14]];
     [cross_street setAdjustsFontSizeToFitWidth:YES];
     [cross_street setMinimumFontSize:8];
@@ -37,23 +37,25 @@
     [cross_street setTextAlignment:UITextAlignmentLeft];
     [cross_street setTextColor:[UIColor darkGrayColor]];
 
-    distance = [[UILabel alloc] initWithFrame:CGRectMake(10, 232, 300, 18)];
-    [distance setBackgroundColor:[UIColor lightGrayColor]];
+    distance = [[UILabel alloc] initWithFrame:CGRectMake(12, 195, 298, 18)];
+    [distance setBackgroundColor:[UIColor clearColor]];
     [distance setFont:[UIFont fontWithName:@"TrebuchetMS" size:16]];
-    [distance setMinimumFontSize:9];
+    [distance setMinimumFontSize:10];
+    [distance setAdjustsFontSizeToFitWidth:YES];
     [distance setLineBreakMode:UILineBreakModeTailTruncation];
     [distance setNumberOfLines:1];
     [distance setTextAlignment:UITextAlignmentLeft];
     [distance setTextColor:[UIColor darkGrayColor]];
 
-    nom_rank = [[UILabel alloc] initWithFrame:CGRectMake(260, 189, 50, 18)];
-    [nom_rank setBackgroundColor:[UIColor lightGrayColor]];
+    nom_rank = [[UILabel alloc] initWithFrame:CGRectMake(20, 140, 75, 18)];
+    [nom_rank setBackgroundColor:[UIColor clearColor]];
     [nom_rank setFont:[UIFont fontWithName:@"TrebuchetMS" size:16]];
-    [nom_rank setMinimumFontSize:14];
+    [nom_rank setMinimumFontSize:11];
+    [nom_rank setAdjustsFontSizeToFitWidth:YES];
     [nom_rank setLineBreakMode:UILineBreakModeTailTruncation];
     [nom_rank setNumberOfLines:1];
     [nom_rank setTextAlignment:UITextAlignmentLeft];
-    [nom_rank setTextColor:[UIColor darkGrayColor]];
+    [nom_rank setTextColor:[UIColor whiteColor]];
 
     up = [[UILabel alloc] initWithFrame:CGRectMake(31, 20, 38, 18)];
     [up setBackgroundColor:[UIColor clearColor]];
@@ -162,17 +164,14 @@
         if ((image_obj = [images objectAtIndex:0])) {
             if ([(url = [image_obj objectForKey:@"url"]) length] > 0) {
                 set_image_url = YES;
-                [image setImageWithURL:[NSURL URLWithString:url]];
+                NSLog(@"setting up the url %@", url);
+                [image setImageWithURL:[NSURL URLWithString:url] placeholderImage:[UIImage imageNamed:@"placeholder.png"]];
             }
         }
     }
     if (! set_image_url) {
         [image setImage:[UIImage imageNamed:@"placeholder.png"]];
     }
-}
-
-- (void)setImageURL:(NSString *)url {
-//    [image setImage:[UIImage imageNamed:url]];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated

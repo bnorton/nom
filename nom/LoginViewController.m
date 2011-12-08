@@ -89,14 +89,7 @@
 -(void)password_ended {
     NSLog(@"should be logging in %@, %@, %@", screen_name.text, email.text, password.text);
     
-    MBProgressHUD *hud = [[MBProgressHUD alloc] initWithView:self.view];
-	[self.view addSubview:hud];
-	
-	hud.dimBackground = YES;
-	
-	// Regiser for HUD callbacks so we can remove it from the window at the right time
-    hud.delegate = self;
-    [hud show:YES];
+    MBProgressHUD *hud = [util showHudInView:self.view];
     
     [NMHTTPClient registerUserEmail:email.text password:password.text screen_name:screen_name.text success:^(NSDictionary *response) {
         NSLog(@"INFO registerUserEmail success callback: %@",response);
@@ -117,22 +110,6 @@
         [hud hide:YES]; 
     }];
     
-}
-
-- (void)hudWasHidden:(MBProgressHUD *)hud {
-    NSLog(@"hudWasHidden");
-    [util shouldShowMessage:@"OK, Thanks for Registering - Nom away" subMessage:nil isError:NO];
-    [self.navigationController dismissModalViewControllerAnimated:YES];
-    /*
-    if ([currentUser getBooleanForKey:@"user_logged_in"]) {
-        NSLog(@"hudWasHidden : user_logged_in");
-        
-        [MKInfoPanel showPanelInView:self.parentViewController.view type:MKInfoPanelTypeInfo 
-                               title: 
-                            subtitle:nil hideAfter:1.5];
-
-    }
-     */
 }
 
 - (void)didReceiveMemoryWarning

@@ -64,45 +64,6 @@
 	return newImage;
 }
 
-
-
--(UIImage*)scaleAndRotateImageToTargetWidth:(NSInteger)width targetHeight:(NSInteger)height
-{    
-	CGImageRef imgRef = self.CGImage;
-    
-	CGFloat original_width = CGImageGetWidth(imgRef);
-	CGFloat original_height = CGImageGetHeight(imgRef);
-    
-    CGFloat ratio = original_width/original_height;
-    
-	CGRect bounds = CGRectMake(0, 0, original_width, original_height);
-//	if (original_width > kMaxResolution || original_height > kMaxResolution) {
-//		
-//        if (ratio > 1) {
-////			bounds.size.width = kMaxResolution;
-//			bounds.size.height = bounds.size.width / ratio;
-//		}
-//		else {
-////			bounds.size.height = kMaxResolution;
-//			bounds.size.width = bounds.size.height * ratio;
-//		}
-//	}
-//    
-	CGFloat scaleRatio = bounds.size.width / original_width;
-	CGSize imageSize = CGSizeMake(CGImageGetWidth(imgRef), CGImageGetHeight(imgRef));
-	CGFloat boundHeight;
-    
-	UIGraphicsBeginImageContext(bounds.size);
-    
-	CGContextRef context = UIGraphicsGetCurrentContext();
-        
-	CGContextDrawImage(UIGraphicsGetCurrentContext(), CGRectMake(0, 0, original_width, height), imgRef);
-	UIImage *imageCopy = UIGraphicsGetImageFromCurrentImageContext();
-	UIGraphicsEndImageContext();
-    
-	return imageCopy;
-}
-
 -(NSData*)scaleAndRotateImageToMaxResolutionData:(int)resolution
 {
 	int kMaxResolution = resolution; // Or whatever
@@ -209,7 +170,7 @@
 	UIImage *imageCopy = UIGraphicsGetImageFromCurrentImageContext();
 	UIGraphicsEndImageContext();
     
-	return imageCopy;
+	return UIImagePNGRepresentation(imageCopy);
 }
 
 @end

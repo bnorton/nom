@@ -33,8 +33,8 @@ typedef enum {
 - (void)reloadTableViewDataSource;
 - (void)doneLoadingTableViewData;
 
-- (void)updateFollowers;
-- (void)updateFollowing;
+- (void)updateFollowersShowingHUD:(BOOL)show;
+- (void)updateFollowingShowingHUD:(BOOL)show;
 
 
 - (id)initWithType:(NMFollower)_type userNid:(NSString *)user_nid;

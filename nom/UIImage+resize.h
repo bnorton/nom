@@ -12,6 +12,4 @@
 
 - (UIImage*)imageByScalingAndCroppingForSize:(CGSize)targetSize;
 
--(UIImage*)scaleAndRotateImageToTargetWidth:(NSInteger)width targetHeight:(NSInteger)height;
-
 @end

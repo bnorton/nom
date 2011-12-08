@@ -7,7 +7,7 @@
 //
 
 #import "UIActionSheet+MKBlockAdditions.h"
-#import "MBProgressHUD.h"
+#import "Util.h"
 
 static DismissBlock _dismissBlock;
 static CancelBlock _cancelBlock;
@@ -132,9 +132,7 @@ static MBProgressHUD *hud;
         view_for_spinner = view;
         if (view_for_spinner != nil && view_for_spinner.window != nil) {
             NSLog(@"INFO: showing the hud for an Image Picked");
-            hud = [[MBProgressHUD alloc] initWithView:view_for_spinner];
-            [view_for_spinner addSubview:hud];
-            [hud show:YES];
+            hud = [util showHudInView:view_for_spinner];
         }
         [actionSheet showInView:view];
     }
@@ -168,6 +166,7 @@ static MBProgressHUD *hud;
 + (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
 {
     // Dismiss the image selection and close the program
+    [hud hide:YES];
     [_presentVC dismissModalViewControllerAnimated:YES];    
 	[picker autorelease];
     [_presentVC release];
@@ -178,6 +177,7 @@ static MBProgressHUD *hud;
 {
 	if(buttonIndex == [actionSheet cancelButtonIndex])
 	{
+        [hud hide:YES];
 		_cancelBlock();
 	}
     else

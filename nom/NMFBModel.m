@@ -35,16 +35,16 @@
 -(void)authorizeWithSuccess:(void (^)())success
                     failure:(void (^)())failure {
     NSLog(@"INFO: authorizeWithSuccess");
-    if (! [[util facebook] isSessionValid]) {
+//    if (! [[util facebook] isSessionValid]) {
         NSLog(@"INFO: authorizeWithSuccess : session NOT valid");
         auth_success = success;
         auth_failure = failure;
         [self __authorize];
-    } else {
-        if (success) {
-            success();
-        }
-    }
+//    } else {
+//        if (success) {
+//            success();
+//        }
+//    }
 }
 
 -(void)meWithSuccess:(void (^)(NSDictionary * me))success

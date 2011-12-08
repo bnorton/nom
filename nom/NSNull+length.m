@@ -19,4 +19,7 @@
     return [aString isKindOfClass:[NSNull class]] ? YES : NO;
 }
 
+- (CGFloat)floatValue {
+    return 0.0f;
+}
 @end

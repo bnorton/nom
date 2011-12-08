@@ -7,6 +7,7 @@
 //
 
 #import "NMActivityViewController.h"
+#import "activityCell.h"
 #import "NMHTTPClient.h"
 #import "current.h"
 
@@ -16,14 +17,15 @@
 
 - (id)initWithType:(NMActivityType)_type userNid:(NSString *)_user_nid name:(NSString *)_name {
     self = [super initWithStyle:UITableViewStylePlain];
-    if (!self) { return nil; }
+    if (! self) { return nil; }
+//    [self.view addSubview:self.navigationController.view];
     
     self.title = NSLocalizedString(@"Timeline", @"All things Nom");
     type = _type;
     
     user_nid = _user_nid;
     name = _name;
-    
+        
     self.tabBarItem.image = [UIImage imageNamed:@"icons-gray/259-list.png"];
     
     UIImageView *background = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"background4a.png"]];
@@ -32,9 +34,8 @@
     currently_visible_rows = 0;
     thumbs     = nil;
     recommends = nil;
-    
-    activities = nil;
-    
+    activities = [[NSMutableArray alloc] initWithCapacity:20];
+
     [self fetchActivities];
     
     return self;
@@ -57,7 +58,11 @@
 
 - (void) viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.navigationController setNavigationBarHidden:NO animated:NO];
+    if ([user_nid isEqualToString:[currentUser getObjectForKey:@"user_nid"]]) {
+        [self.navigationController setNavigationBarHidden:NO animated:YES];
+    } else {
+        [self.navigationController setNavigationBarHidden:YES animated:YES];
+    }
 }
 
 - (void)process_activity_list {
@@ -65,55 +70,67 @@
     [activities addObjectsFromArray:thumbs];
     [activities addObjectsFromArray:recommends];
     
+//    for (id item in thumbs) { [activities addObject:item]; }
+//    for (id item in recommends) { [activities addObject:item]; } 
+    
+    NSLog(@"INFO process_activity_list %@ ",activities);
+    
     [activities sortUsingComparator:^NSComparisonResult(id obj1, id obj2) {
-        NSDate *one = nil;
-        NSDate *two = nil;
+        NSDate *one = nil, *two = nil;
+        NSString *str1 = nil, *str2 = nil;
         if ([obj1 isKindOfClass:[NSDictionary class]] && 
             [obj1 respondsToSelector:@selector(objectForKey:)]) {
-            one = [obj1 objectForKey:@"timestamp"];
+            str1 = [obj1 objectForKey:@"timestamp"];
         }
         if ([obj2 isKindOfClass:[NSDictionary class]] && 
             [obj2 respondsToSelector:@selector(objectForKey:)]) {
-            two = [obj2 objectForKey:@"timestamp"];
+            str2 = [obj2 objectForKey:@"timestamp"];
         }
-        if (one != nil && two != nil){
-            return [two compare:one];
+        @try {
+            one = [util dateFromRailsString:str1]; 
+            two = [util dateFromRailsString:str1]; 
+        }
+        @catch (NSException *exception) {;}
+        
+        if (one != nil && two != nil) { 
+            return [two compare:one]; 
         }
         return 1;
-
     }];
     
 }
 
 - (void)fetchActivities {
     if (type == NMActivityTypeByFollowing) {
-        
         [NMHTTPClient activitiesWithSuccess:^(NSDictionary *response) {
-            NSLog(@"activity fetch success by_following");
+            current_response = response;
+            NSLog(@"INFO Activity following response %@", response);
             if (([response objectForKey:@"status"]) > 0) {
                 NSArray *_recommends;
                 NSArray *_thumbs;
                 if ((_recommends = [response objectForKey:@"recommendations"])) {
                     recommends = _recommends;
+                    NSLog(@"INFO Activity have recommendations");
                 }
                 if ((_thumbs = [response objectForKey:@"thumbs"])) {
+                    NSLog(@"INFO Activity have thumbs");
                     thumbs = _thumbs;
                 }
-                [self process_activity_list];
-                [self.tableView reloadData];
+                [self doneLoadingTableViewData:YES];
+            } else {
+                [util showErrorInView:self.view message:@"Oh. Activity parsing failed"];
+                [self doneLoadingTableViewData:NO];
             }
-            
-            
-            [self doneLoadingTableViewData];
         } failure:^(NSDictionary *response) {
-            NSLog(@"THE fetchActivities following FAILED WITH : %@", response);
-            [self doneLoadingTableViewData];
+            [util showErrorInView:self.view message:@"Sorry, Activity fetch failed"];
+            [self doneLoadingTableViewData:NO];
         }];
         
     } else if (type == NMActivityTypeByUser) {
         
         [NMHTTPClient usersActivities:user_nid withSuccess:^(NSDictionary *response) {
-            
+            current_response = response;
+            NSLog(@"INFO Activity users response %@", response);
             NSLog(@"activity fetch success by_user");
             if (([response objectForKey:@"status"]) > 0) {
                 NSArray *_recommends;
@@ -124,14 +141,16 @@
                 if ((_thumbs = [response objectForKey:@"thumbs"])) {
                     thumbs = _thumbs;
                 }
-
-                [self.tableView reloadData];
+                [self doneLoadingTableViewData:YES];
+            }
+            else {
+                [self doneLoadingTableViewData:NO];
+                [util showErrorInView:self.view message:@"Activity parsing failed"];
             }
             
-            [self doneLoadingTableViewData];
         } failure:^(NSDictionary *response) {
-            NSLog(@"THE fetchActivities followers FAILED WITH : %@", response);
-            [self doneLoadingTableViewData];
+            [util showErrorInView:self.view message:@"Activity fetch failed"];
+            [self doneLoadingTableViewData:NO];
         }];
         
     }
@@ -147,7 +166,6 @@
     [super viewDidLoad];
 	
 	if (_refreshHeaderView == nil) {
-		
 		EGORefreshTableHeaderView *view = [[EGORefreshTableHeaderView alloc] 
                                            initWithFrame:CGRectMake(0.0f, 0.0f - self.tableView.bounds.size.height, 
                                                                     self.view.frame.size.width, 
@@ -161,90 +179,95 @@
 	
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
 }
 
 #pragma mark - Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{ return 1;
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView { 
+    return 1;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{ return [activities count];
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    NSLog(@"INFO Activities rows %d", [activities count]);
+    return [activities count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *CellIdentifier = @"Cell";
     
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    activityCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        cell = [[activityCell alloc] initWithReuseIdentifier:CellIdentifier];
     }
-    
-    // Configure the cell...
-    
+    @try {
+        if (([activities count] > indexPath.row)) {
+             if (([[[activities objectAtIndex:indexPath.row] objectForKey:@"recommendation_nid"] length] > 0)) {
+                 [cell setupForRecommendation:[activities objectAtIndex:indexPath.row]];
+             }
+             else {
+                 [cell setupForThumb:[activities objectAtIndex:indexPath.row]];
+             }
+        }
+    } @catch (NSException *ex) {
+        NSLog(@"had some trouble setting up the cell for %d  EXCEPTION %@",indexPath.row, [ex description]);
+    }
     return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 85;
 }
 
 #pragma mark -
 #pragma mark Data Source Loading / Reloading Methods
 
 - (void)reloadTableViewDataSource {
-	
-	//  should be calling your tableviews data source model to reload
-	//  put here just for demo
-	_reloading = YES;
+	_reloading = YES;    
+    [self fetchActivities];
 	
 }
 
-- (void)doneLoadingTableViewData {
-	
-	//  model should call this when its done loading
+- (void)doneLoadingTableViewData:(BOOL)success {
+    if (success) {
+        [self process_activity_list];
+    }
+    [self.tableView reloadData];
 	_reloading = NO;
     NSLog(@"SET activity fetched date %@",user_nid);
     [currentUser setDate:[NSDate date] forKey:[NSString stringWithFormat:@"activites_date_for_user_%@", user_nid]];
 	[_refreshHeaderView egoRefreshScrollViewDataSourceDidFinishedLoading:self.tableView];
-	
 }
 
+- (void)doneLoadingTableViewData {
+    [self doneLoadingTableViewData:YES];
+}
 
 #pragma mark -
 #pragma mark UIScrollViewDelegate Methods
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView{	
-	
 	[_refreshHeaderView egoRefreshScrollViewDidScroll:scrollView];
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate{
-	
 	[_refreshHeaderView egoRefreshScrollViewDidEndDragging:scrollView];
 }
-
 
 #pragma mark -
 #pragma mark EGORefreshTableHeaderDelegate Methods
 
 - (void)egoRefreshTableHeaderDidTriggerRefresh:(EGORefreshTableHeaderView*)view{
-	
-	[self reloadTableViewDataSource];
-	[self performSelector:@selector(doneLoadingTableViewData) withObject:nil afterDelay:3.0];
-	
+	[self reloadTableViewDataSource];	
 }
 
 - (BOOL)egoRefreshTableHeaderDataSourceIsLoading:(EGORefreshTableHeaderView*)view{
-	
-	return _reloading; // should return if data source model is reloading
+	return _reloading;
 }
 
 - (NSDate*)egoRefreshTableHeaderDataSourceLastUpdated:(EGORefreshTableHeaderView*)view{
-	
-	
-    // should return date data source was last changed
     NSLog(@"get activity date for %@",user_nid);
     return [currentUser getDateForKey:[NSString stringWithFormat:@"activites_date_for_user_%@", user_nid]];
 }

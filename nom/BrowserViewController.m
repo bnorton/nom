@@ -41,9 +41,7 @@
 /**********************************************************************************************************************/
 #pragma mark - UIActionSheet Delegate
 
-- (void)actionSheet:(UIActionSheet *)uias clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    // user pressed "Cancel"
+- (void)actionSheet:(UIActionSheet *)uias clickedButtonAtIndex:(NSInteger)buttonIndex {
     if(buttonIndex == [uias cancelButtonIndex]) return;
         
     // user pressed "Open in Safari"
@@ -80,37 +78,34 @@
 - (id)initWithUrls:(NSURL*)u
 {
     self = [self initWithNibName:@"BrowserViewController" bundle:nil];
-    if(self)
-    {
-        self.webView.delegate = self;
-        self.url = u;
-        
-        activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0, 0, 20, 20)];
-        
-        self.forwardButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:PNG_BUTTON_FORWARD] 
-                                                              style:UIBarButtonItemStylePlain 
-                                                             target:self 
-                                                             action:@selector(forwardButtonPressed:)];
-
-        
-        self.backButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:PNG_BUTTON_BACK]
-                                                           style:UIBarButtonItemStylePlain 
-                                                          target:self 
-                                                          action:@selector(backButtonPressed:)];
-         
-        self.stopButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop 
-                                                                        target:self 
-                                                                        action:@selector(stopReloadButtonPressed:)];
-        
-        self.reloadButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
-                                                                          target:self 
-                                                                          action:@selector(stopReloadButtonPressed:)];
-        
-        self.actionButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction
-                                                                          target:self
-                                                                          action:@selector(actionButtonPressed:)];
-    }
+    if(! self) { return nil; }
+    self.webView.delegate = self;
+    self.url = u;
     
+    activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0, 0, 20, 20)];
+    
+    self.forwardButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:PNG_BUTTON_FORWARD] 
+                                                          style:UIBarButtonItemStylePlain 
+                                                         target:self 
+                                                         action:@selector(forwardButtonPressed:)];
+
+    
+    self.backButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:PNG_BUTTON_BACK]
+                                                       style:UIBarButtonItemStylePlain 
+                                                      target:self 
+                                                      action:@selector(backButtonPressed:)];
+     
+    self.stopButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop 
+                                                                    target:self 
+                                                                    action:@selector(stopReloadButtonPressed:)];
+    
+    self.reloadButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
+                                                                      target:self 
+                                                                      action:@selector(stopReloadButtonPressed:)];
+    
+    self.actionButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction
+                                                                      target:self
+                                                                      action:@selector(actionButtonPressed:)];
     return self;
 }
 

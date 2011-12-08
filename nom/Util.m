@@ -21,6 +21,7 @@ static NSOperationQueue *sharedQueue = nil;
 static TTTOrdinalNumberFormatter *_ordinal_formatter;
 static TTTLocationFormatter *_location_formatter;
 static TTTTimeIntervalFormatter *_time_formatter;
+static TTTArrayFormatter * _array_formatter;
 static NSDateFormatter *_date_formatter;
 
 static Facebook *_facebook;
@@ -63,6 +64,7 @@ static UIView *currently_set_view;
         _ordinal_formatter = [[TTTOrdinalNumberFormatter alloc] init];
         _location_formatter = [[TTTLocationFormatter alloc] init];
         _time_formatter = [[TTTTimeIntervalFormatter alloc] init];
+        _array_formatter = [[TTTArrayFormatter alloc] init];
         _date_formatter = [[NSDateFormatter alloc] init];
         
         _perms = [NSArray arrayWithObjects:PERMS];
@@ -103,11 +105,23 @@ static UIView *currently_set_view;
     return _time_formatter;
 }
 
++ (TTTArrayFormatter *)format_array {
+    return _array_formatter;
+}
+
 + (NSString *)timeAgoFromRailsString:(NSString *)str {
     @try { 
         [_date_formatter setDateFormat:@"yyyy-MM-ddTHH:mm:ssZ"];
         NSDate *date = [_date_formatter dateFromString:str]; 
         return [_time_formatter stringForTimeIntervalFromDate:[NSDate date] toDate:date];
+    } @catch (NSException *ex) {;}
+    return nil;
+}
+
++ (NSDate *)dateFromRailsString:(NSString *)str {
+    @try { 
+        [_date_formatter setDateFormat:@"yyyy-MM-ddTHH:mm:ssZ"];
+        return [_date_formatter dateFromString:str]; 
     } @catch (NSException *ex) {;}
     return nil;
 }
@@ -140,6 +154,15 @@ static UIView *currently_set_view;
     [MKInfoPanel showPanelInView:in_view type:type title:message subtitle:sub hideAfter:3.25];
 }
 
++ (MBProgressHUD *)showHudInView:(id)view {
+    if (view == nil) { return nil; }
+    MBProgressHUD *hud = [[MBProgressHUD alloc] initWithView:view];
+    [view addSubview:hud];
+    [hud setMode:MBProgressHUDModeIndeterminate];
+    [hud show:YES];
+    return hud;
+}
+
 + (void)viewDidAppear:(UIView *)the_view {
     @synchronized (self) {
         if ( ! [currently_set_view isEqual:the_view]) {
@@ -169,7 +192,7 @@ static UIView *currently_set_view;
 
 + (NSString *)textForThumb:(NSInteger)value {
     if (value == 1) {
-        return @"Thumb up";
+        return @"a thumb up";
     } else if (value == 2) {
         return @"meh";
     }

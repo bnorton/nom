@@ -11,6 +11,19 @@
 @interface LocationDetailViewController : UITableViewController {
     NSDictionary *location;
     NSString *location_nid;
+    
+    UILabel *name;
+    UILabel *address;
+    UILabel *categories;
+    UILabel *rank;
+    UILabel *geolocation;
+    
+    UIButton *add_image;
+    UIButton *publish;
+    
+    UIImageView *image;
+    UIImageView *image_frame;
+    
 }
 
 @property (nonatomic,retain) NSDictionary *location;

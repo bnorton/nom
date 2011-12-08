@@ -18,10 +18,46 @@
     self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
     if (! self) { return nil; }
     
-    title = [[UILabel alloc] initWithFrame:CGRectMake(5, 5, 250, 0)];
-    text = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
-    when = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
-    distance = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
+    title = [[UILabel alloc] initWithFrame:CGRectMake(10, 5, 300, 21)];
+    [title setBackgroundColor:[UIColor clearColor]];
+    [title setFont:[UIFont fontWithName:@"TrebuchetMS" size:17]];
+    [title setAdjustsFontSizeToFitWidth:YES];
+    [title setMinimumFontSize:8];
+    [title setLineBreakMode:UILineBreakModeTailTruncation];
+    [title setNumberOfLines:1];
+    [title setTextAlignment:UITextAlignmentLeft];
+    [title setTextColor:[UIColor darkGrayColor]];
+
+    text = [[UILabel alloc] initWithFrame:CGRectMake(10, 27, 300, 18)];
+    [text setBackgroundColor:[UIColor clearColor]];
+    [text setFont:[UIFont fontWithName:@"TrebuchetMS" size:14]];
+    [text setAdjustsFontSizeToFitWidth:YES];
+    [text setMinimumFontSize:8];
+    [text setLineBreakMode:UILineBreakModeTailTruncation];
+    [text setNumberOfLines:1];
+    [text setTextAlignment:UITextAlignmentLeft];
+    [text setTextColor:[UIColor darkGrayColor]];
+
+    when = [[UILabel alloc] initWithFrame:CGRectMake(10, 46, 300, 18)];
+    [when setBackgroundColor:[UIColor clearColor]];
+    [when setFont:[UIFont fontWithName:@"TrebuchetMS" size:14]];
+    [when setAdjustsFontSizeToFitWidth:YES];
+    [when setMinimumFontSize:8];
+    [when setLineBreakMode:UILineBreakModeTailTruncation];
+    [when setNumberOfLines:1];
+    [when setTextAlignment:UITextAlignmentLeft];
+    [when setTextColor:[UIColor darkGrayColor]];
+
+    distance = [[UILabel alloc] initWithFrame:CGRectMake(10, 65, 300, 18)];
+    [distance setBackgroundColor:[UIColor clearColor]];
+    [distance setFont:[UIFont fontWithName:@"TrebuchetMS" size:14]];
+    [distance setAdjustsFontSizeToFitWidth:YES];
+    [distance setMinimumFontSize:8];
+    [distance setLineBreakMode:UILineBreakModeTailTruncation];
+    [distance setNumberOfLines:1];
+    [distance setTextAlignment:UITextAlignmentLeft];
+    [distance setTextColor:[UIColor darkGrayColor]];
+
     
     location_nid = @"";
     user_nid = @"";    
@@ -35,40 +71,31 @@
 }
 
 - (void)setupCommon:(NSDictionary *)common {
-    title.text = [common objectForKey:@"location_name"];
     location_nid = [common objectForKey:@"location_nid"];
     @try {
-        CGFloat lat = [[common objectForKey:@"lat"] floatValue];
-        CGFloat lng = [[common objectForKey:@"lat"] floatValue];
-        NSString *far = [currentLocation howFarFromLat:lat Long:lng];
         NSString *city = [common objectForKey:@"city"];
-        distance.text = [NSString stringWithFormat:@"from around %@ away in %@", far, city];
+        distance.text = [NSString stringWithFormat:@"from %@", city];
     } @catch (NSException *ex) {
         distance.text = [common objectForKey:@"city"];
     }
-    
 }
 
 - (void)setupForThumb:(NSDictionary *)thumb {
     NSDictionary *location = [thumb objectForKey:@"location"];
-    
-    text.text = [NSString stringWithFormat:@".. is a %@ in my book", 
+    title.text = [NSString stringWithFormat:@"%@ thinks that..", [thumb objectForKey:@"name"]];
+    text.text = [NSString stringWithFormat:@"%@ is %@", [location objectForKey:@"name"],
                  [util textForThumb:[[thumb objectForKey:@"value"] integerValue]]];
-    when.text = @"some date";
-
+    when.text = [util timeAgoFromRailsString:[thumb objectForKey:@"created_at"]];
     [self setupCommon:location];
     
     user_nid = [thumb objectForKey:@"user_nid"];
-    
 }
 
 - (void)setupForRecommendation:(NSDictionary *)recom{
-
+    title.text = [NSString stringWithFormat:@"for %@", [recom objectForKey:@"location_name"]];
     text.text = [recom objectForKey:@"text"];
-    when.text = @"some date";
 
     [self setupCommon:recom];
-    
     user_nid = [recom objectForKey:@"user_nid"];
 
 }
@@ -81,11 +108,7 @@
     return 50;
 }
 
-
-
-
 @end
-
 
 /*
  {    
@@ -138,6 +161,7 @@
         },
         "created_at": "2011-11-20T08:26:58Z",
         "value": 2,
+        "name" : "Brian Norton"
         "user_nid": "4eccc0fbeef0a64dcf000001"
      }
  ],

@@ -9,9 +9,11 @@
 #import "NMAppDelegate.h"
 
 #import "NMInitialConnectViewController.h"
+#import "TrendingLocationsViewController.h"
 #import "NMActivityViewController.h"
 #import "LocationsViewController.h"
 #import "ConnectViewController.h"
+#import "SearchViewController.h"
 #import "currentUser.h"
 
 #import "Util.h"
@@ -22,6 +24,10 @@
 @synthesize location;
 @synthesize tabBarController = _tabBarController;
 
+- (UINavigationController *)newNav:(UIViewController *)vc {
+    return [[UINavigationController alloc] initWithRootViewController:vc];
+}
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     
@@ -29,38 +35,40 @@
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
-    UIViewController *activity = [[NMActivityViewController alloc] initWithType:NMActivityTypeByFollowing];
-    UIViewController *locations= [[LocationsViewController alloc] init];
-    UIViewController *connect  = [[ConnectViewController alloc] init];
+    UINavigationController *activity = [self newNav:[[NMActivityViewController alloc] initWithType:NMActivityTypeByFollowing]];
+    [activity.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] forBarMetrics:UIBarMetricsDefault];
+    
+    UINavigationController *trending = [self newNav:[[TrendingLocationsViewController alloc] init]];
+    [trending.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] forBarMetrics:UIBarMetricsDefault];
+    
+    UINavigationController *locations = [self newNav:[[LocationsViewController alloc] init]];
+    [locations.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] forBarMetrics:UIBarMetricsDefault];
+    
+    UINavigationController *search  = [self newNav:[[SearchViewController alloc] init]];
+    [search.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] forBarMetrics:UIBarMetricsDefault];
+    
+    UINavigationController *connect  = [self newNav:[[ConnectViewController alloc] init]];
+    [connect.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] forBarMetrics:UIBarMetricsDefault];
     
     self.tabBarController = [[UITabBarController alloc] init];
-    self.tabBarController.viewControllers = [NSArray arrayWithObjects:activity, locations, connect, nil];
+
+    self.tabBarController.viewControllers = [NSArray arrayWithObjects:activity, trending, locations, search, connect, nil];
     [self.tabBarController.tabBar setBackgroundImage:[UIImage imageNamed:@"tab_bar4a.png"]];
-    
-    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:self.tabBarController];
 
-//    self.window.rootViewController = self.tabBarController;
+    self.window.rootViewController = self.tabBarController;
     
-    self.window.rootViewController = nav;
-    [self.window makeKeyAndVisible];
-    
-    [nav.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] 
-                            forBarMetrics:UIBarMetricsDefault];
-
-//    [currentUser setString:nil ForKey:@"fb_access_token"];
-//    [currentUser setObject:nil forKey:@"fb_expiration_date"];
-
+   [self.window makeKeyAndVisible];
+ 
     NSLog(@"logged in or connected %d", [currentUser getBooleanForKey:@"logged_in_or_connected"]);
-//    [currentUser setBoolean:NO ForKey:@"logged_in_or_connected"];
     
     if ( ! [currentUser getBooleanForKey:@"logged_in_or_connected"]) {
         UIViewController *initialConnect = [[NMInitialConnectViewController alloc] init];
-        UINavigationController *isnav = [[UINavigationController alloc] initWithRootViewController:initialConnect];
-        [isnav.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] 
+        UINavigationController *isnav = [[UINavigationController alloc] initWithRootViewController:initialConnect];        [isnav.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] 
                                   forBarMetrics:UIBarMetricsDefault];
 
-        [nav performBlock:^{
-            [nav presentModalViewController:isnav animated:YES];
+
+        [self performBlock:^{
+            [self.tabBarController presentModalViewController:isnav animated:YES];
         } afterDelay:.8];
     }
     

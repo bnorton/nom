@@ -193,13 +193,14 @@
 
 /** Location :: Search / User :: Search */
 
-+ (void)search:(NSString *)identifier path:(NSString *)path
++ (void)search:(NSString *)identifier path:(NSString *)path location:(NSString *)location
                 success:(void (^)(NSDictionary * response))success
                 failure:(void (^)(NSDictionary * response))failure {
     
     NSArray *items  = [NSArray arrayWithObjects:identifier, nil];
     NSArray *params = [NSArray arrayWithObjects:@"query", nil];
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjects:items forKeys:params];
+    if (location != nil) { [parameters setObject:location forKey:@"where"]; }
     
     [NMHTTPClient enqueueRequestWithMethod:@"GET" path:path parameters:parameters success:success failure:failure];
     
@@ -208,14 +209,14 @@
            success:(void (^)(NSDictionary * response))success
            failure:(void (^)(NSDictionary * response))failure {
     
-    [NMHTTPClient search:identifier path:@"/users/search.json" success:success failure:failure];
+    [NMHTTPClient search:identifier path:@"/users/search.json" location:nil success:success failure:failure];
 }
 
-+ (void)searchLocation:(NSString *)identifier
++ (void)searchLocation:(NSString *)identifier location:(NSString *)location
            success:(void (^)(NSDictionary * response))success
            failure:(void (^)(NSDictionary * response))failure {
     
-    [NMHTTPClient search:identifier path:@"/locations/search.json" success:success failure:failure];
+    [NMHTTPClient search:identifier path:@"/locations/search.json" location:location success:success failure:failure];
 }
 
 /**
@@ -261,8 +262,12 @@
     NSArray *params = [NSArray arrayWithObjects:@"value",nil];
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjects:items forKeys:params];
     
+    NSString *user_name;
+    if ([(user_name = [currentUser getStringForKey:@"user_name"]) length] > 0) {
+        [parameters setObject:user_name forKey:@"user_name"];
+    }
+    
     [NMHTTPClient enqueueRequestWithMethod:@"POST" path:path parameters:parameters success:success failure:failure];
-
 }
 
 + (void)thumbLocation:(NSString *)location_nid value:(NSString *)value
@@ -271,7 +276,6 @@
     
     [NMHTTPClient thumbValue:value path:[NSString stringWithFormat:@"/locations/%@/thumbs/create.json",location_nid] 
                 success:success failure:failure];
-    
 }
 
 + (void)thumbUser:(NSString *)their_user_nid value:(NSString *)value
@@ -280,7 +284,6 @@
     
     [NMHTTPClient thumbValue:value path:[NSString stringWithFormat:@"/users/%@/thumbs/create.json",their_user_nid] 
                      success:success failure:failure];
-    
 }
 
 /**

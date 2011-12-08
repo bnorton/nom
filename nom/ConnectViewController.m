@@ -26,11 +26,7 @@
     
     user_nid = _user_nid;
     
-    hud = [[MBProgressHUD alloc] initWithView:self.view];
-    [self.view addSubview:hud];
-    [hud setMode:MBProgressHUDModeIndeterminate];
-    // [hud setAnimationType:MBProgressHUDAnimationFade];
-    [hud show:YES];
+    hud = [util showHudInView:self.view];
     
     [NMHTTPClient userDetail:user_nid success:^(NSDictionary *response) {
         [hud hide:YES];
@@ -80,7 +76,7 @@
     }
     
     user_name = [[UILabel alloc] initWithFrame:CGRectMake(120, 10, 190, 27)];
-    [user_name setBackgroundColor:[UIColor lightGrayColor]];
+    [user_name setBackgroundColor:[UIColor clearColor]];
     [user_name setFont:[UIFont fontWithName:@"TrebuchetMS" size:25]];
     [user_name setAdjustsFontSizeToFitWidth:YES];
     [user_name setMinimumFontSize:12];
@@ -91,7 +87,7 @@
     [user_name setTextColor:[UIColor darkGrayColor]];
     
     user_location = [[UILabel alloc] initWithFrame:CGRectMake(120, 39, 190, 21)];
-    [user_location setBackgroundColor:[UIColor lightGrayColor]];
+    [user_location setBackgroundColor:[UIColor clearColor]];
     [user_location setFont:[UIFont fontWithName:@"TrebuchetMS" size:18]];
     [user_location setAdjustsFontSizeToFitWidth:YES];
     [user_location setMinimumFontSize:11];
@@ -101,7 +97,7 @@
     [user_location setTextColor:[UIColor darkGrayColor]];
     
     last_seen = [[UILabel alloc] initWithFrame:CGRectMake(120, 62, 190, 18)];
-    [last_seen setBackgroundColor:[UIColor lightGrayColor]];
+    [last_seen setBackgroundColor:[UIColor clearColor]];
     [last_seen setFont:[UIFont fontWithName:@"TrebuchetMS" size:16]];
     [last_seen setAdjustsFontSizeToFitWidth:YES];
     [last_seen setMinimumFontSize:11];
@@ -242,17 +238,13 @@
         case 3:
             if (type == NMUserProfileTypeMe) {
                 __block UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-                if ( ! [[util facebook] isSessionValid]) {
-                    [[util fbmodel] authorizeWithSuccess:^{
-                        cell.textLabel.text = FB_CONNECTED;
-                        [util viewDidAppear:self.view];
-                    } failure:^{
-                        cell.textLabel.text = FB_NOT_CONNECTED;
-                        [util showErrorInView:self.view message:@"Facebook connect cancelled or failed"];
-                    }];
-                } else {
+                [[util fbmodel] authorizeWithSuccess:^{
                     cell.textLabel.text = FB_CONNECTED;
-                }
+                    [util viewDidAppear:self.view];
+                } failure:^{
+                    cell.textLabel.text = FB_NOT_CONNECTED;
+                    [util showErrorInView:self.view message:@"Facebook connect cancelled or failed"];
+                }];
                 [cell setSelected:NO animated:YES];
             }
             return;

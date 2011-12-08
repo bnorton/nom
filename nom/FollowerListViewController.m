@@ -24,10 +24,10 @@
     
     if (type == NMFollowersType) {
         self.title = NSLocalizedString(@"Followers", @"Followers");
-        [self updateFollowers];
+        [self updateFollowersShowingHUD:YES];
     } else if (type == NMFollowingType) {
         self.title = NSLocalizedString(@"Following", @"Following");
-        [self updateFollowing];
+        [self updateFollowingShowingHUD:YES];
     }
     
     return self;
@@ -58,7 +58,11 @@
     [self.tableView reloadData];
 }
 
-- (void)updateFollowers {
+- (void)updateFollowersShowingHUD:(BOOL)show {
+    MBProgressHUD *hud = nil;
+    if (show) {
+        hud = [util showHudInView:self.tableView];
+    }
     NSLog(@"INFO: begin updateFollowers for %@", user_nid);
     [NMHTTPClient followersFor:user_nid withSuccess:^(NSDictionary *_response) {
         NSLog(@"INFO: updateFollowers success %@",response);
@@ -67,16 +71,22 @@
             follows = [response objectForKey:@"results"];
         }
         [self updateComplete];
+        [hud hide:YES];
     } failure:^(NSDictionary *_response) {
         response = _response;
         follows = nil;
         NSLog(@"INFO: updateFollowers failure for %@", user_nid);
         [self updateComplete];
+        [hud hide:YES];
         [util showErrorInView:self.view message:@"Couldn't load followers"];
     }];
 }
 
-- (void)updateFollowing {
+- (void)updateFollowingShowingHUD:(BOOL)show {
+    MBProgressHUD *hud = nil;
+    if (show) {
+        hud = [util showHudInView:self.tableView];
+    }
     NSLog(@"INFO: begin updateFollowing for %@", user_nid);
     [NMHTTPClient followingFor:user_nid withSuccess:^(NSDictionary *_response) {
         response = _response;
@@ -85,11 +95,13 @@
             follows = [response objectForKey:@"results"];
         }
         [self updateComplete];
+        [hud hide:YES];
     } failure:^(NSDictionary *_response) {
         NSLog(@"INFO: updateFollowing failure %@", user_nid);
         response = _response;
         follows = nil;
         [self updateComplete];
+        [hud hide:YES];
         [util showErrorInView:self.view message:@"Couldn't load following"];
     }];
 }
@@ -223,10 +235,10 @@
 	_reloading = YES;
     if (type == NMFollowersType) {
         NSLog(@"FOLLOWERS: updating followers");
-        [self updateFollowers];
+        [self updateFollowersShowingHUD:NO];
     } else if (type == NMFollowingType) {
         NSLog(@"FOLLOWERS: updating following");
-        [self updateFollowing];
+        [self updateFollowingShowingHUD:NO];
     }
 	
 }

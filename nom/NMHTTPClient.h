@@ -55,7 +55,7 @@
                     success:(void (^)(NSDictionary * response))success
                     failure:(void (^)(NSDictionary * response))failure;
 
-+ (void)searchLocation:(NSString *)identifier
++ (void)searchLocation:(NSString *)identifier location:(NSString *)location
                     success:(void (^)(NSDictionary * response))success
                     failure:(void (^)(NSDictionary * response))failure;
 /* ########################### END LOCATION ##############################

@@ -13,10 +13,12 @@
 #import "MKInfoPanel.h"
 
 #import "NMHTTPClient.h"
-
+#import "MBProgressHUD.h"
+ 
 #import "TTTOrdinalNumberFormatter.h"
 #import "TTTLocationFormatter.h"
 #import "TTTTimeIntervalFormatter.h"
+#import "TTTArrayFormatter.h"
 
 #import "Facebook.h"
 #import "NMFBModel.h"
@@ -40,7 +42,10 @@
 + (TTTLocationFormatter *)format_location;
 + (TTTOrdinalNumberFormatter *)format_ordinal;
 + (TTTTimeIntervalFormatter *)format_time;
++ (TTTArrayFormatter *)format_array;
+
 + (NSString *)timeAgoFromRailsString:(NSString *)str;
++ (NSDate *)dateFromRailsString:(NSString *)str;
 
 + (NMFBModel *)fbmodel;
 + (Facebook *)facebook;
@@ -49,6 +54,8 @@
 + (SBJsonWriter *)JSONWriter;
 
 + (NSString *)textForThumb:(NSInteger)value;
+
++ (MBProgressHUD *)showHudInView:(id)view;
 
 + (void)showInfoInView:(UIView *)in_view message:(NSString *)message;
 + (void)showErrorInView:(UIView *)in_view message:(NSString *)message;

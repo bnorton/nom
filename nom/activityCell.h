@@ -18,6 +18,11 @@
     NSString *user_nid;
 }
 
+- (id)initWithReuseIdentifier:(NSString *)reuseIdentifier;
+
+- (void)setupForThumb:(NSDictionary *)thumb;
+- (void)setupForRecommendation:(NSDictionary *)recom;
+
 @property (nonatomic, retain) NSString *location_nid;
 @property (nonatomic, retain) NSString *user_nid;
 

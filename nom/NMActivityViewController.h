@@ -12,9 +12,15 @@
 typedef enum {
     NMActivityTypeByUser,
     NMActivityTypeByFollowing
-}NMActivityType;
+} NMActivityType;
+
+typedef enum {
+    NMActivityCellTypeRecommendation,
+    NMActivityCellTypeThumb
+} NMActivityCellType;
 
 @interface NMActivityViewController : UITableViewController <EGORefreshTableHeaderDelegate, UITableViewDelegate, UITableViewDataSource> {
+    id current_response;
     NSUInteger currently_visible_rows;
     NSArray *thumbs;
     NSArray *recommends;
@@ -29,6 +35,7 @@ typedef enum {
 
 - (void)reloadTableViewDataSource;
 - (void)doneLoadingTableViewData;
+- (void)doneLoadingTableViewData:(BOOL)success;
 
 - (void)fetchActivities;
 

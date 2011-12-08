@@ -8,9 +8,22 @@
 
 #import <UIKit/UIKit.h>
 #import "EGORefreshTableHeaderView.h"
+#import "CustomSegmentedControl.h"
 
 #define __distances @"¼ mile", @"½ mile", @"1 mile", @"2½ miles", @"5 miles", nil
 #define __distances_vals [NSNumber numberWithFloat:0.25f], [NSNumber numberWithFloat:0.5f], [NSNumber numberWithFloat:1.0f], [NSNumber numberWithFloat:2.5f], [NSNumber numberWithFloat:5.0f], nil
+
+#define BUTTON_WIDTH 54.0
+#define BUTTON_SEGMENT_WIDTH 51.0
+#define CAP_WIDTH 5.0
+
+typedef enum {
+    CapLeft          = 0,
+    CapMiddle        = 1,
+    CapRight         = 2,
+    CapLeftAndRight  = 3
+} CapLocation;
+
 typedef enum {
     NMLocationsFilterAll,
     NMLocationsFilterCost,
@@ -26,10 +39,11 @@ typedef enum {
     NMFilterDistanceFive
 } NMFilterDistance;
 
-@interface LocationsViewController : UITableViewController <EGORefreshTableHeaderDelegate, UITableViewDelegate, UITableViewDataSource> {
+@interface LocationsViewController : UITableViewController <EGORefreshTableHeaderDelegate, UITableViewDelegate, UITableViewDataSource, CustomSegmentedControlDelegate> {
     
     id current_response;
     NSArray *locations;
+    NSMutableArray *filtered_by_all;
     NSMutableArray *filtered_by_cost;
     NSMutableArray *filtered_by_current_category;
     NSMutableArray *filtered_by_distance;
@@ -48,6 +62,9 @@ typedef enum {
 	//  Reloading var should really be your tableviews datasource
 	//  Putting it here for demo purposes 
 	BOOL _reloading;
+
+    NSArray* segmentControlTitles;
+
 }
 
 @property (nonatomic, retain) id current_response;
@@ -58,6 +75,8 @@ typedef enum {
 
 - (id)init;
 - (id)initFilteredBy:(NMLocationsFilter)filter;
+
+- (void)setupLocations;
 
 - (void)fetchLocations;
 - (void)fetchLocationsWithOptions:(NSDictionary *)options;
