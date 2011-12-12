@@ -17,7 +17,7 @@
     if (! self) { return nil; }
     
     self.tabBarItem.image = [UIImage imageNamed:@"icons-gray/249-piechart.png"];
-    self.title = NSLocalizedString(@"Nearby", @"Places close to here");
+    self.title = NSLocalizedString(@"Trending", @"Places close to here");
     
     UIImageView *background = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"background4a.png"]];
     [self.tableView setBackgroundView:background];

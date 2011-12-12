@@ -137,7 +137,7 @@
     if (((lat = [[geolocation objectForKey:@"lat"] floatValue]) != 0.0f) && 
         ((lng = [[geolocation objectForKey:@"lng"] floatValue]) != 0.0f)) {
         
-        if ((str = [location objectForKey:@"neighborhoods"])) {
+        if ([(str = [location objectForKey:@"neighborhoods"]) length] > 0) {
             tmp = [currentLocation howFarFromLat:lat Long:lng];
             distance.text = [NSString stringWithFormat:@"%@ in %@", tmp, str];
         } else {
@@ -170,6 +170,7 @@
         }
     }
     if (! set_image_url) {
+        NSLog(@"setting the image to default");
         [image setImage:[UIImage imageNamed:@"placeholder.png"]];
     }
 }

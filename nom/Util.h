@@ -57,6 +57,9 @@
 
 + (MBProgressHUD *)showHudInView:(id)view;
 
++ (NSString *)base36Encode:(NSInteger)to_encode;
++ (NSString *)publicationToken;
+
 + (void)showInfoInView:(UIView *)in_view message:(NSString *)message;
 + (void)showErrorInView:(UIView *)in_view message:(NSString *)message;
 + (void)showInfoInView:(UIView *)in_view isError:(BOOL)error message:(NSString *)message subMessage:(NSString *)sub;

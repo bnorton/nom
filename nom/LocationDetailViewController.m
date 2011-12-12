@@ -8,8 +8,10 @@
 
 #import "LocationDetailViewController.h"
 #import "UIActionSheet+MKBlockAdditions.h"
+#import "FormTableController.h"
 #import "current.h"
 #import "Util.h"
+#include <stdlib.h>
 
 @implementation LocationDetailViewController
 
@@ -23,7 +25,7 @@
     location_nid = [location objectForKey:@"location_nid"];
     
     name = [[UILabel alloc] initWithFrame:CGRectMake(10, 5, 300, 24)];
-    [name setBackgroundColor:[UIColor lightGrayColor]];
+    [name setBackgroundColor:[UIColor clearColor]];
     [name setFont:[UIFont fontWithName:@"TrebuchetMS" size:22]];
     [name setAdjustsFontSizeToFitWidth:YES];
     [name setMinimumFontSize:12];
@@ -80,15 +82,23 @@
     add_image = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     [add_image setFrame:CGRectMake(20, 5, 280, 30)];
     [add_image addTarget:self action:@selector(attachImage) forControlEvents:UIControlEventTouchUpInside];
-
+    [add_image setTitle:@"Upload Image" forState:UIControlStateNormal];
+    [add_image setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
+    [add_image setTitleColor:[UIColor lightGrayColor] forState:UIControlStateSelected];
+    [add_image setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
+    
     publish = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     [publish setFrame:CGRectMake(20, 5, 280, 30)];
     [publish addTarget:self action:@selector(publish) forControlEvents:UIControlEventTouchUpInside];
+    [publish setTitle:@"Recommend this spot" forState:UIControlStateNormal];
+    [publish setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
+    [publish setTitleColor:[UIColor lightGrayColor] forState:UIControlStateSelected];
+    [publish setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
 
-    image_frame = [[UIImageView alloc] initWithFrame:CGRectMake(10, 5, 300, 160)];
-    [image_frame setImage:[UIImage imageNamed:@"assets/image_frame1g.png"]];
+//    image_frame = [[UIImageView alloc] initWithFrame:CGRectMake(10, 5, 300, 160)];
+//    [image_frame setImage:[UIImage imageNamed:@"assets/image_frame1g.png"]];
     
-    image = [[UIImageView alloc] initWithFrame:CGRectMake(10, 5, 300, 160)];
+    image = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 172)];
     [image setImage:[UIImage imageNamed:@"placeholder.png"]];
 
     [self performSelector:@selector(setup)];
@@ -120,7 +130,13 @@
         geolocation.text = [currentLocation howFarFromLat:lat Long:lng];
     }
     
-    [add_image.titleLabel setText:@"Add and Image"];
+    @try {
+        NSString *url = [[[location objectForKey:@"images"] objectAtIndex:0] objectForKey:@"url"];
+        [image setImageWithURL:[NSURL URLWithString:url] placeholderImage:[UIImage imageNamed:@"placeholder.png"]];
+    }
+    @catch (NSException *exception) {
+        
+    }
 }
  
 - (void)sendImageReadyMessageNamed:(NSString *)inname {    
@@ -128,31 +144,27 @@
     if (_name) {
         _name = [NSString stringWithFormat:@" for %@", _name];
     }
-    __block MBProgressHUD *hud = [[MBProgressHUD alloc] initWithView:self.view];
-    [hud setLabelText:@"Uploading.."];
-    [hud setMode:MBProgressHUDModeDeterminate];
-    [hud setProgress:0];
-    [self.view addSubview:hud];
-    [hud show:YES];
+
     [NMHTTPClient imageUpload:location_nid success:^(NSDictionary *response) {
-        NSLog(@"INFO Image uploaded for %@", location_nid);
-        [hud setProgress:1.0f];
-        [hud setLabelText:@"Done"];
-        [hud setDetailsLabelText:@""];
-        [hud hide:YES afterDelay:1];
         [util showInfoInView:self.view message:@"Image upload completed."];
     } failure:^(NSDictionary *response) {
-        NSLog(@"INFO Image upload failed for %@", location_nid);
         [util showErrorInView:self.view message:[NSString stringWithFormat:@"Image upload failed%@", _name]];
     } progress:^(NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite) {
-        [hud setDetailsLabelText:[NSString stringWithFormat:@"%f of %f", totalBytesWritten, totalBytesExpectedToWrite]];
-        [hud setProgress:(totalBytesWritten/totalBytesExpectedToWrite)];
         NSLog(@"image upload progress %d, %d", totalBytesWritten, totalBytesExpectedToWrite);
     }];
 }
 
 - (void)publish {
-    
+    NSString *url = @"", *nid = @"";
+    @try {
+        url = [[[location objectForKey:@"images"] objectAtIndex:0] objectForKey:@"url"];
+        nid = [[[location objectForKey:@"images"] objectAtIndex:0] objectForKey:@"image_nid"];
+        NSLog(@"INFO publishing with nid %@", nid);
+    }
+    @catch (NSException *exception) {;}
+    NSLog(@"abou to publis hdo we have an image url %@", url);
+    FormTableController *form = [[FormTableController alloc] initWithLocation:location imageUrl:url imageNid:nid];
+    [self.navigationController pushViewController:form animated:YES];
 }
 
 - (void) attachImage {
@@ -214,7 +226,7 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-        if (indexPath.row == 3) {
+        if (indexPath.row == 1) {
             [cell setSelectionStyle:UITableViewCellSelectionStyleGray];
         } else {
             [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
@@ -253,9 +265,9 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.row == 0) {
-        return 22;
+        return 32;
     } else if (indexPath.row == 1) {
-        return 180;
+        return 173;
     }
     return 40;
 }

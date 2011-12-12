@@ -60,15 +60,15 @@
 	}
 	[_refreshHeaderView refreshLastUpdatedDate];
 
-    self.navigationItem.rightBarButtonItem = [self woodBarButtonItemWithText:@"Store"];
-    UIButton* rightButton = (UIButton*)self.navigationItem.rightBarButtonItem.customView;
-    [rightButton addTarget:self action:@selector(storeAction:) forControlEvents:UIControlEventTouchUpInside];
+//    self.navigationItem.rightBarButtonItem = [self woodBarButtonItemWithText:@"Store"];
+//    UIButton* rightButton = (UIButton*)self.navigationItem.rightBarButtonItem.customView;
+//    [rightButton addTarget:self action:@selector(storeAction:) forControlEvents:UIControlEventTouchUpInside];
     
-    self.navigationItem.leftBarButtonItem = [self woodBarButtonItemWithText:@"Edit"];
-    UIButton* leftButton = (UIButton*)self.navigationItem.leftBarButtonItem.customView;
-    [leftButton addTarget:self action:@selector(editAction:) forControlEvents:UIControlEventTouchUpInside];
+//    self.navigationItem.leftBarButtonItem = [self woodBarButtonItemWithText:@"Edit"];
+//    UIButton* leftButton = (UIButton*)self.navigationItem.leftBarButtonItem.customView;
+//    [leftButton addTarget:self action:@selector(editAction:) forControlEvents:UIControlEventTouchUpInside];
     
-    segmentControlTitles = [NSArray arrayWithObjects:@"Books", @"PDFs", nil];
+    segmentControlTitles = [NSArray arrayWithObjects:@"Rank", @"Cost", @"Tags", nil];
     UIImage* dividerImage = [UIImage imageNamed:@"assets/view-control-divider.png"];
     id iid = [[CustomSegmentedControl alloc] initWithSegmentCount:segmentControlTitles.count segmentsize:CGSizeMake(BUTTON_SEGMENT_WIDTH, dividerImage.size.height) dividerImage:dividerImage tag:0 delegate:self];
     self.navigationItem.titleView = iid;
@@ -306,11 +306,7 @@
 
 - (void) touchDownAtSegmentIndex:(NSUInteger)segmentIndex
 {
-    [[[UIAlertView alloc] initWithTitle:[segmentControlTitles objectAtIndex:segmentIndex]
-                                 message:nil
-                                delegate:nil
-                       cancelButtonTitle:nil 
-                       otherButtonTitles:NSLocalizedString(@"OK", nil), nil] show];
+    
 }
 
 -(UIBarButtonItem*)woodBarButtonItemWithText:(NSString*)buttonText
@@ -343,16 +339,16 @@
     if (location == CapLeftAndRight)
     {
         buttonWidth = BUTTON_WIDTH;
-//        buttonImage = [[UIImage imageNamed:@"assets/nav-button.png"] stretchableImageWithLeftCapWidth:CAP_WIDTH topCapHeight:0.0];
-        buttonImage = [[UIImage imageNamed:@"assets/bar_button1b.png"] stretchableImageWithLeftCapWidth:CAP_WIDTH topCapHeight:0.0];
-        buttonPressedImage = [[UIImage imageNamed:@"assets/nav-button-press.png"] stretchableImageWithLeftCapWidth:CAP_WIDTH topCapHeight:0.0];
+        buttonImage = [[UIImage imageNamed:@"assets/nav-button.png"] stretchableImageWithLeftCapWidth:CAP_WIDTH topCapHeight:0.0];
+//        buttonImage = [[UIImage imageNamed:@"assets/bar_button1b.png"] stretchableImageWithLeftCapWidth:CAP_WIDTH topCapHeight:0.0];
+//        buttonPressedImage = [[UIImage imageNamed:@"assets/nav-button-press.png"] stretchableImageWithLeftCapWidth:CAP_WIDTH topCapHeight:0.0];
     }
     else
     {
         buttonWidth = BUTTON_SEGMENT_WIDTH;
         
-        //        buttonImage = [self image:[[UIImage imageNamed:@"assets/nav-button.png"] stretchableImageWithLeftCapWidth:CAP_WIDTH topCapHeight:0.0] withCap:location capWidth:CAP_WIDTH buttonWidth:buttonWidth];
-        buttonImage = [self image:[[UIImage imageNamed:@"assets/bar_button1b.png"] stretchableImageWithLeftCapWidth:CAP_WIDTH topCapHeight:0.0] withCap:location capWidth:CAP_WIDTH buttonWidth:buttonWidth];
+        buttonImage = [self image:[[UIImage imageNamed:@"assets/nav-button.png"] stretchableImageWithLeftCapWidth:CAP_WIDTH topCapHeight:0.0] withCap:location capWidth:CAP_WIDTH buttonWidth:buttonWidth];
+//        buttonImage = [self image:[[UIImage imageNamed:@"assets/bar_button1b.png"] stretchableImageWithLeftCapWidth:CAP_WIDTH topCapHeight:0.0] withCap:location capWidth:CAP_WIDTH buttonWidth:buttonWidth];
         buttonPressedImage = [self image:[[UIImage imageNamed:@"assets/nav-button-press.png"] stretchableImageWithLeftCapWidth:CAP_WIDTH topCapHeight:0.0] withCap:location capWidth:CAP_WIDTH buttonWidth:buttonWidth];
     }
     

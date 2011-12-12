@@ -30,6 +30,5 @@
 
 - (id)initWithReuseIdentifier:(NSString *)reuseIdentifier;
 - (void)setLocation:(NSDictionary *)location;
-- (void)setImageURL:(NSString *)url;
 
 @end

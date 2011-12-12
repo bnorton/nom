@@ -8,6 +8,7 @@
 
 #import "SearchViewController.h"
 #import "searchLocationCell.h"
+#import "LocationDetailViewController.h"
 #import "Util.h"
 
 @implementation SearchViewController
@@ -98,7 +99,9 @@
 }
 
 - (void)fetchedBasedOn:(NSString *)query where:(NSString *)loc {
-    
+    __block MBProgressHUD *hud = [util showHudInView:self.view];
+    [self.view addSubview:hud];
+    [hud show:YES];
     NSLog(@"INFO: based on location for query %@", query);
     [NMHTTPClient searchLocation:query location:loc success:^(NSDictionary *response) {
         NSLog(@"INFO: success called back from search query %@", response);
@@ -111,8 +114,10 @@
         @catch (NSException *exception) {
             locations = nil;
         }
+        [hud hide:YES];
     } failure:^(NSDictionary *response) {
         NSLog(@"INFO: failure called back from search query %@", response);
+        [hud hide:YES];
         
     }];
 }
@@ -158,31 +163,35 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [util showInfoInView:self.view message:@"didSelectRowAtIndexPath"];
+    if ([locations count] > indexPath.row) {
+        LocationDetailViewController *detail = [[LocationDetailViewController alloc] 
+                                                initWithLocation:[locations objectAtIndex:indexPath.row]];
+        [self.navigationController pushViewController:detail animated:YES];
+    }
 }
 
 - (void)filterContentForSearchText:(NSString*)searchText scope:(NSString*)scope {  
-    [util showInfoInView:self.view message:@"filterContentForSearchText"];
+//    [util showInfoInView:self.view message:@"filterContentForSearchText"];
 }     
 
 - (BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString {  
       // Return YES to cause the search result table view to be reloaded.  
-    [util showInfoInView:self.view message:@"shouldReloadTableForSearchString"];  
+//    [util showInfoInView:self.view message:@"shouldReloadTableForSearchString"];  
     return YES;  
 }  
 
 - (BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchScope:(NSInteger)searchOption {  
     // Return YES to cause the search result table view to be reloaded.  
-    [util showInfoInView:self.view message:@"shouldReloadTableForSearchScope"];  
+//    [util showInfoInView:self.view message:@"shouldReloadTableForSearchScope"];  
     return YES;  
 }  
 
 - (void)searchDisplayControllerDidBeginSearch:(UISearchDisplayController *)controller {  
-    [util showInfoInView:self.view message:@"searchDisplayControllerDidBeginSearch"];
+//    [util showInfoInView:self.view message:@"searchDisplayControllerDidBeginSearch"];
 }  
 
 - (void)searchDisplayControllerDidEndSearch:(UISearchDisplayController *)controller {  
-    [util showInfoInView:self.view message:@"searchDisplayControllerDidEndSearch"];
+//    [util showInfoInView:self.view message:@"searchDisplayControllerDidEndSearch"];
 }
 
 @end

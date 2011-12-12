@@ -163,6 +163,24 @@ static UIView *currently_set_view;
     return hud;
 }
 
++ (NSString *)base36Encode:(NSInteger)to_encode {
+    NSString *alpha = @"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    NSString *result = @"";
+    int mod;
+    while (to_encode != 0) {
+        mod = to_encode % 36;
+        to_encode = to_encode / 36;
+    
+        result = [NSString stringWithFormat:@"%c%@", [alpha characterAtIndex:mod], result];
+    }
+    return result;
+}
+
++ (NSString *)publicationToken {
+    int r = abs((int)arc4random() % (int)pow(36, 10));
+    return [util base36Encode:r];
+}
+
 + (void)viewDidAppear:(UIView *)the_view {
     @synchronized (self) {
         if ( ! [currently_set_view isEqual:the_view]) {

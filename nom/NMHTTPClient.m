@@ -170,7 +170,7 @@
     /* @optional */
     if (distance < 0.25) { distance = 0.5f; }
     if (distance > 5.0f) { distance = 5.0f; }
-    
+    distance = 1.5f;
     [items addObject:[NSString stringWithFormat:@"%f", distance]];
     [params addObject:@"dist"];
     [items addObject:[NSString stringWithFormat:@"%d", 50]];
@@ -348,7 +348,7 @@
  #############################################################################
  #####  RECOMMENDATIONS  #####################################################
  #############################################################################
- get "/recommendation/new"          => "recommendations#new"          ### POST
+ get "/recommendation/create"          => "recommendations#new"          ### POST
  get "/recommendation/destroy"      => "recommendations#destroy"      ### POST
  
  get "/users/:nid/recommended"    => "recommendations#user"
@@ -358,16 +358,19 @@
  #############################################################################
  */
 
-+ (void)recommend:(NSString *)location_nid text:(NSString *)text facebook:(BOOL)facebook
++ (void)recommend:(NSString *)location_nid imageNid:(NSString *)image_nid 
+             text:(NSString *)text facebook:(BOOL)facebook
                     success:(void (^)(NSDictionary * response))success
-                    failure:(void (^)(NSDictionary * response))failure
-                    progress:(void (^)(NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite))progress {
+                    failure:(void (^)(NSDictionary * response))failure {
     
     NSArray *items  = [NSArray arrayWithObjects:location_nid, text,[NSNumber numberWithBool:NO], nil];
     NSArray *params = [NSArray arrayWithObjects:@"location_nid",@"text",@"image_attachment_present", nil];
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjects:items forKeys:params];
     
+    [self addDefaultParams:parameters];
+    
     if (facebook) { [parameters setObject:[NSNumber numberWithBool:YES] forKey:@"facebook"]; }
+    if (image_nid){ [parameters setObject:image_nid forKey:@"image_nid"]; }
     
     /**
      * Build the image and the image metadata
@@ -391,7 +394,7 @@
     /**
      * Construct and begin the request with callbacks
      */
-    NSMutableURLRequest *request = [HTTPClient multipartFormRequestWithMethod:@"POST" path:@"/recommendations/create.json" parameters:parameters constructingBodyWithBlock: ^(id <AFMultipartFormData>formData) {
+    NSMutableURLRequest *request = [HTTPClient multipartFormRequestWithMethod:@"POST" path:@"/recommendation/create.json" parameters:parameters constructingBodyWithBlock: ^(id <AFMultipartFormData>formData) {
         if (image_flag) { 
            [formData appendPartWithFileData:image_data name:@"image[image]" fileName:file_name mimeType:@"image/png"];
         }
@@ -407,12 +410,7 @@
             failure([(AFJSONRequestOperation *)operation responseJSON]);
         }
     }];
-    [operation setUploadProgressBlock:^(NSInteger bytesWritten, NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite) {
-        NSLog(@" %d Sent %d of %d bytes",bytesWritten, totalBytesWritten, totalBytesExpectedToWrite);
-        if (progress) {
-            progress(totalBytesWritten,totalBytesExpectedToWrite);
-        }
-    }];
+
     [[[NSOperationQueue alloc] init] addOperation:operation];
 //    [HTTPQueue addOperation:operation];
 }
@@ -672,7 +670,6 @@
     }];
     
     NSLog(@"Image Upload Request %@", request);
-    
     AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSURLResponse *response, id JSON) {
         NSLog(@"INFO: image upload done: %@", JSON);
         NSFileManager *filemgr = [NSFileManager defaultManager];
@@ -682,9 +679,14 @@
         } else {
             NSLog (@"Remove failed"); 
         }
-    
+        if (success) {
+            success(JSON);
+        }
     } failure:^(NSURLRequest *request, NSURLResponse *response, NSError *error, id JSON) {
             NSLog(@"failure callback for imageUpload %@", JSON);
+        if (failure){
+            failure(JSON);
+        }
     }];
         
     [operation setUploadProgressBlock:^(NSInteger bytesWritten, NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite) {

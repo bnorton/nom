@@ -15,6 +15,16 @@
 
 #define FB_SUCCESS_MESSAGE @"OK, We've Connected Nom to Facebook"
 
+#define FB_TITLE        @"I just Nommed @ %@."
+#define FB_CAPTION      @"...used Nom in %@"
+#define FB_TITLE_AND_DISH @"I just Nommed at %@ and had %@"
+
+#define FB_PUBLISH_LINK         @"http://justnom.it/r/%@"
+#define FB_ACTION_LINK  @"http://justnom.it/itunes"
+
+#define FB_ACTION_NAME  @"Nom to Find & Recommend"
+
+
 @interface NMFBModel : NSObject <FBRequestDelegate, FBDialogDelegate, FBLoginDialogDelegate, FBSessionDelegate> {
     
     void (^auth_success)(void);
@@ -25,7 +35,10 @@
 
     void (^me_friends_success)(NSDictionary *friends);
     void (^me_friends_failure)(NSDictionary *friends);
-        
+
+    void (^publish_success)(void);
+    void (^publish_failure)(void);
+
     NSDictionary *_me;
     NSDictionary *_mefriends;
     
@@ -33,12 +46,17 @@
 
 - (id)init;
 
--(void)authorizeWithSuccess:(void (^)())success
+- (void)authorizeWithSuccess:(void (^)())success
                     failure:(void (^)())failure;
 
--(void)meWithSuccess:(void (^)(NSDictionary * response))success
+- (void)meWithSuccess:(void (^)(NSDictionary * response))success
              failure:(void (^)(NSDictionary * response))failure;
 
 - (void)meFriendsWithSuccess:(void (^)(NSDictionary * response))success
                      failure:(void (^)(NSDictionary * response))failure;
+
+- (void)publish:(NSString *)body locationName:(NSString *)location_name 
+           city:(NSString *)city imageUrl:(NSString *)image 
+        success:(void (^)(void))success
+        failure:(void (^)(void))failure;
 @end

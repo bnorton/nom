@@ -7,6 +7,7 @@
 //
 
 #import "NMFBModel.h"
+#import "NMJSONUtilities.h"
 #import "Util.h"
 
 @implementation NMFBModel
@@ -18,8 +19,6 @@
 - (id)init {
     self = [super init];
     if (!self) return nil;
-    
-    
     
     return self;
 }
@@ -34,17 +33,11 @@
 
 -(void)authorizeWithSuccess:(void (^)())success
                     failure:(void (^)())failure {
+
     NSLog(@"INFO: authorizeWithSuccess");
-//    if (! [[util facebook] isSessionValid]) {
-        NSLog(@"INFO: authorizeWithSuccess : session NOT valid");
-        auth_success = success;
-        auth_failure = failure;
-        [self __authorize];
-//    } else {
-//        if (success) {
-//            success();
-//        }
-//    }
+    auth_success = success;
+    auth_failure = failure;
+    [self __authorize];
 }
 
 -(void)meWithSuccess:(void (^)(NSDictionary * me))success
@@ -74,6 +67,57 @@
         success(_mefriends);
     }
 }
+
+#pragma mark - FBPublish to Stream
+/** Possible Arguments 
+ name, caption, description, link, picture, message, source
+ */
+- (void)publish:(NSString *)body locationName:(NSString *)location_name 
+           city:(NSString *)city imageUrl:(NSString *)image 
+        success:(void (^)(void))success
+        failure:(void (^)(void))failure {
+    
+    if (success) { publish_success = [success copy]; }
+    if (failure) { publish_failure = [failure copy]; }
+    
+    if (! ([location_name length] > 0)) {
+        return;
+    }
+    NSArray* actionLinks = [NSArray arrayWithObjects:
+                            [NSDictionary dictionaryWithObjectsAndKeys:
+                             FB_ACTION_NAME, @"name",
+                             FB_ACTION_LINK, @"link", nil], nil];
+    
+    NSString *actionLinksStr = [NMJSONUtilities jsonStringFrom:actionLinks];
+    NSLog(@"action links done %@", actionLinksStr);
+    
+    NSString *name = [NSString stringWithFormat:FB_TITLE, location_name];
+    
+    NSString *caption = [NSString stringWithFormat:FB_CAPTION, city];
+
+    NSString *token = [util publicationToken];
+    NSString *link = [NSString stringWithFormat:FB_PUBLISH_LINK, token];
+    
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                   name,           @"name",
+                                   caption,        @"caption",
+                                   link,           @"link",
+                                   image,          @"picture",
+                                   actionLinksStr, @"actions",
+                                   nil];
+    
+    NSString *path = [currentUser getStringForKey:@"facebook_user_id"];
+    path = [NSString stringWithFormat:@"%@/%@", [path length] > 0 ? 
+            [currentUser getStringForKey:@"fb_user_id"],@"feed" :
+            [currentUser getStringForKey:@"fb_user_name"],@"feed"];
+    
+    NSLog(@"INFO PATH for fb publish %@ params %@", path, params);
+    
+    [[util facebook] requestWithGraphPath:path andParams:params 
+                            andHttpMethod:@"POST" andDelegate:self];
+    
+}
+
 
 #pragma mark - FBSessionDelegate
 
@@ -118,6 +162,7 @@
 
 - (void)fbDialogLogin:(NSString*)token expirationDate:(NSDate*)expirationDate {
     [self fbDidLogin];
+    
 }
 
 - (void)fbDialogNotLogin:(BOOL)cancelled {
@@ -163,7 +208,10 @@
     }
     else if ([[NSString stringWithFormat:@"%@",request.url] 
               rangeOfString:@"feed"].location != NSNotFound) {
-        
+        NSLog(@"posted to my wall");
+        if (publish_success) {
+            publish_success();
+        }
     }
     else {
         NSLog(@"request.url for NMFBModel %@", request.url);
@@ -176,6 +224,12 @@
 - (void)request:(FBRequest *)request didFailWithError:(NSError *)error {
     NSLog(@"ERROR NMFBModel request failed: %@ code : %d", [error description], [error code]);
     
+    if ([[NSString stringWithFormat:@"%@",request.url] 
+         rangeOfString:@"feed"].location != NSNotFound) {
+        if (publish_failure) {
+            publish_failure();
+        }
+    }
     if ([error code] == 10000 && [[error description] 
                                   rangeOfString:@"couldn’t be completed"].location != NSNotFound) {
         // USER REVOKED ACCESS

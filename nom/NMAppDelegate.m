@@ -35,6 +35,8 @@
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
+    [currentLocation startUpdating];
+    
     UINavigationController *activity = [self newNav:[[NMActivityViewController alloc] initWithType:NMActivityTypeByFollowing]];
     [activity.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] forBarMetrics:UIBarMetricsDefault];
     
@@ -55,6 +57,8 @@
     self.tabBarController.viewControllers = [NSArray arrayWithObjects:activity, trending, locations, search, connect, nil];
     [self.tabBarController.tabBar setBackgroundImage:[UIImage imageNamed:@"tab_bar4a.png"]];
 
+    [self.tabBarController setSelectedIndex:2];
+    
     self.window.rootViewController = self.tabBarController;
     
    [self.window makeKeyAndVisible];

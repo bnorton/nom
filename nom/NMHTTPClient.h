@@ -84,10 +84,10 @@
                     success:(void (^)(NSDictionary * response))success
                     failure:(void (^)(NSDictionary * response))failure;
 
-+ (void)recommend:(NSString *)location_nid text:(NSString *)text facebook:(BOOL)facebook
-                    success:(void (^)(NSDictionary * response))success
-                    failure:(void (^)(NSDictionary * response))failure
-                    progress:(void (^)(NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite))progress;
++ (void)recommend:(NSString *)location_nid imageNid:(NSString *)image_nid 
+             text:(NSString *)text facebook:(BOOL)facebook
+          success:(void (^)(NSDictionary * response))success
+          failure:(void (^)(NSDictionary * response))failure;
 
 
 
