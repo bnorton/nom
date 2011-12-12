@@ -176,6 +176,18 @@
     }
 }
 
+- (void)preBuildCells {
+    [self setupLocations];
+    int i = 0;
+    for (NSDictionary *l in locations) {
+        if (i > 20) { NSLog(@"ERROR: tried to preBuild more then 20 cells");
+            break;  }
+        
+        
+        
+    }
+}
+
 - (void)didReceiveMemoryWarning { [super didReceiveMemoryWarning]; }
 
 - (void)distanceChanged:(NMFilterDistance)new_dist {

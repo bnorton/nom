@@ -173,6 +173,7 @@
         NSLog(@"setting the image to default");
         [image setImage:[UIImage imageNamed:@"placeholder.png"]];
     }
+    [image setNeedsDisplay];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated

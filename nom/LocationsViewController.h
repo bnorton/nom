@@ -76,10 +76,12 @@ typedef enum {
 - (id)init;
 - (id)initFilteredBy:(NMLocationsFilter)filter;
 
-- (void)setupLocations;
-
 - (void)fetchLocations;
 - (void)fetchLocationsWithOptions:(NSDictionary *)options;
+
+- (void)setupLocations;
+
+- (void)preBuildCells;
 
 - (void)filter_by_cost:(NSString *)cost_str;
 
