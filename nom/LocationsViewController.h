@@ -17,6 +17,8 @@
 #define BUTTON_SEGMENT_WIDTH 51.0
 #define CAP_WIDTH 5.0
 
+@class cellCache;
+
 typedef enum {
     CapLeft          = 0,
     CapMiddle        = 1,
@@ -64,6 +66,8 @@ typedef enum {
 	BOOL _reloading;
 
     NSArray* segmentControlTitles;
+    
+    cellCache *cache;
 
 }
 

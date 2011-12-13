@@ -160,4 +160,5 @@
             failure:(void (^)(NSDictionary * response))failure
            progress:(void (^)(NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite))progress;
 
++ (void)imageFetch:(id)image_path;
 @end

@@ -10,6 +10,7 @@
 #import "LocationDetailViewController.h"
 #import "current.h"
 #import "Util.h"
+#import "cellCache.h"
 #import "LocationCell.h"
 
 @interface LocationsViewController (PrivateMethods)
@@ -46,6 +47,9 @@
     filtered_by_cost = [[NSMutableArray alloc] initWithCapacity:20];
     filtered_by_distance = [[NSMutableArray alloc] initWithCapacity:20];
     filtered_by_current_category = [[NSMutableArray alloc] initWithCapacity:20];
+    
+    cache = [[cellCache alloc] initWithMaxCapacity:50];
+    
     return self;
 }
 
@@ -87,6 +91,7 @@
 - (void)updateComplete {
     [self doneLoadingTableViewData];
     [self setupLocations];
+    [self preBuildCells];
 }
 
 - (void)fetchLocations {
@@ -100,7 +105,6 @@
            @try {
                current_response = response;
                filtered_by_all = [response objectForKey:@"results"];
-               filter = NMLocationsFilterAll;
            } @catch (NSException *ex) {
                [util showErrorInView:self.view message:@"Failed to parse items around here"];
            }
@@ -177,14 +181,35 @@
 }
 
 - (void)preBuildCells {
-    [self setupLocations];
+    static NSString *iden = @"cached_location_cell";
+    
     int i = 0;
+    LocationCell *cell;
     for (NSDictionary *l in locations) {
-        if (i > 20) { NSLog(@"ERROR: tried to preBuild more then 20 cells");
-            break;  }
+//        if (i > 20) { NSLog(@"ERROR: tried to preBuild more then 20 cells");
+//            break;  
+//        }
+        cell = [[LocationCell alloc] initWithReuseIdentifier:iden];
+        [cell setLocation:l];
+        [cache addCell:cell forKey:[l objectForKey:@"location_nid"]];
         
-        
-        
+        ++i;
+    }
+    i=0;
+    for (NSDictionary *l in locations) {
+        NSString *url = nil;
+        @try {
+            url = [[[l objectForKey:@"images"] objectAtIndex:0] objectForKey:@"url"];
+            [NMHTTPClient imageFetch:url];
+            NSLog(@"image fetch kicked off for %@", url);
+        }
+        @catch (NSException *ex) {
+            NSLog(@"image not fetched %@ for %@",ex, url);
+        }
+        ++i;
+//        if (i > 10) {
+//            break;
+//        }
     }
 }
 
@@ -229,15 +254,29 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *CellIdentifier = @"Cell";
+    LocationCell *cell;
     
-    LocationCell *cell = (LocationCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil) {
-        cell = [[LocationCell alloc] initWithReuseIdentifier:CellIdentifier];
+    bool success_flag;
+    @try {
+        cell = (LocationCell *)[cache cellForKey:[[locations objectAtIndex:indexPath.row] objectForKey:@"location_nid"]];
+        NSLog(@"Got the cell from the cache");
+        if (cell != nil) { success_flag = true; }
     }
+    @catch (NSException *ex) {
+        NSLog(@"cell from cache failed %@", ex);
+        success_flag = false;
+    }
+    
+    if (! success_flag) {
+        cell = (LocationCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+        if (cell == nil) {
+            cell = [[LocationCell alloc] initWithReuseIdentifier:CellIdentifier];
+        }
 
-    NSLog(@"INFO locations controller set %d", indexPath.row);
-    if ([locations count] > indexPath.row) {
-        [cell setLocation:[locations objectAtIndex:indexPath.row]];
+        NSLog(@"INFO locations controller set %d", indexPath.row);
+        if ([locations count] > indexPath.row) {
+            [cell setLocation:[locations objectAtIndex:indexPath.row]];
+        }
     }
     return cell;
 }

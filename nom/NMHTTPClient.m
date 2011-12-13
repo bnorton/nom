@@ -29,9 +29,11 @@
     }
         
     NSNumber *lat = [NSNumber numberWithFloat:[currentLocation lat]];
+//    lat = [NSNumber numberWithFloat:37.789259];
     if (lat) { [params setObject:lat forKey:@"lat"]; }
     
     NSNumber *lng = [NSNumber numberWithFloat:[currentLocation lng]];
+//    lng = [NSNumber numberWithFloat:-122.416396];
     if (lat) { [params setObject:lng forKey:@"lng"]; }
 
 }
@@ -623,6 +625,13 @@
  
  ############################################################################
  */
+
++ (void)imageFetch:(id)image_path {
+    NSURL *url = [image_path isKindOfClass:[NSURL class]] ? image_path : [NSURL URLWithString:image_path];
+    AFImageRequestOperation *operation = [[AFImageRequestOperation alloc] initWithRequest:[NSURLRequest requestWithURL:url]];
+    [HTTPQueue addOperation:operation];
+}
+
 + (void)imageUpload:(NSString *)location_nid
           success:(void (^)(NSDictionary * response))success
           failure:(void (^)(NSDictionary * response))failure
