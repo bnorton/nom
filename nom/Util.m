@@ -111,7 +111,8 @@ static UIView *currently_set_view;
 
 + (NSString *)timeAgoFromRailsString:(NSString *)str {
     @try { 
-        [_date_formatter setDateFormat:@"yyyy-MM-ddTHH:mm:ssZ"];
+        // "created_at" = "2011-12-13T21:12:19Z"
+        [_date_formatter setDateFormat:RAILS_TIME_FORMAT];
         NSDate *date = [_date_formatter dateFromString:str]; 
         return [_time_formatter stringForTimeIntervalFromDate:[NSDate date] toDate:date];
     } @catch (NSException *ex) {;}
@@ -120,7 +121,8 @@ static UIView *currently_set_view;
 
 + (NSDate *)dateFromRailsString:(NSString *)str {
     @try { 
-        [_date_formatter setDateFormat:@"yyyy-MM-ddTHH:mm:ssZ"];
+        // "created_at" = "2011-12-13T21:12:19Z"
+        [_date_formatter setDateFormat:RAILS_TIME_FORMAT];
         return [_date_formatter dateFromString:str]; 
     } @catch (NSException *ex) {;}
     return nil;

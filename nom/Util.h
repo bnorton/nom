@@ -24,6 +24,7 @@
 #import "NMFBModel.h"
 #import "JSON.h"
 
+#define RAILS_TIME_FORMAT @"yyyy-MM-dd'T'HH':'mm':'ss'Z'"
 #define HTTPClient [util http_client]
 #define HTTPQueue [util queue]
 

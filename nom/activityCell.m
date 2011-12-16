@@ -7,6 +7,7 @@
 //
 
 #import "activityCell.h"
+#include "UILabel+frame.h"
 #import "Util.h"
 
 @implementation activityCell
@@ -21,24 +22,20 @@
     title = [[UILabel alloc] initWithFrame:CGRectMake(10, 5, 300, 21)];
     [title setBackgroundColor:[UIColor clearColor]];
     [title setFont:[UIFont fontWithName:@"TrebuchetMS" size:17]];
-    [title setAdjustsFontSizeToFitWidth:YES];
-    [title setMinimumFontSize:8];
     [title setLineBreakMode:UILineBreakModeTailTruncation];
-    [title setNumberOfLines:1];
+    [title setNumberOfLines:0];
     [title setTextAlignment:UITextAlignmentLeft];
     [title setTextColor:[UIColor darkGrayColor]];
 
     text = [[UILabel alloc] initWithFrame:CGRectMake(10, 27, 300, 18)];
-    [text setBackgroundColor:[UIColor clearColor]];
-    [text setFont:[UIFont fontWithName:@"TrebuchetMS" size:14]];
-    [text setAdjustsFontSizeToFitWidth:YES];
-    [text setMinimumFontSize:8];
+    [text setBackgroundColor:[UIColor lightGrayColor]];
+    [text setFont:[UIFont fontWithName:@"TrebuchetMS" size:13]];
     [text setLineBreakMode:UILineBreakModeTailTruncation];
-    [text setNumberOfLines:1];
+    [text setNumberOfLines:0];
     [text setTextAlignment:UITextAlignmentLeft];
     [text setTextColor:[UIColor darkGrayColor]];
 
-    when = [[UILabel alloc] initWithFrame:CGRectMake(10, 46, 300, 18)];
+    when = [[UILabel alloc] initWithFrame:CGRectMake(10, 42, 300, 18)];
     [when setBackgroundColor:[UIColor clearColor]];
     [when setFont:[UIFont fontWithName:@"TrebuchetMS" size:14]];
     [when setAdjustsFontSizeToFitWidth:YES];
@@ -48,7 +45,7 @@
     [when setTextAlignment:UITextAlignmentLeft];
     [when setTextColor:[UIColor darkGrayColor]];
 
-    distance = [[UILabel alloc] initWithFrame:CGRectMake(10, 65, 300, 18)];
+    distance = [[UILabel alloc] initWithFrame:CGRectMake(10, 61, 300, 18)];
     [distance setBackgroundColor:[UIColor clearColor]];
     [distance setFont:[UIFont fontWithName:@"TrebuchetMS" size:14]];
     [distance setAdjustsFontSizeToFitWidth:YES];
@@ -58,6 +55,7 @@
     [distance setTextAlignment:UITextAlignmentLeft];
     [distance setTextColor:[UIColor darkGrayColor]];
 
+    [self setSelectionStyle:UITableViewCellSelectionStyleGray];
     
     location_nid = @"";
     user_nid = @"";    
@@ -82,26 +80,70 @@
 
 - (void)setupForThumb:(NSDictionary *)thumb {
     NSDictionary *location = [thumb objectForKey:@"location"];
-    title.text = [NSString stringWithFormat:@"%@ thinks that..", [thumb objectForKey:@"name"]];
-    text.text = [NSString stringWithFormat:@"%@ is %@", [location objectForKey:@"name"],
-                 [util textForThumb:[[thumb objectForKey:@"value"] integerValue]]];
+    title.text = [NSString stringWithFormat:@"%@ says %@", [thumb objectForKey:@"name"], 
+                  [NSString stringWithFormat:@"%@ is %@", [location objectForKey:@"name"],
+                   [util textForThumb:[[thumb objectForKey:@"value"] integerValue]]]];
+    [title newFrameForText:title.text];
+    text.text = @"";
+    
     when.text = [util timeAgoFromRailsString:[thumb objectForKey:@"created_at"]];
     [self setupCommon:location];
     
     user_nid = [thumb objectForKey:@"user_nid"];
 }
 
-- (void)setupForRecommendation:(NSDictionary *)recom{
-    title.text = [NSString stringWithFormat:@"for %@", [recom objectForKey:@"location_name"]];
-    text.text = [recom objectForKey:@"text"];
+- (void)setupForRecommendation:(NSDictionary *)recom {
+    title.text = [NSString stringWithFormat:@"via %@ for %@", 
+                  [recom objectForKey:@"user_name"],
+                  [recom objectForKey:@"location_name"]];
+    NSString *txt = [recom objectForKey:@"text"];
+    [text newFrameForText:txt];
+    text.text = txt;
+    when.text = [util timeAgoFromRailsString:[recom objectForKey:@"created_at"]];
 
     [self setupCommon:recom];
+    
     user_nid = [recom objectForKey:@"user_nid"];
 
 }
 
+- (CGFloat)mockSetupCommon:(NSDictionary *)common {
+    location_nid = [common objectForKey:@"location_nid"];
+    @try {
+        NSString *city = [common objectForKey:@"city"];
+        distance.text = [NSString stringWithFormat:@"from %@", city];
+    } @catch (NSException *ex) {
+        distance.text = [common objectForKey:@"city"];
+    }
+}
+
+- (CGFloat)mockSetupForThumb:(NSDictionary *)thumb {
+    NSDictionary *location = [thumb objectForKey:@"location"];
+    title.text = [NSString stringWithFormat:@"%@ thinks that..", [thumb objectForKey:@"name"]];
+    text.text = [NSString stringWithFormat:@"%@ is %@", [location objectForKey:@"name"],
+                 [util textForThumb:[[thumb objectForKey:@"value"] integerValue]]];
+    
+    when.text = [util timeAgoFromRailsString:[thumb objectForKey:@"created_at"]];
+    [self setupCommon:location];
+    
+    user_nid = [thumb objectForKey:@"user_nid"];
+}
+
+- (CGFloat)mockSetupForRecommendation:(NSDictionary *)recom{
+    title.text = [NSString stringWithFormat:@"for %@", [recom objectForKey:@"name"]];
+    NSString *txt = [recom objectForKey:@"text"];
+    [text newFrameForText:txt];
+    text.text = txt;
+    
+    [self setupCommon:recom];
+    user_nid = [recom objectForKey:@"user_nid"];
+    
+}
+
 - (CGFloat)heightForThumb:(NSDictionary *)thumb {
-    return 50;
+    // title + text + when + distance
+    NSString *txt = [thumb objectForKey:@"text"];
+    return 26 + [text newFrameForText:@""];
 }
 
 - (CGFloat)heightForRecommendation:(NSDictionary *)recom {
@@ -129,20 +171,19 @@
          "user_nid": "4eccc0fbeef0a64dcf000001"
      },
      {
-         "location_nid": "4ec8b8fdeef0a679f80002b3",
-         "created_at": "2011-11-26T08:26:37Z",
-         "title": null,
-         "recommendation_nid": "4ed0a2bdeef0a66634000002",
-         "token": "d0n5ky7pwh",
-         "text": "I really like 15 Romolo and recommended it via Nom. justnom.it/r/d0n5ky7pwh",
-         "lng": null,
-         "image_nid": null,
-         "lat": null,
-         "location_city": "San Francisco",
-         "location_name": "15 Romolo",
-         "user_name": Brian Norton,
-         "user_nid": "4eccc0fbeef0a64dcf000001"
-     }
+         "created_at" = "2011-12-13T21:12:19Z";
+         "image_nid" = "<null>";
+         lat = "37.7901";
+         lng = "-122.404";
+         "location_city" = "<null>";
+         "location_name" = "Nick's Crispy Tacos";
+         "location_nid" = "4eccc0fbeef0a64dcf000001";
+         "recommendation_nid" = 4ee7bfb3eef0a61a7e000005;
+         text = "I just Nommed @ Nick's Crispy Tacos justnom.it/r/d4qg9hifo0";
+         title = "<null>";
+         token = d4qg9hifo0;
+         "user_nid" = 4eccc0fbeef0a64dcf000001;
+    }
  ],
  "thumbs": [
      {

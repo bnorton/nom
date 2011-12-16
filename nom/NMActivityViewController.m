@@ -108,7 +108,7 @@
             if (([response objectForKey:@"status"]) > 0) {
                 NSArray *_recommends;
                 NSArray *_thumbs;
-                if ((_recommends = [response objectForKey:@"recommendations"])) {
+                if ((_recommends = [response objectForKey:@"recommends"])) {
                     recommends = _recommends;
                     NSLog(@"INFO Activity have recommendations");
                 }

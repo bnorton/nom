@@ -21,6 +21,7 @@ typedef enum {
 	NSString* text;
 	NSString* image_url;
     NSString* image_nid;
+    NSString* location_nid;
     
 	UITextField* nameField_ ;
 	UITextField* addressField_ ;

@@ -29,11 +29,9 @@
     }
         
     NSNumber *lat = [NSNumber numberWithFloat:[currentLocation lat]];
-//    lat = [NSNumber numberWithFloat:37.789259];
     if (lat) { [params setObject:lat forKey:@"lat"]; }
     
     NSNumber *lng = [NSNumber numberWithFloat:[currentLocation lng]];
-//    lng = [NSNumber numberWithFloat:-122.416396];
     if (lat) { [params setObject:lng forKey:@"lng"]; }
 
 }
@@ -371,7 +369,7 @@
     
     [self addDefaultParams:parameters];
     
-    if (facebook) { [parameters setObject:[NSNumber numberWithBool:YES] forKey:@"facebook"]; }
+    if (facebook) { [parameters setObject:[NSNumber numberWithBool:facebook] forKey:@"facebook"]; }
     if (image_nid){ [parameters setObject:image_nid forKey:@"image_nid"]; }
     
     /**

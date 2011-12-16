@@ -29,6 +29,8 @@
         address = nil;
     }
     
+    location_nid = [location objectForKey:@"location_nid"];
+    
 	text    = [NSString stringWithFormat:@"I just Nommed @ %@", name];
     image_url = img_url;
     image_nid = img_nid;
@@ -117,7 +119,7 @@
 
     if ([currentUser getBooleanForKey:@"publish_to_facebook"]) {
         [[util fbmodel] publish:text locationName:name city:address imageUrl:image_url success:^{
-            [util showInfoInView:self.view message:@"Post(s) were successful"];
+            [util showInfoInView:self.view message:@"Facebook post was successful"];
             [hud hide:YES];
         } failure:^{
             [util showErrorInView:self.view message:@"Facebook post failed :("];
@@ -125,12 +127,12 @@
         }];
     }
     if ([currentUser getBooleanForKey:@"publish_to_nom"]) {
-        [NMHTTPClient recommend:name imageNid:image_nid text:text facebook:[currentUser getBooleanForKey:@"publish_to_facebook"] 
+        [NMHTTPClient recommend:location_nid imageNid:image_nid text:text facebook:[currentUser getBooleanForKey:@"publish_to_facebook"] 
         success:^(NSDictionary *response) {
-            [util showInfoInView:self.view message:@"Post(s) were successful"];
+            [util showInfoInView:self.view message:@"Nom publication success"];
             [hud hide:YES];
         } failure:^(NSDictionary *response) {
-            [util showErrorInView:self.view message:@"Nom post failed :("];
+            [util showErrorInView:self.view message:@"Nom publication failed :("];
             [hud hide:YES];
         }];
     }
