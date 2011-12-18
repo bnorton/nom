@@ -3,7 +3,7 @@
 //  nom
 //
 //  Created by Brian Norton on 12/1/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 Nom Inc. All rights reserved.
 //
 
 #import "activityCell.h"
@@ -28,7 +28,7 @@
     [title setTextColor:[UIColor darkGrayColor]];
 
     text = [[UILabel alloc] initWithFrame:CGRectMake(10, 27, 300, 18)];
-    [text setBackgroundColor:[UIColor lightGrayColor]];
+    [text setBackgroundColor:[UIColor clearColor]];
     [text setFont:[UIFont fontWithName:@"TrebuchetMS" size:13]];
     [text setLineBreakMode:UILineBreakModeTailTruncation];
     [text setNumberOfLines:0];
@@ -78,7 +78,7 @@
     }
 }
 
-- (void)setupForThumb:(NSDictionary *)thumb {
+- (CGFloat)setupForThumb:(NSDictionary *)thumb isMocked:(BOOL)mock {
     NSDictionary *location = [thumb objectForKey:@"location"];
     title.text = [NSString stringWithFormat:@"%@ says %@", [thumb objectForKey:@"name"], 
                   [NSString stringWithFormat:@"%@ is %@", [location objectForKey:@"name"],
@@ -92,52 +92,40 @@
     user_nid = [thumb objectForKey:@"user_nid"];
 }
 
-- (void)setupForRecommendation:(NSDictionary *)recom {
-    title.text = [NSString stringWithFormat:@"via %@ for %@", 
-                  [recom objectForKey:@"user_name"],
-                  [recom objectForKey:@"location_name"]];
-    NSString *txt = [recom objectForKey:@"text"];
-    [text newFrameForText:txt];
-    text.text = txt;
-    when.text = [util timeAgoFromRailsString:[recom objectForKey:@"created_at"]];
-
-    [self setupCommon:recom];
+- (CGFloat)setupForRecommendation:(NSDictionary *)recom isMocked:(BOOL)mock {
+    CGFloat height = 19;
     
-    user_nid = [recom objectForKey:@"user_nid"];
-
-}
-
-- (CGFloat)mockSetupCommon:(NSDictionary *)common {
-    location_nid = [common objectForKey:@"location_nid"];
-    @try {
-        NSString *city = [common objectForKey:@"city"];
-        distance.text = [NSString stringWithFormat:@"from %@", city];
-    } @catch (NSException *ex) {
-        distance.text = [common objectForKey:@"city"];
+    NSString *lname = [recom objectForKey:@"location_name"];
+    NSString *uname = [recom objectForKey:@"user_name"];
+    NSString *str = nil;
+    
+    if ([lname length] > 0 ) {
+        if ([uname length] > 0) {
+            str = [NSString stringWithFormat:@"via %@ for %@", lname, uname];
+        } else {
+            str = [NSString stringWithFormat:@"for %@", lname];
+        }
+    } else if ([uname length] > 0) {
+        str = [NSString stringWithFormat:@"via %@", uname];
+    } else {
+        
     }
-}
-
-- (CGFloat)mockSetupForThumb:(NSDictionary *)thumb {
-    NSDictionary *location = [thumb objectForKey:@"location"];
-    title.text = [NSString stringWithFormat:@"%@ thinks that..", [thumb objectForKey:@"name"]];
-    text.text = [NSString stringWithFormat:@"%@ is %@", [location objectForKey:@"name"],
-                 [util textForThumb:[[thumb objectForKey:@"value"] integerValue]]];
+    height += [title newFrameForText:str];
     
-    when.text = [util timeAgoFromRailsString:[thumb objectForKey:@"created_at"]];
-    [self setupCommon:location];
-    
-    user_nid = [thumb objectForKey:@"user_nid"];
-}
-
-- (CGFloat)mockSetupForRecommendation:(NSDictionary *)recom{
-    title.text = [NSString stringWithFormat:@"for %@", [recom objectForKey:@"name"]];
     NSString *txt = [recom objectForKey:@"text"];
-    [text newFrameForText:txt];
-    text.text = txt;
-    
-    [self setupCommon:recom];
-    user_nid = [recom objectForKey:@"user_nid"];
-    
+    CGFloat txt_height = 0;
+    if ([txt length] > 0) {
+        txt_height = [text newFrameForText:txt];
+        height += txt_height + 6;
+    }
+    if (! mock) {
+        title.text = str; 
+        text.text = txt;
+        when.frame = CGRectMake(10, (height - 19), 300, 18);
+        when.text = [util timeAgoFromRailsString:[recom objectForKey:@"created_at"]];
+        user_nid = [recom objectForKey:@"user_nid"];
+    }
+    return height + 1;
 }
 
 - (CGFloat)heightForThumb:(NSDictionary *)thumb {

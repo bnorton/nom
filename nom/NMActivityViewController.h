@@ -9,6 +9,8 @@
 #import <UIKit/UIKit.h>
 #import "EGORefreshTableHeaderView.h"
 
+@class activityCell;
+
 typedef enum {
     NMActivityTypeByUser,
     NMActivityTypeByFollowing
@@ -31,6 +33,8 @@ typedef enum {
 	BOOL _reloading;
     
     NMActivityType type;
+    
+    activityCell *sampleCell;
 }
 
 - (void)reloadTableViewDataSource;

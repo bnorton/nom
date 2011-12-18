@@ -3,7 +3,7 @@
 //  nom
 //
 //  Created by Brian Norton on 12/1/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 Nom Inc. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -20,8 +20,8 @@
 
 - (id)initWithReuseIdentifier:(NSString *)reuseIdentifier;
 
-- (void)setupForThumb:(NSDictionary *)thumb;
-- (void)setupForRecommendation:(NSDictionary *)recom;
+- (CGFloat)setupForThumb:(NSDictionary *)thumb isMocked:(BOOL)mock;
+- (CGFloat)setupForRecommendation:(NSDictionary *)recom isMocked:(BOOL)mock;
 
 @property (nonatomic, retain) NSString *location_nid;
 @property (nonatomic, retain) NSString *user_nid;

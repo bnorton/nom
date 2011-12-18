@@ -18,7 +18,6 @@
 - (id)initWithType:(NMActivityType)_type userNid:(NSString *)_user_nid name:(NSString *)_name {
     self = [super initWithStyle:UITableViewStylePlain];
     if (! self) { return nil; }
-//    [self.view addSubview:self.navigationController.view];
     
     self.title = NSLocalizedString(@"Timeline", @"All things Nom");
     type = _type;
@@ -36,6 +35,8 @@
     recommends = nil;
     activities = [[NSMutableArray alloc] initWithCapacity:20];
 
+    sampleCell = [[activityCell alloc] initWithReuseIdentifier:@"Sample"];
+    
     [self fetchActivities];
     
     return self;
@@ -205,10 +206,10 @@
     @try {
         if (([activities count] > indexPath.row)) {
              if (([[[activities objectAtIndex:indexPath.row] objectForKey:@"recommendation_nid"] length] > 0)) {
-                 [cell setupForRecommendation:[activities objectAtIndex:indexPath.row]];
+                 [cell setupForRecommendation:[activities objectAtIndex:indexPath.row] isMocked:NO];
              }
              else {
-                 [cell setupForThumb:[activities objectAtIndex:indexPath.row]];
+                 [cell setupForThumb:[activities objectAtIndex:indexPath.row] isMocked:NO];
              }
         }
     } @catch (NSException *ex) {
@@ -218,7 +219,20 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 85;
+    CGFloat height = 0;
+    @try {
+        if (([activities count] > indexPath.row)) {
+            if (([[[activities objectAtIndex:indexPath.row] objectForKey:@"recommendation_nid"] length] > 0)) {
+                height = [sampleCell setupForRecommendation:[activities objectAtIndex:indexPath.row] isMocked:YES];
+            }
+            else {
+                height = [sampleCell setupForThumb:[activities objectAtIndex:indexPath.row] isMocked:YES];
+            }
+        }
+    } @catch (NSException *ex) {
+        NSLog(@"had some trouble mocking the cell for %d EXCEPTION %@", indexPath.row, [ex description]);
+    }
+    return height;
 }
 
 #pragma mark -
