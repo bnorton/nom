@@ -47,7 +47,7 @@
  * #######################################################################
  * ########################### LOCATION ##################################
  */
-+ (void)here:(CGFloat)distance categories:(NSString *)categories cost:(NSString *)cost
++ (void)here:(CGFloat)distance categories:(NSString *)categories cost:(NSString *)cost limit:(NSUInteger)limit
                     success:(void (^)(NSDictionary * response))success
                     failure:(void (^)(NSDictionary * response))failure;
 
@@ -85,7 +85,7 @@
                     failure:(void (^)(NSDictionary * response))failure;
 
 + (void)recommend:(NSString *)location_nid imageNid:(NSString *)image_nid 
-             text:(NSString *)text facebook:(BOOL)facebook
+             text:(NSString *)text facebook:(BOOL)facebook token:(NSString *)token
           success:(void (^)(NSDictionary * response))success
           failure:(void (^)(NSDictionary * response))failure;
 

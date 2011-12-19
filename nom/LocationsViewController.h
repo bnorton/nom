@@ -59,6 +59,9 @@ typedef enum {
     NSArray *distance_values;
     
     NSArray *categories;
+    
+    NSUInteger current_limit;
+    
     EGORefreshTableHeaderView *_refreshHeaderView;
 	
 	//  Reloading var should really be your tableviews datasource

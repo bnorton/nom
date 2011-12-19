@@ -73,7 +73,7 @@
  name, caption, description, link, picture, message, source
  */
 - (void)publish:(NSString *)body locationName:(NSString *)location_name 
-           city:(NSString *)city imageUrl:(NSString *)image 
+           city:(NSString *)city imageUrl:(NSString *)image token:(NSString *)token
         success:(void (^)(void))success
         failure:(void (^)(void))failure {
     
@@ -89,13 +89,11 @@
                              FB_ACTION_LINK, @"link", nil], nil];
     
     NSString *actionLinksStr = [NMJSONUtilities jsonStringFrom:actionLinks];
-    NSLog(@"action links done %@", actionLinksStr);
     
     NSString *name = [NSString stringWithFormat:FB_TITLE, location_name];
     
-    NSString *caption = [NSString stringWithFormat:FB_CAPTION, city];
+    NSString *caption = body;//[NSString stringWithFormat:FB_CAPTION, city];
 
-    NSString *token = [util publicationToken];
     NSString *link = [NSString stringWithFormat:FB_PUBLISH_LINK, token];
     
     NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
@@ -106,10 +104,10 @@
                                    actionLinksStr, @"actions",
                                    nil];
     
-    NSString *path = [currentUser getStringForKey:@"facebook_user_id"];
-    path = [NSString stringWithFormat:@"%@/%@", [path length] > 0 ? 
-            [currentUser getStringForKey:@"fb_user_id"],@"feed" :
-            [currentUser getStringForKey:@"fb_user_name"],@"feed"];
+    NSString *path = [currentUser getStringForKey:@"fb_user_id"];
+    path = [NSString stringWithFormat:@"%@/%@", ([path length] > 0 ? 
+            [currentUser getStringForKey:@"fb_user_id"] :
+            [currentUser getStringForKey:@"fb_user_name"]),@"feed"];
     
     NSLog(@"INFO PATH for fb publish %@ params %@", path, params);
     
@@ -180,11 +178,11 @@
           request.httpMethod);
     
     if ([request.url isEqual:[NSString stringWithFormat:@"%@%@", FB_BASE, FB_ME]]) {
-        NSInteger uid      = [[result objectForKey:@"id"] integerValue];
+        NSString *uid      = [result objectForKey:@"id"];
         NSString *uname    = [result objectForKey:@"username"];
         NSString *fullname = [result objectForKey:@"name"];
         
-        [currentUser setNumber:uid ForKey:@"fb_user_id"];
+        [currentUser setString:uid ForKey:@"fb_user_id"];
         [currentUser setString:uname ForKey:@"fb_user_name"];
         [currentUser setString:fullname ForKey:@"fb_full_name"];
         

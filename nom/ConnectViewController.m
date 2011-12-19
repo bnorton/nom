@@ -141,7 +141,8 @@
     }
     user_location.text = [user objectForKey:@"city"];
     
-    if ([(str = [user objectForKey:@"last_seen"]) length] > 0) {
+    if ([(str = [user objectForKey:@"updated_at"]) length] > 0) {
+        NSLog(@"CONNECT INFO: last seen %@", str);
         if ([(tmp = [util timeAgoFromRailsString:str]) length] > 0) {        
             str = [NSString stringWithFormat:@"last seen: %@", tmp];
         }

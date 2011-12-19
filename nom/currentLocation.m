@@ -10,7 +10,6 @@
 #import "current.h"
 #import "Util.h"
 
-static CLLocationManager *locationManager = nil;
 static BOOL isScheduledForStop = false;
 static NSTimer *scheduledTimer = nil;
 
@@ -22,7 +21,7 @@ static NSTimer *scheduledTimer = nil;
     if(!initialized)
     {
         initialized = YES;
-        locationManager = [[CLLocationManager alloc] init];
+        
     }
 }
 
@@ -30,43 +29,44 @@ static NSTimer *scheduledTimer = nil;
     self = [super init];
     if (!self) return nil;
     
+    locationManager = [[CLLocationManager alloc] init];
     [locationManager setDelegate:self];
     
     return self;
 }
 
-+ (void)startUpdating {
+- (void)startUpdating {
     if (isScheduledForStop) {
         isScheduledForStop = false;
         [scheduledTimer invalidate];
     }
-    [locationManager startUpdatingHeading];
+    [locationManager startUpdatingLocation];
 }
 
-+ (void)stopUpdatingLater {
+- (void)stopUpdatingLater {
     isScheduledForStop = false;
     [locationManager stopUpdatingLocation];
 }
 
-+ (void)stopUpdating {
+- (void)stopUpdating {
     if (isScheduledForStop) {
         return;
     } else {
         isScheduledForStop = true;
-        scheduledTimer = [NSTimer scheduledTimerWithTimeInterval:5 target:[currentLocation class]
+        scheduledTimer = [NSTimer scheduledTimerWithTimeInterval:7.5 target:[util currentLocation]
                                   selector:@selector(stopUpdatingLater) 
                                   userInfo:nil repeats:NO];
     }
 }
 
-+ (CGFloat)lat { return locationManager.location.coordinate.latitude;     }
-+ (CGFloat)lng { return locationManager.location.coordinate.longitude;    }
-+ (CGFloat)altitude { return locationManager.location.altitude;           }
-+ (CGFloat)accuracy { return locationManager.location.horizontalAccuracy; }
+- (CGFloat)lat { return locationManager.location.coordinate.latitude;     }
+- (CGFloat)lng { return locationManager.location.coordinate.longitude;    }
+- (CGFloat)altitude { return locationManager.location.altitude;           }
+- (CGFloat)accuracy { return locationManager.location.horizontalAccuracy; }
 
 + (NSString *)howFarFromLat:(CGFloat)lat Long:(CGFloat)lng {
     CLLocation *old = [[CLLocation alloc] initWithLatitude:lat longitude:lng];
-    CLLocation *now = [[CLLocation alloc] initWithLatitude:[currentLocation lat] longitude:[currentLocation lng]];
+    CLLocation *now = [[CLLocation alloc] initWithLatitude:[[util currentLocation] lat] longitude:[[util currentLocation] lng]];
     NSString *format = [[util format_location] stringFromDistanceAndBearingFromLocation:now toLocation:old];
     NSLog(@"INFO how far from %@", format);
     return format;
@@ -107,7 +107,7 @@ static NSTimer *scheduledTimer = nil;
     CLLocationAccuracy accuracy = newLocation.horizontalAccuracy;
     if (accuracy < kCLLocationAccuracyHundredMeters){
         
-        
+        [self stopUpdating];
     }
 }
 

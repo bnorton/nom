@@ -15,7 +15,7 @@
 
 #define FB_SUCCESS_MESSAGE @"OK, We've Connected Nom to Facebook"
 
-#define FB_TITLE        @"I just Nommed @ %@."
+#define FB_TITLE        @"Nommed @ %@."
 #define FB_CAPTION      @"...used Nom in %@"
 #define FB_TITLE_AND_DISH @"I just Nommed at %@ and had %@"
 
@@ -56,7 +56,7 @@
                      failure:(void (^)(NSDictionary * response))failure;
 
 - (void)publish:(NSString *)body locationName:(NSString *)location_name 
-           city:(NSString *)city imageUrl:(NSString *)image 
+           city:(NSString *)city imageUrl:(NSString *)image token:(NSString *)token
         success:(void (^)(void))success
         failure:(void (^)(void))failure;
 @end

@@ -24,6 +24,8 @@ static TTTTimeIntervalFormatter *_time_formatter;
 static TTTArrayFormatter * _array_formatter;
 static NSDateFormatter *_date_formatter;
 
+static currentLocation *_currentLocation;
+
 static Facebook *_facebook;
 static NSArray *_perms;
 static NMFBModel *_fbmodel;
@@ -49,7 +51,6 @@ static UIView *currently_set_view;
     static BOOL initialized = NO;
     if(!initialized)
     {
-        
         initialized = YES;
         NSLog(@"UTIL initialize");
 
@@ -66,6 +67,10 @@ static UIView *currently_set_view;
         _time_formatter = [[TTTTimeIntervalFormatter alloc] init];
         _array_formatter = [[TTTArrayFormatter alloc] init];
         _date_formatter = [[NSDateFormatter alloc] init];
+        [_date_formatter setTimeZone:[NSTimeZone timeZoneWithName:@"UTC"]];
+        
+        _currentLocation = [[currentLocation alloc] init];
+        [_currentLocation startUpdating];
         
         _perms = [NSArray arrayWithObjects:PERMS];
         [_location_formatter setUnitSystem:TTTImperialSystem];
@@ -163,6 +168,10 @@ static UIView *currently_set_view;
     [hud setMode:MBProgressHUDModeIndeterminate];
     [hud show:YES];
     return hud;
+}
+
++ (currentLocation *)currentLocation {
+    return _currentLocation;
 }
 
 + (NSString *)base36Encode:(NSInteger)to_encode {

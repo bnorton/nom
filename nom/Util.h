@@ -19,6 +19,7 @@
 #import "TTTLocationFormatter.h"
 #import "TTTTimeIntervalFormatter.h"
 #import "TTTArrayFormatter.h"
+#import "currentLocation.h"
 
 #import "Facebook.h"
 #import "NMFBModel.h"
@@ -33,7 +34,7 @@
 
 #define PERMS @"user_checkins", @"publish_stream", @"offline_access", @"friends_location", @"email", nil
 
-@class AFHTTPClient;
+@class AFHTTPClient, currentLocation;
 
 @interface util : NSObject
 
@@ -57,6 +58,8 @@
 + (NSString *)textForThumb:(NSInteger)value;
 
 + (MBProgressHUD *)showHudInView:(id)view;
+
++ (currentLocation *)currentLocation;
 
 + (NSString *)base36Encode:(NSInteger)to_encode;
 + (NSString *)publicationToken;

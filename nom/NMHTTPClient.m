@@ -28,10 +28,10 @@
         if (auth_token) { [params setObject:auth_token forKey:@"auth_token"]; }
     }
         
-    NSNumber *lat = [NSNumber numberWithFloat:[currentLocation lat]];
+    NSNumber *lat = [NSNumber numberWithFloat:[[util currentLocation] lat]];
     if (lat) { [params setObject:lat forKey:@"lat"]; }
     
-    NSNumber *lng = [NSNumber numberWithFloat:[currentLocation lng]];
+    NSNumber *lng = [NSNumber numberWithFloat:[[util currentLocation] lng]];
     if (lat) { [params setObject:lng forKey:@"lng"]; }
 
 }
@@ -161,16 +161,18 @@
 
 /** Location Based Services */
 
-+ (void)here:(CGFloat)distance categories:(NSString *)categories cost:(NSString *)cost
++ (void)here:(CGFloat)distance categories:(NSString *)categories cost:(NSString *)cost limit:(NSUInteger)limit
                 success:(void (^)(NSDictionary * response))success
                 failure:(void (^)(NSDictionary * response))failure {
     
     NSMutableArray *items  = [[NSMutableArray alloc] initWithCapacity:4];
     NSMutableArray *params = [[NSMutableArray alloc] initWithCapacity:4];
     /* @optional */
-    if (distance < 0.25) { distance = 0.5f; }
-    if (distance > 5.0f) { distance = 5.0f; }
-    distance = 1.5f;
+    if (distance < 0.25) { distance = 0.24f;  }
+    if (distance > 5.0f) { distance = 5.01f;  }
+    if (limit < 6)  { limit = 6; }
+    if (limit > 25) { limit = 24; }
+    
     [items addObject:[NSString stringWithFormat:@"%f", distance]];
     [params addObject:@"dist"];
     [items addObject:[NSString stringWithFormat:@"%d", 50]];
@@ -354,18 +356,19 @@
  */
 
 + (void)recommend:(NSString *)location_nid imageNid:(NSString *)image_nid 
-             text:(NSString *)text facebook:(BOOL)facebook
+             text:(NSString *)text facebook:(BOOL)facebook token:(NSString *)token
                     success:(void (^)(NSDictionary * response))success
                     failure:(void (^)(NSDictionary * response))failure {
-    
-    NSArray *items  = [NSArray arrayWithObjects:location_nid, text,[NSNumber numberWithBool:NO], nil];
-    NSArray *params = [NSArray arrayWithObjects:@"location_nid",@"text",@"image_attachment_present", nil];
+
+    token = token != nil ? token : [util publicationToken];
+    NSArray *items  = [NSArray arrayWithObjects:location_nid, token, text,[NSNumber numberWithBool:NO], nil];
+    NSArray *params = [NSArray arrayWithObjects:@"location_nid", @"token", @"text", @"image_attachment_present", nil];
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjects:items forKeys:params];
     
     [self addDefaultParams:parameters];
     
     if (facebook) { [parameters setObject:[NSNumber numberWithBool:facebook] forKey:@"facebook"]; }
-    if (image_nid){ [parameters setObject:image_nid forKey:@"image_nid"]; }
+    if (image_nid){ [parameters setObject:image_nid forKey:@"image_nid"];                         }
     
     /**
      * Build the image and the image metadata

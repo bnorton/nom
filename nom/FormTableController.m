@@ -112,13 +112,15 @@
     [hud show:YES];
     
     NSLog(@"submitting");
-    text = text == nil ? @"" : text;
-    name = name == nil ? @"" : name;
-    address = address == nil ? @"" : address;
+    text = textView_.text != nil ? textView_.text : text;
+    name = nameField_.text != nil ? nameField_.text : name;
+    address = addressField_.text != nil ? addressField_.text : address;
     image_url = image_url == nil ? @"" : image_url;
-
+    
+    NSString *token = [util publicationToken];
+    
     if ([currentUser getBooleanForKey:@"publish_to_facebook"]) {
-        [[util fbmodel] publish:text locationName:name city:address imageUrl:image_url success:^{
+        [[util fbmodel] publish:text locationName:name city:address imageUrl:image_url token:token success:^{
             [util showInfoInView:self.view message:@"Facebook post was successful"];
             [hud hide:YES];
         } failure:^{
@@ -127,7 +129,8 @@
         }];
     }
     if ([currentUser getBooleanForKey:@"publish_to_nom"]) {
-        [NMHTTPClient recommend:location_nid imageNid:image_nid text:text facebook:[currentUser getBooleanForKey:@"publish_to_facebook"] 
+        [NMHTTPClient recommend:location_nid imageNid:image_nid text:text 
+                       facebook:[currentUser getBooleanForKey:@"publish_to_facebook"] token:token
         success:^(NSDictionary *response) {
             [util showInfoInView:self.view message:@"Nom publication success"];
             [hud hide:YES];

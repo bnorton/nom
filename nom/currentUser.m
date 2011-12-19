@@ -17,11 +17,12 @@ static NSMutableDictionary *user = nil;
     if ([[defaults objectForKey:@"auth_token"] length] > 0) { [user setObject:[defaults objectForKey:@"auth_token"] forKey:@"auth_token"]; }
     if ([[defaults objectForKey:@"user_nid"] length] > 0)   { [user setObject:[defaults objectForKey:@"user_nid"] forKey:@"user_nid"]; }
     if ([[defaults objectForKey:@"email"] length] > 0)      { [user setObject:[defaults objectForKey:@"email"] forKey:@"email"]; }
-    if ([[defaults objectForKey:@"last_seen"] length] > 0)  { [user setObject:[defaults objectForKey:@"last_seen"] forKey:@"last_seen"]; }
+//    if ([[defaults objectForKey:@"last_seen"] length] > 0)  { [user setObject:[defaults objectForKey:@"last_seen"] forKey:@"last_seen"]; }
     if ([[defaults objectForKey:@"name"] length] > 0)       { [user setObject:[defaults objectForKey:@"name"] forKey:@"name"]; }
     if ([[defaults objectForKey:@"screen_name"] length] > 0){ [user setObject:[defaults objectForKey:@"screen_name"] forKey:@"screen_name"]; }
     if ([[defaults objectForKey:@"image_url"] length] > 0)  { [user setObject:[defaults objectForKey:@"image_url"] forKey:@"image_url"]; }
     if ([[defaults objectForKey:@"created_at"] length] > 0) { [user setObject:[defaults objectForKey:@"created_at"] forKey:@"created_at"]; }
+    if ([[defaults objectForKey:@"updated_at"] length] > 0) { [user setObject:[defaults objectForKey:@"updated_at"] forKey:@"updated_at"]; }
     if ([[defaults objectForKey:@"city"] length] > 0)       { [user setObject:[defaults objectForKey:@"city"] forKey:@"city"]; }
     if ([[defaults objectForKey:@"follower_count"] length] > 0){ [user setObject:[defaults objectForKey:@"follower_count"] forKey:@"follower_count"]; }
 
@@ -93,11 +94,12 @@ static NSMutableDictionary *user = nil;
         if ([[_user objectForKey:@"auth_token"] length] > 0) { [defaults setObject:[_user objectForKey:@"auth_token"] forKey:@"auth_token"]; }
         if ([[_user objectForKey:@"user_nid"] length] > 0)   { [defaults setObject:[_user objectForKey:@"user_nid"] forKey:@"user_nid"]; }
         if ([[_user objectForKey:@"email"] length] > 0)      { [defaults setObject:[_user objectForKey:@"email"] forKey:@"email"]; }
-        if ([[_user objectForKey:@"last_seen"] length] > 0)  { [defaults setObject:[_user objectForKey:@"last_seen"] forKey:@"last_seen"]; }
+//        if ([[_user objectForKey:@"last_seen"] length] > 0)  { [defaults setObject:[_user objectForKey:@"last_seen"] forKey:@"last_seen"]; }
         if ([[_user objectForKey:@"name"] length] > 0)       { [defaults setObject:[_user objectForKey:@"name"] forKey:@"name"]; }
         if ([[_user objectForKey:@"screen_name"] length] > 0){ [defaults setObject:[_user objectForKey:@"screen_name"] forKey:@"screen_name"]; }
         if ([[_user objectForKey:@"image_url"] length] > 0)  { [defaults setObject:[_user objectForKey:@"image_url"] forKey:@"image_url"]; }
         if ([[_user objectForKey:@"created_at"] length] > 0) { [defaults setObject:[_user objectForKey:@"created_at"] forKey:@"created_at"]; }
+        if ([[_user objectForKey:@"updated_at"] length] > 0) { [defaults setObject:[_user objectForKey:@"updated_at"] forKey:@"updated_at"]; }
         if ([[_user objectForKey:@"city"] length] > 0)       { [defaults setObject:[_user objectForKey:@"city"] forKey:@"city"]; }
         if ([[_user objectForKey:@"follower_count"] length] > 0){ [defaults setObject:[_user objectForKey:@"follower_count"] forKey:@"follower_count"]; }
         

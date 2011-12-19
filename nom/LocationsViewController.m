@@ -48,6 +48,8 @@
     filtered_by_distance = [[NSMutableArray alloc] initWithCapacity:20];
     filtered_by_current_category = [[NSMutableArray alloc] initWithCapacity:20];
     
+    current_limit = 25;
+    
     cache = [[cellCache alloc] initWithMaxCapacity:50];
     
     return self;
@@ -99,7 +101,7 @@
 }
 
 - (void)fetchLocationsWithOptions:(NSDictionary *)options {
-    [NMHTTPClient here:[[distance_values objectAtIndex:distance] floatValue] categories:nil cost:nil 
+    [NMHTTPClient here:[[distance_values objectAtIndex:distance] floatValue] categories:nil cost:nil  limit:current_limit
        success:^(NSDictionary *response) {
            NSLog(@"INFO: here success callback : %@", response);
            @try {
@@ -295,7 +297,9 @@
     }
 }
 
-#pragma mark -
+#pragma mark - UIActionSheetMethods
+
+
 #pragma mark Data Source Loading / Reloading Methods
 
 - (void)reloadTableViewDataSource {

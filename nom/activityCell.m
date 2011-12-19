@@ -91,10 +91,13 @@ static CGRect distance_frame;
 - (void)reset {
     title.frame = title_frame;
     text.frame = text_frame;
+    when.frame = when_frame;
+    distance.frame = distance_frame;
 }
 
 - (CGFloat)setupForThumb:(NSDictionary *)thumb isMocked:(BOOL)mock {
     CGFloat height = 19;
+    if (! mock) { [self reset]; }
     
     NSDictionary *location = [thumb objectForKey:@"location"];
     NSDictionary *user = [thumb objectForKey:@"user"];
@@ -115,9 +118,11 @@ static CGRect distance_frame;
     if (! mock) {
         title.text = str;
         text.text = @"";
+        title.frame = CGRectMake(10, (height - 17 - text.frame.size.height), text.frame.size.width, text.frame.size.height);
         when.frame = CGRectMake(10, (height - 15), 300, 18);
         when.text = [util timeAgoFromRailsString:[thumb objectForKey:@"created_at"]];
         user_nid = [thumb objectForKey:@"user_nid"];
+        location_nid = [location objectForKey:@"location_nid"];
     } else {
         [self reset];
     }
@@ -127,6 +132,7 @@ static CGRect distance_frame;
 
 - (CGFloat)setupForRecommendation:(NSDictionary *)recom isMocked:(BOOL)mock {
     CGFloat height = 19;
+    if (! mock) { [self reset]; }
     
     NSDictionary *location = [recom objectForKey:@"location"];
     NSDictionary *user = [recom objectForKey:@"user"];
@@ -161,11 +167,13 @@ static CGRect distance_frame;
     }
     if (! mock) {
         title.text = str; 
+        title.frame = CGRectMake(10, 5, title.frame.size.width, title.frame.size.height);
         text.text = txt;
         text.frame = CGRectMake(10, (height - 17 - text.frame.size.height), text.frame.size.width, text.frame.size.height);
         when.frame = CGRectMake(10, (height - 15), 300, 18);
         when.text = [util timeAgoFromRailsString:[recom objectForKey:@"created_at"]];
         user_nid = [user objectForKey:@"user_nid"];
+        location_nid = [location objectForKey:@"location_nid"];
     } else {
         [self reset];
     }

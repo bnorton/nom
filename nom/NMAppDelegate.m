@@ -21,7 +21,6 @@
 @implementation NMAppDelegate
 
 @synthesize window = _window;
-@synthesize location;
 @synthesize tabBarController = _tabBarController;
 
 - (UINavigationController *)newNav:(UIViewController *)vc {
@@ -31,25 +30,23 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     
-    [[UIApplication sharedApplication] setStatusBarStyle: UIStatusBarStyleBlackTranslucent];
+    [[UIApplication sharedApplication] setStatusBarStyle: UIStatusBarStyleBlackOpaque];
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
-    [currentLocation startUpdating];
-    
-    UINavigationController *activity = [self newNav:[[NMActivityViewController alloc] initWithType:NMActivityTypeByFollowing]];
+    UINavigationController *activity  = [self newNav:[[NMActivityViewController alloc] initWithType:NMActivityTypeByFollowing]];
     [activity.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] forBarMetrics:UIBarMetricsDefault];
     
-    UINavigationController *trending = [self newNav:[[TrendingLocationsViewController alloc] init]];
+    UINavigationController *trending  = [self newNav:[[TrendingLocationsViewController alloc] init]];
     [trending.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] forBarMetrics:UIBarMetricsDefault];
     
     UINavigationController *locations = [self newNav:[[LocationsViewController alloc] init]];
     [locations.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] forBarMetrics:UIBarMetricsDefault];
     
-    UINavigationController *search  = [self newNav:[[SearchViewController alloc] init]];
+    UINavigationController *search    = [self newNav:[[SearchViewController alloc] init]];
     [search.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] forBarMetrics:UIBarMetricsDefault];
     
-    UINavigationController *connect  = [self newNav:[[ConnectViewController alloc] init]];
+    UINavigationController *connect   = [self newNav:[[ConnectViewController alloc] init]];
     [connect.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] forBarMetrics:UIBarMetricsDefault];
     
     self.tabBarController = [[UITabBarController alloc] init];
@@ -75,8 +72,6 @@
             [self.tabBarController presentModalViewController:isnav animated:YES];
         } afterDelay:.8];
     }
-    
-    location = [[currentLocation alloc] init];
     
     return YES;
 }

@@ -10,15 +10,17 @@
 #import <CoreLocation/CoreLocation.h>
 
 
-@interface currentLocation : NSObject <CLLocationManagerDelegate>
+@interface currentLocation : NSObject <CLLocationManagerDelegate> {
+    CLLocationManager *locationManager;
+}
 
-+ (void)startUpdating;
-+ (void)stopUpdating;
+- (void)startUpdating;
+- (void)stopUpdating;
 
-+ (CGFloat)lat;
-+ (CGFloat)lng;
-+ (CGFloat)altitude;
-+ (CGFloat)accuracy;
+- (CGFloat)lat;
+- (CGFloat)lng;
+- (CGFloat)altitude;
+- (CGFloat)accuracy;
 
 + (NSString *)howFarFromLat:(CGFloat)lat Long:(CGFloat)lng;
 
