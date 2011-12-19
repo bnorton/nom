@@ -247,8 +247,8 @@
  #####  THUMBS  ##############################################################
  #############################################################################
  
- POST => "locations/:nid/thumbs/new"
- POST => "users/:nid/thumbs/new"
+ POST => "locations/:nid/thumbs/create"
+ POST => "users/:nid/thumbs/create"
  
  #############################################################################
  #############################################################################
@@ -261,11 +261,6 @@
     NSArray *items  = [NSArray arrayWithObjects:value,nil];
     NSArray *params = [NSArray arrayWithObjects:@"value",nil];
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjects:items forKeys:params];
-    
-    NSString *user_name;
-    if ([(user_name = [currentUser getStringForKey:@"user_name"]) length] > 0) {
-        [parameters setObject:user_name forKey:@"user_name"];
-    }
     
     [NMHTTPClient enqueueRequestWithMethod:@"POST" path:path parameters:parameters success:success failure:failure];
 }

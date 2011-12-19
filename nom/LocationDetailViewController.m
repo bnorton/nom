@@ -95,6 +95,14 @@
     [publish setTitleColor:[UIColor lightGrayColor] forState:UIControlStateSelected];
     [publish setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
 
+    thumb = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    [thumb setFrame:CGRectMake(20, 5, 280, 30)];
+    [thumb addTarget:self action:@selector(thumb) forControlEvents:UIControlEventTouchUpInside];
+    [thumb setTitle:@"How was it? (good/meh)" forState:UIControlStateNormal];
+    [thumb setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
+    [thumb setTitleColor:[UIColor lightGrayColor] forState:UIControlStateSelected];
+    [thumb setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
+
 //    image_frame = [[UIImageView alloc] initWithFrame:CGRectMake(10, 5, 300, 160)];
 //    [image_frame setImage:[UIImage imageNamed:@"assets/image_frame1g.png"]];
     
@@ -102,6 +110,8 @@
     [image setImage:[UIImage imageNamed:@"placeholder.png"]];
 
     [self performSelector:@selector(setup)];
+    
+    thumb_buttons = [NSArray arrayWithObjects:THUMB_BUTTONS];
     
     return self;
 }
@@ -154,6 +164,29 @@
     }];
 }
 
+- (void)thumbValue:(NSString *)value {
+    [NMHTTPClient thumbLocation:location_nid value:value success:^(NSDictionary *response) {
+        [util showInfoInView:self.view message:@"Saved your perception."];
+    } failure:^(NSDictionary *response) {
+        [util showErrorInView:self.view message:@"There was an issue saving your perception."];
+    }];
+}
+
+- (void)thumb {
+    NSString *title = [NSString stringWithFormat:@"%@ was...", name.text];
+    [UIActionSheet actionSheetWithTitle:title message:@"blah - subname" buttons:thumb_buttons showFromBar:self.tabBarController.tabBar 
+      onDismiss:^(int buttonIndex) {
+          NSLog(@"INFO thumb -> dismissed thumb with button index %d", buttonIndex);
+          if (buttonIndex == 0) {
+              [self thumbValue:@"1"];
+          } else {
+              [self thumbValue:@"2"];              
+          }
+    } onCancel:^{
+        NSLog(@"INFO :thumb canceled");
+    }];
+}
+
 - (void)publish {
     NSString *url = @"", *nid = @"";
     @try {
@@ -162,7 +195,7 @@
         NSLog(@"INFO publishing with nid %@", nid);
     }
     @catch (NSException *exception) {;}
-    NSLog(@"abou to publis hdo we have an image url %@", url);
+    NSLog(@"about to publish do we have an image url %@", url);
     FormTableController *form = [[FormTableController alloc] initWithLocation:location imageUrl:url imageNid:nid];
     [self.navigationController pushViewController:form animated:YES];
 }
@@ -172,7 +205,7 @@
     if ([(title = [location objectForKey:@"name"]) length] > 0) {
         title = [NSString stringWithFormat:@"Add image to %@", title];
     } else { title = @"Pick and Image."; }
-    [UIActionSheet photoPickerWithTitle:title showInView:self.view presentVC:self onPhotoPicked:^(UIImage *chosenImage) {
+    [UIActionSheet photoPickerWithTitle:title showFromBar:self.tabBarController.tabBar presentVC:self onPhotoPicked:^(UIImage *chosenImage) {
         NSData *imageData = UIImagePNGRepresentation(chosenImage);
         
         NSString *path = NSTemporaryDirectory();
@@ -216,7 +249,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section { 
-    return 4;
+    return 5;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -238,7 +271,8 @@
             [name removeFromSuperview];
         }
         [cell addSubview:name];
-    } else if (indexPath.row == 1) { // basic info
+    } 
+    else if (indexPath.row == 1) { // basic info
         if ([image superview]) { 
             [image removeFromSuperview];
         }
@@ -247,12 +281,19 @@
             [image_frame removeFromSuperview];
         }
         [cell addSubview:image_frame]; 
-    } else if (indexPath.row == 2) { //map and geolocation
+    } 
+    else if (indexPath.row == 2) { //map and geolocation
         if ([add_image superview]) {
             [add_image removeFromSuperview];
         }
         [cell addSubview:add_image];
-    } else { // what else is there
+    } else if (indexPath.row == 3) {
+        if ([thumb superview]) {
+            [thumb removeFromSuperview];
+        }
+        [cell addSubview:thumb];
+    }
+    else { // what else is there
         if ([publish superview]) {
             [publish removeFromSuperview];
         }
@@ -300,7 +341,7 @@
         "creator": null,
         "updated_at": "2011-12-05T06:12:42Z",
         "json_encode": null,
-        "primary": "4ec8b8a7eef0a679f8000001",
+        "primary_category": "4ec8b8a7eef0a679f8000001",
         "schemaless": null,
         "street2": null,
         "timeofday": "lunch | dinner",
@@ -353,7 +394,7 @@
         },
         "gowalla_url": null,
         "metadata_nid": null,
-        "secondary": "4ec8b8a8eef0a679f800000e",
+        "secondary_category": "4ec8b8a8eef0a679f800000e",
         "yid": "44270320",
         "state": "California",
         "twitter": null

@@ -13,7 +13,7 @@
 +(void) actionSheetWithTitle:(NSString*) title
                      message:(NSString*) message
                      buttons:(NSArray*) buttonTitles
-                  showInView:(UIView*) view
+                 showFromBar:(id) bar
                    onDismiss:(DismissBlock) dismissed                   
                     onCancel:(CancelBlock) cancelled;
 
@@ -22,13 +22,13 @@
                       message:(NSString*) message          
        destructiveButtonTitle:(NSString*) destructiveButtonTitle
                       buttons:(NSArray*) buttonTitles
-                   showInView:(UIView*) view
+                  showFromBar:(id) bar
                     onDismiss:(DismissBlock) dismissed                   
                      onCancel:(CancelBlock) cancelled;
 
 
 + (void) photoPickerWithTitle:(NSString*) title
-                   showInView:(UIView*) view
+                  showFromBar:(id) bar
                     presentVC:(UIViewController*) presentView
                 onPhotoPicked:(PhotoPickedBlock) photoPicked                   
                      onCancel:(CancelBlock) cancelled;

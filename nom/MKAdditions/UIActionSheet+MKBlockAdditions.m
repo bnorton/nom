@@ -30,7 +30,7 @@ static MBProgressHUD *hud;
 +(void) actionSheetWithTitle:(NSString*) title
                      message:(NSString*) message
                      buttons:(NSArray*) buttonTitles
-                  showInView:(UIView*) view
+                 showFromBar:(id) bar
                    onDismiss:(DismissBlock) dismissed                   
                     onCancel:(CancelBlock) cancelled
 {    
@@ -38,7 +38,7 @@ static MBProgressHUD *hud;
                                 message:message 
                  destructiveButtonTitle:nil 
                                 buttons:buttonTitles 
-                             showInView:view 
+                            showFromBar:bar
                               onDismiss:dismissed 
                                onCancel:cancelled];
 }
@@ -47,7 +47,7 @@ static MBProgressHUD *hud;
                       message:(NSString*) message          
        destructiveButtonTitle:(NSString*) destructiveButtonTitle
                       buttons:(NSArray*) buttonTitles
-                   showInView:(UIView*) view
+                  showFromBar:(id) bar
                     onDismiss:(DismissBlock) dismissed                   
                      onCancel:(CancelBlock) cancelled
 {
@@ -72,21 +72,18 @@ static MBProgressHUD *hud;
     if(destructiveButtonTitle)
         actionSheet.cancelButtonIndex ++;
     
-    if([view isKindOfClass:[UIView class]])
-        [actionSheet showInView:view];
+    if([bar isKindOfClass:[UITabBar class]])
+        [actionSheet showFromTabBar:(UITabBar*) bar];
     
-    if([view isKindOfClass:[UITabBar class]])
-        [actionSheet showFromTabBar:(UITabBar*) view];
-    
-    if([view isKindOfClass:[UIBarButtonItem class]])
-        [actionSheet showFromBarButtonItem:(UIBarButtonItem*) view animated:YES];
+    if([bar isKindOfClass:[UIToolbar class]])
+        [actionSheet showFromBarButtonItem:(UIBarButtonItem*) bar animated:YES];
     
     [actionSheet release];
     
 }
 
 + (void) photoPickerWithTitle:(NSString*) title
-                   showInView:(UIView*) view
+                  showFromBar:(id) bar
                     presentVC:(UIViewController*) presentVC
                 onPhotoPicked:(PhotoPickedBlock) photoPicked                   
                      onCancel:(CancelBlock) cancelled
@@ -127,21 +124,11 @@ static MBProgressHUD *hud;
     actionSheet.tag = kPhotoActionSheetTag;
 	actionSheet.cancelButtonIndex = cancelButtonIndex;		 
         
-	if([view isKindOfClass:[UIView class]]){
-        NSLog(@"INFO: setting the view_for_spinner");
-        view_for_spinner = view;
-        if (view_for_spinner != nil && view_for_spinner.window != nil) {
-            NSLog(@"INFO: showing the hud for an Image Picked");
-            hud = [util showHudInView:view_for_spinner];
-        }
-        [actionSheet showInView:view];
-    }
+    if([bar isKindOfClass:[UITabBar class]])
+        [actionSheet showFromTabBar:(UITabBar*) bar];
     
-    if([view isKindOfClass:[UITabBar class]])
-        [actionSheet showFromTabBar:(UITabBar*) view];
-    
-    if([view isKindOfClass:[UIBarButtonItem class]])
-        [actionSheet showFromBarButtonItem:(UIBarButtonItem*) view animated:YES];
+    if([bar isKindOfClass:[UIToolbar class]])
+        [actionSheet showFromToolbar:(UIToolbar*) bar];
     
     [actionSheet release];    
 }

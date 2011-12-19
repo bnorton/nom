@@ -203,7 +203,7 @@ a_location = {
     "creator": null,
     "updated_at": "2011-11-20T19:26:17Z",
     "json_encode": null,
-    "primary": "4ec5ad3f3c6167f601000027",
+    "primary_category": "4ec5ad3f3c6167f601000027",
     "schemaless": null,
     "street2": null,
     "timeofday": "lunch | dinner",
@@ -248,7 +248,7 @@ a_location = {
     "gowalla_url": null,
     "metadata_nid": null,
     "nid": "4ec954593c61671c7e0000a8",
-    "secondary": "4ec954593c61671c7e0000a6",
+    "secondary_category": "4ec954593c61671c7e0000a6",
     "yid": "-1787425622251775235",
     "state": "California",
     "twitter": null

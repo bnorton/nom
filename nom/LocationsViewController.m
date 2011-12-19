@@ -138,19 +138,19 @@
     if ([filtered_by_current_category count] > 0) {
         [filtered_by_current_category removeAllObjects];
     }
-    NSString *primary;    
+    NSString *primary_category;    
     for (NSDictionary *record in filtered_by_all) {
-        if (record && ([(primary = [record objectForKey:@"primary"]) length] > 0)) {
-            if ([primary isEqualToString:category_nid]) {
+        if (record && ([(primary_category = [record objectForKey:@"primary_category"]) length] > 0)) {
+            if ([primary_category isEqualToString:category_nid]) {
                 [filtered_by_current_category addObject:record];
             }
         }
     }
     
-    NSString *secondary;
+    NSString *secondary_category;
     for (NSDictionary *record in filtered_by_all) {
-        if (record && ([(secondary = [record objectForKey:@"secondary"]) length] > 0)) {
-            if ([primary isEqualToString:category_nid]) {
+        if (record && ([(secondary_category = [record objectForKey:@"secondary_category"]) length] > 0)) {
+            if ([secondary_category isEqualToString:category_nid]) {
                 [filtered_by_current_category addObject:record];
             }
         }

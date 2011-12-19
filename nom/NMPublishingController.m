@@ -50,7 +50,7 @@
 #pragma mark - View lifecycle
 
 -(void)attachImage {
-    [UIActionSheet photoPickerWithTitle:@"Image Source" showInView:self.view presentVC:self 
+    [UIActionSheet photoPickerWithTitle:@"Image Source" showFromBar:self.tabBarController.tabBar presentVC:self 
                 onPhotoPicked:^(UIImage *chosenImage) {
         NSData *imageData = UIImagePNGRepresentation(currentImageAttachement);
         NSString *path = NSTemporaryDirectory();

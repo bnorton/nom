@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+#define THUMB_BUTTONS @"Solid", @"Meh", nil
+
 @interface LocationDetailViewController : UITableViewController {
     NSDictionary *location;
     NSString *location_nid;
@@ -20,6 +22,9 @@
     
     UIButton *add_image;
     UIButton *publish;
+    UIButton *thumb;
+    
+    NSArray *thumb_buttons;
     
     UIImageView *image;
     UIImageView *image_frame;
