@@ -13,7 +13,7 @@
 - (id)initWithRootViewController:(UIViewController *)rvc
 {
     self = [super initWithRootViewController:rvc];
-    if (self) { return nil; }
+    if (! self) { return nil; }
     
     [self.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] 
                             forBarMetrics:UIBarMetricsDefault];

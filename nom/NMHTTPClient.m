@@ -15,19 +15,20 @@
     NSLog(@"INFO: calling out to %@ with params %@ \n and request object %@\n\n================================",path,params,request);
 }
 
-+ (void)addDefaultParams:(NSMutableDictionary *)params {
++ (void)addDefaultParams:(NSMutableDictionary *)params userParams:(BOOL)user {
     /**
      * Setup default params if we dont already have them
      */
-    if( ! [params objectForKey:@"user_nid"]) {
-        NSString *user_nid = [currentUser getStringForKey:@"user_nid"];
-        if (user_nid) { [params setObject:user_nid forKey:@"user_nid"]; }
-        
-        /* Add the auth_token of the user_nid comes from current_user */
-        NSString *auth_token = [currentUser getStringForKey:@"auth_token"];
-        if (auth_token) { [params setObject:auth_token forKey:@"auth_token"]; }
+    if (user) {
+        if( ! [params objectForKey:@"user_nid"]) {
+            NSString *user_nid = [currentUser getStringForKey:@"user_nid"];
+            if (user_nid) { [params setObject:user_nid forKey:@"user_nid"]; }
+            
+            /* Add the auth_token of the user_nid comes from current_user */
+            NSString *auth_token = [currentUser getStringForKey:@"auth_token"];
+            if (auth_token) { [params setObject:auth_token forKey:@"auth_token"]; }
+        }
     }
-        
     NSNumber *lat = [NSNumber numberWithFloat:[[util currentLocation] lat]];
     if (lat) { [params setObject:lat forKey:@"lat"]; }
     
@@ -37,32 +38,41 @@
 }
 
 + (void)enqueueRequestWithMethod:(NSString *)method path:(NSString *)path 
-                      parameters:(NSMutableDictionary *)parameters
-                   success:(void (^)(NSDictionary * response))success
-                   failure:(void (^)(NSDictionary * response))failure {
-        
+                      parameters:(NSMutableDictionary *)parameters defaultParams:(BOOL)params
+                         success:(void (^)(NSDictionary * response))success
+                         failure:(void (^)(NSDictionary * response))failure {
+
     if (!parameters) { parameters = [[NSMutableDictionary alloc] initWithCapacity:4]; }
-    
-    [NMHTTPClient addDefaultParams:parameters];
-    
+
+    [NMHTTPClient addDefaultParams:parameters userParams:params];
+
     NSMutableURLRequest *request = [HTTPClient requestWithMethod:method path:path parameters:parameters];
-    
+
     [self showInfo:path params:parameters request:request];
 
     AFJSONRequestOperation * operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request 
-      success:^(NSURLRequest *request, NSURLResponse *response, id JSON) {
+     success:^(NSURLRequest *request, NSURLResponse *response, id JSON) {
         if (success) { 
             NSLog(@"INFO: success callback for %@",path);
             success(JSON); 
         }
         else {NSLog(@"WARN: %@ has no success callback registered for patameters %@", path, parameters);}
-    } failure:^(NSURLRequest *request, NSURLResponse *response, NSError *error, id JSON) {
+     } failure:^(NSURLRequest *request, NSURLResponse *response, NSError *error, id JSON) {
         if (failure) { NSLog(@"INFO failure callback %@ for %@ and %@",error, path, JSON);
             failure(JSON);
         } else {NSLog(@"WARN: %@ has no failure callback registered for patameters %@", path, parameters);}
-    }];
-    
+     }];
+
     [HTTPQueue addOperation:operation];
+}
+
+
++ (void)enqueueRequestWithMethod:(NSString *)method path:(NSString *)path 
+                      parameters:(NSMutableDictionary *)parameters
+                   success:(void (^)(NSDictionary * response))success
+                   failure:(void (^)(NSDictionary * response))failure {
+        
+    [self enqueueRequestWithMethod:method path:path parameters:parameters defaultParams:YES success:success failure:failure];
 }
 
 /**
@@ -365,7 +375,7 @@
     NSArray *params = [NSArray arrayWithObjects:@"location_nid", @"token", @"text", @"image_attachment_present", nil];
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjects:items forKeys:params];
     
-    [self addDefaultParams:parameters];
+    [self addDefaultParams:parameters userParams:YES];
     
     if (facebook) { [parameters setObject:[NSNumber numberWithBool:facebook] forKey:@"facebook"]; }
     if (image_nid){ [parameters setObject:image_nid forKey:@"image_nid"];                         }
@@ -419,7 +429,7 @@
  #############################################################################
  #####  FOLLOWERS  ###########################################################
  #############################################################################
- POST => '/follow/new'
+ POST => '/follow/create'
  POST => '/follow/destroy'
  
  GET =>'/followers'
@@ -430,31 +440,31 @@
  */
 
 
-+ (void)followAction:(NSString *)path otherUserId:(NSString *)other_user_nid 
++ (void)followAction:(NSString *)path toUserId:(NSString *)to_user_nid 
            success:(void (^)(NSDictionary * response))success
            failure:(void (^)(NSDictionary * response))failure {
     
-    NSArray *items  = [NSArray arrayWithObjects:other_user_nid, nil];
-    NSArray *params = [NSArray arrayWithObjects:@"other_user_nid", nil];
+    NSArray *items  = [NSArray arrayWithObjects:to_user_nid, nil];
+    NSArray *params = [NSArray arrayWithObjects:@"to_user_nid", nil];
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjects:items forKeys:params];
     
     [NMHTTPClient enqueueRequestWithMethod:@"POST" path:path parameters:parameters success:success failure:failure];
     
 }
 
-+ (void)follow:(NSString *)other_user_nid 
++ (void)follow:(NSString *)to_user_nid 
        success:(void (^)(NSDictionary * response))success
        failure:(void (^)(NSDictionary * response))failure {
     
-    [NMHTTPClient followAction:@"/followers/create.json" otherUserId:other_user_nid success:success failure:failure];
+    [NMHTTPClient followAction:@"/follow/create.json" toUserId:to_user_nid success:success failure:failure];
     
 }
 
-+ (void)unFollow:(NSString *)other_user_nid 
++ (void)unFollow:(NSString *)to_user_nid 
        success:(void (^)(NSDictionary * response))success
        failure:(void (^)(NSDictionary * response))failure {
     
-    [NMHTTPClient followAction:@"/followers/destroy.json" otherUserId:other_user_nid success:success failure:failure];
+    [NMHTTPClient followAction:@"/follow/destroy.json" toUserId:to_user_nid success:success failure:failure];
     
 }
 
@@ -568,9 +578,8 @@
 + (void)usersActivities:(NSString *)user withSuccess:(void (^)(NSDictionary * response))success
                 failure:(void (^)(NSDictionary * response))failure {
     
-    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:@"by_user"];
-    [params setObject:user forKey:@"by_user_nid"];
-    [NMHTTPClient enqueueRequestWithMethod:@"GET" path:@"/activities.json" parameters:params success:success failure:failure];
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObject:user forKey:@"by_user_nid"];
+    [NMHTTPClient enqueueRequestWithMethod:@"GET" path:@"/activities.json" parameters:params defaultParams:NO success:success failure:failure];
     
 }
 
@@ -637,7 +646,7 @@
     NSArray *params = [NSArray arrayWithObjects:@"location_nid",@"image_attachment_present", nil];
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjects:items forKeys:params];
     
-    [NMHTTPClient addDefaultParams:parameters];
+    [NMHTTPClient addDefaultParams:parameters userParams:YES];
     NSLog(@"formdata params %@", parameters);
     
     /**

@@ -48,8 +48,9 @@
     if ([(aname = [currentUser getStringForKey:@"name"]) length] > 0) {}
     else if ([(aname = [currentUser getStringForKey:@"screen_name"]) length] > 0) {} 
     else { aname = @"Activity"; }
-
+    hidden_nav_bar_flag = YES;
     return [self initWithType:_type userNid:[currentUser getStringForKey:@"user_nid"] name:aname];
+    
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -59,10 +60,10 @@
 
 - (void) viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    if ([user_nid isEqualToString:[currentUser getObjectForKey:@"user_nid"]]) {
-        [self.navigationController setNavigationBarHidden:NO animated:YES];
-    } else {
+    if (hidden_nav_bar_flag) {
         [self.navigationController setNavigationBarHidden:YES animated:YES];
+    } else {
+        [self.navigationController setNavigationBarHidden:NO animated:YES];
     }
 }
 

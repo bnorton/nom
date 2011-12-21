@@ -9,8 +9,8 @@
 #import <UIKit/UIKit.h>
 #import "MBProgressHUD.h"
 
-#define me_connect_labels @"Following", @"Followers", @" Recent activity", @" Facebook", @"Settings", nil
-#define other_connect_labels @"Following", @"Followers", @" Recent activity", nil
+#define me_connect_labels @"Following", @"Followers", @" Recent activity", @" Facebook", @"Settings", @"Find other Nommers", nil
+#define other_connect_labels @"Following", @"Followers", @" Recent activity", @"Follow", nil
 #define img_frame CGRectMake(10, 5, 40, 40)
 
 #define FB_CONNECTED @" Facebook              Connected"
@@ -20,6 +20,8 @@
 #define activity_image @"icons-gray/259-list.png"
 #define following_image @"icons-gray/112-group.png"
 #define settings_image @"icons-gray/123-id-card.png"
+#define search_image @"icons-gray/06-magnify.png"
+#define do_follow_image @"icons-gray/06-magnify.png"
 
 @class MBProgressHUD;
 
@@ -42,6 +44,8 @@ typedef enum {
     UIView *header;
     
     MBProgressHUD *hud;
+    
+    BOOL isCurrentUser;
 }
 
 @property (nonatomic, copy) NSString *user_nid;

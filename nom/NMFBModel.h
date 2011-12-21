@@ -13,7 +13,7 @@
 #define FB_ME       @"me"
 #define FB_FRIENDS  @"me/friends?fields=id,name,location,picture,email"
 
-#define FB_SUCCESS_MESSAGE @"OK, We've Connected Nom to Facebook"
+#define FB_SUCCESS_MESSAGE @"OK, We've Connected to FB"
 
 #define FB_TITLE        @"Nommed @ %@."
 #define FB_CAPTION      @"...used Nom in %@"

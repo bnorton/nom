@@ -26,6 +26,7 @@
     
     UIImageView *image_border;
     UIImageView *image;
+    
 }
 
 - (id)initWithReuseIdentifier:(NSString *)reuseIdentifier;

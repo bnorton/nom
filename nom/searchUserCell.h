@@ -8,8 +8,15 @@
 
 #import <UIKit/UIKit.h>
 
-@interface searchUserCell : UITableViewCell
+@interface searchUserCell : UITableViewCell {
+    UILabel *name;
+    UILabel *where;
+    UILabel *counts;
+    
+    UIImageView *user_image;
+}
 
 - (id)initWithReuseIdentifier:(NSString *)reuseIdentifier;
+- (CGFloat)setUser:(NSDictionary *)user isMocked:(BOOL)mocked;
 
 @end

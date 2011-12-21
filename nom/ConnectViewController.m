@@ -9,6 +9,7 @@
 #import "ConnectViewController.h"
 #import "FollowerListViewController.h"
 #import "NMActivityViewController.h"
+#import "SearchViewController.h"
 #import "SettingsViewController.h"
 #import "NMHTTPClient.h"
 #import "Util.h"
@@ -18,21 +19,38 @@
 @synthesize user_nid;
 
 - (id)init {
+//    NSDate *then = [currentUser getDateForKey:@"current_user_detail_fetch_time"];
+//    if (then != nil) {
+//        NSLog(@"init in ConnectView_Controller %f %@",[then timeIntervalSince1970], [[then class] description]);
+//        NSLog(@"time_ago %@", [then timeIntervalSinceDate:[NSDate date]]);
+//        if ([[currentUser getDateForKey:@"current_user_detail_fetch_time"] timeIntervalSince1970]) {
+//            return [self initWithType:NMUserProfileTypeMe user_nid:[currentUser getStringForKey:@"user_nid"]];
+//        }        
+//    }
+    NSLog(@"init");
     return [self initWithType:NMUserProfileTypeMe user:[currentUser user]];
 }
 
 - (id)initWithType:(NMUserProfileType)_type user_nid:(NSString *)_user_nid {
-     self = [self initWithType:_type user:nil];
-    
     user_nid = _user_nid;
-    
+    isCurrentUser = [user_nid isEqualToString:[currentUser getStringForKey:@"user_nid"]];
+    if (isCurrentUser) {
+        return [self initWithType:_type user:[currentUser user]]; // break the chain if I am me
+    }
+     
+    self = [self initWithType:_type user:nil];
+        
+    NSLog(@"INFO isCurrentUser1 %d", isCurrentUser);
+
     hud = [util showHudInView:self.view];
+    [self.view addSubview:hud];
     
     [NMHTTPClient userDetail:user_nid success:^(NSDictionary *response) {
         [hud hide:YES];
         NSLog(@"INFO user detail callback %@", response);
         @try {
             [self setupUserContent:[[response objectForKey:@"results"] objectAtIndex:0]];
+            [currentUser setDate:[NSDate date] forKey:@"current_user_detail_fetch_time"];
         } @catch (NSException *ex) {
             [util showErrorInView:self.view message:@"User detail parse failed"];
         }
@@ -54,6 +72,9 @@
     type = _type;
     if (user) { user_nid = [user objectForKey:@"user_nid"]; }
 
+    isCurrentUser = [user_nid isEqualToString:[currentUser getStringForKey:@"user_nid"]];
+    NSLog(@"INFO isCurrentUser %@ %@ %d", user_nid, [currentUser getStringForKey:@"user_nid"], isCurrentUser);
+
     self.tabBarItem.image = [UIImage imageNamed:@"icons-gray/291-idcard.png"];
     
     UIImageView *background = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"background4a.png"]];
@@ -64,13 +85,15 @@
     UIImage *activity  = [UIImage imageNamed:activity_image];
     UIImage *fb        = [UIImage imageNamed:fb_image];
     UIImage *settings  = [UIImage imageNamed:settings_image];
+    UIImage *search    = [UIImage imageNamed:search_image];
+    UIImage *do_follow = [UIImage imageNamed:do_follow_image];
     
-    if (type == NMUserProfileTypeMe) {
+    if (type == NMUserProfileTypeMe || isCurrentUser) {
         labels = [NSArray arrayWithObjects:me_connect_labels];
-        images = [NSArray arrayWithObjects:followers,following,activity,fb,settings,nil];
+        images = [NSArray arrayWithObjects:followers,following,activity,fb,settings,search,nil];
     } else if (type == NMUserProfileTypeOther) {
         labels = [NSArray arrayWithObjects:other_connect_labels];
-        images = [NSArray arrayWithObjects:followers,following,activity,nil];
+        images = [NSArray arrayWithObjects:followers,following,activity,do_follow,nil];
     } else {
         labels = nil; images = nil;
     }
@@ -128,9 +151,14 @@
 
 - (void)setupUserContent:(NSDictionary *)user {
     
+    user_nid = [user objectForKey:@"user_nid"];
+    
     NSString *name = @"User", *str, *tmp;
     if ([(str = [user objectForKey:@"name"]) length] > 0) {
         name = str;
+    }
+    if (type == NMUserProfileTypeOther && isCurrentUser) {
+        name = @"You";
     }
     self.title = NSLocalizedString(name, @"User Profile page");
     
@@ -171,12 +199,40 @@
     } else {
         [self.navigationController setNavigationBarHidden:NO animated:YES];
     }
+    
+    if (isCurrentUser) {
+        NSString *title = [user_name.text length] > 0 ? user_name.text : @"User";
+        self.title = NSLocalizedString(title, @"User Name");
+    }
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    if (isCurrentUser) {
+        self.title = NSLocalizedString(@"You", @"User Name");
+    }    
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 { return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
+-(void)fb_auth:(UITableViewCell *)cell {
+    [[util fbmodel] authorizeWithSuccess:^{
+        cell.textLabel.text = FB_CONNECTED;
+        [util viewDidAppear:self.view];
+    } failure:^{
+        cell.textLabel.text = FB_NOT_CONNECTED;
+        [util showErrorInView:self.view message:@"Facebook connect cancelled or failed"];
+    }];
+}
+
+-(void)follow_unfollow {
+    [NMHTTPClient follow:user_nid success:^(NSDictionary *response) {
+        [util showInfoInView:self.view message:[NSString stringWithFormat:@"Now Following %@", user_name.text]];
+    } failure:^(NSDictionary *response) {
+        [util showErrorInView:self.view message:@"Cound not Follow"];
+    }];
+}
 #pragma mark - Table view data source
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
@@ -188,7 +244,7 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView { 
-    return 1; 
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section { 
@@ -206,17 +262,17 @@
         cell.textLabel.textColor = [UIColor darkGrayColor];
         cell.textLabel.font = [UIFont fontWithName:@"TrebuchetMS" size:18];
     }
+    
     cell.imageView.image = [images objectAtIndex:indexPath.row];
     cell.textLabel.text = [labels objectAtIndex:indexPath.row];
     
-    if (indexPath.row == 3 && type == NMUserProfileTypeMe) {
+    if (indexPath.row == 3 && (type == NMUserProfileTypeMe || isCurrentUser)) {
         if ([[util facebook] isSessionValid]) {
             cell.textLabel.text = FB_CONNECTED;
         } else {
             cell.textLabel.text = FB_NOT_CONNECTED;
         }
     }
-    
     return cell;
 }
 
@@ -225,6 +281,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UIViewController *viewController = nil;
+    __block UITableViewCell *cell;
     
     switch (indexPath.row) {
         case 0:
@@ -234,24 +291,24 @@
             viewController = [[FollowerListViewController alloc] initWithType:NMFollowersType userNid:user_nid];
             break;
         case 2:
-            viewController = [[NMActivityViewController alloc] initWithType:NMActivityTypeByUser];
+            viewController = [[NMActivityViewController alloc] initWithType:NMActivityTypeByUser userNid:user_nid name:user_name.text];
             break;
         case 3:
+            cell = [tableView cellForRowAtIndexPath:indexPath];
             if (type == NMUserProfileTypeMe) {
-                __block UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-                [[util fbmodel] authorizeWithSuccess:^{
-                    cell.textLabel.text = FB_CONNECTED;
-                    [util viewDidAppear:self.view];
-                } failure:^{
-                    cell.textLabel.text = FB_NOT_CONNECTED;
-                    [util showErrorInView:self.view message:@"Facebook connect cancelled or failed"];
-                }];
+                [self fb_auth:cell];
+                [cell setSelected:NO animated:YES];
+            } else if (type == NMUserProfileTypeOther){
+                [self follow_unfollow];
                 [cell setSelected:NO animated:YES];
             }
             return;
             break;
         case 4:
             viewController = [[SettingsViewController alloc] initWithType:NMSettingsSourceConnect];
+            break;
+        case 5:
+            viewController = [[SearchViewController alloc] initWithSearchTarget:NMSearchTargetUser];
             break;
         default:
         // don't do anything here

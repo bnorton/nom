@@ -43,7 +43,7 @@
     UINavigationController *locations = [self newNav:[[LocationsViewController alloc] init]];
     [locations.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] forBarMetrics:UIBarMetricsDefault];
     
-    UINavigationController *search    = [self newNav:[[SearchViewController alloc] init]];
+    UINavigationController *search    = [self newNav:[[SearchViewController alloc] initWithSearchTarget:NMSearchTargetLocation]];
     [search.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] forBarMetrics:UIBarMetricsDefault];
     
     UINavigationController *connect   = [self newNav:[[ConnectViewController alloc] init]];

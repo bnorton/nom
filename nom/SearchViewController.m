@@ -8,17 +8,24 @@
 
 #import "SearchViewController.h"
 #import "searchLocationCell.h"
+#import "searchUserCell.h"
+#import "ConnectViewController.h"
 #import "LocationDetailViewController.h"
 #import "Util.h"
 
 @implementation SearchViewController
 
-- (id)init {
+- (id)initWithSearchTarget:(NMSearchTarget)_target {
     self = [super initWithStyle:UITableViewStylePlain];
     if (! self) { return nil; }
 
+    target = _target;
+
     self.tabBarItem.image = [UIImage imageNamed:@"icons-gray/06-magnify.png"];
-    self.title = NSLocalizedString(@"Search", @"Search");
+    
+    NSString *title = target == NMSearchTargetLocation ? @"Search" : @"User Search";
+    self.title = NSLocalizedString(title, @"Search");
+    
     UIImageView *background = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"background4a.png"]];
     
     [self.tableView setBackgroundView:background];
@@ -64,7 +71,11 @@
 
 - (void) viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.navigationController setNavigationBarHidden:YES animated:YES];
+    if (target == NMSearchTargetUser) {
+        [self.navigationController setNavigationBarHidden:NO animated:YES];
+    } else {
+        [self.navigationController setNavigationBarHidden:YES animated:YES];
+    }
 }
 
 - (void)setupCellsCache {
@@ -93,33 +104,62 @@
 - (BOOL)textFieldShouldClear:(UITextField *)textField {
     NSLog(@"textFieldShouldClear");
     [self cancelButtonPressed:nil];
-    locations = nil;
+    items = nil;
     [self setupCellsCache];
     return YES;
 }
 
-- (void)fetchedBasedOn:(NSString *)query where:(NSString *)loc {
-    __block MBProgressHUD *hud = [util showHudInView:self.view];
-    [self.view addSubview:hud];
-    [hud show:YES];
-    NSLog(@"INFO: based on location for query %@", query);
-    [NMHTTPClient searchLocation:query location:loc success:^(NSDictionary *response) {
-        NSLog(@"INFO: success called back from search query %@", response);
+- (void)searchLocation:(NSString *)query where:(NSString *)where {
+    [NMHTTPClient searchLocation:query location:where success:^(NSDictionary *response) {
+        NSLog(@"INFO: success called back from location search query %@", response);
         @try {
             current_response = response;
-            locations = [response objectForKey:@"results"];
-            
+            items = [response objectForKey:@"results"];
             [self setupCellsCache];
         }
         @catch (NSException *exception) {
-            locations = nil;
+            items = nil;
         }
         [hud hide:YES];
     } failure:^(NSDictionary *response) {
         NSLog(@"INFO: failure called back from search query %@", response);
-        [hud hide:YES];
-        
+        [hud hide:YES];    
     }];
+
+}
+
+-(void)searchUser:(NSString *)query {
+    [NMHTTPClient searchUser:query success:^(NSDictionary *response) {
+        NSLog(@"INFO: success called back from user search query %@", response);
+        @try {
+            current_response = response;
+            items = [response objectForKey:@"results"];
+            [self setupCellsCache];
+        }
+        @catch (NSException *exception) {
+            items = nil;
+        }
+        [hud hide:YES];
+
+    } failure:^(NSDictionary *response) {
+        items = nil;
+         NSLog(@"INFO: failure called back from user search query %@", response);
+        [hud hide:YES];
+    }];
+}
+
+- (void)fetchedBasedOn:(NSString *)query where:(NSString *)loc {
+    NSLog(@"INFO: based on location for query %@", query);
+
+    hud = [util showHudInView:self.view];
+    [self.view addSubview:hud];
+    [hud show:YES];
+    if (target == NMSearchTargetLocation) {
+        [self searchLocation:query where:loc];
+    } 
+    else if (target == NMSearchTargetUser) {
+        [self searchUser:query];
+    }
 }
 
 #pragma mark - View lifecycle
@@ -135,20 +175,28 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    NSLog(@"numRowsInSection %d", [locations count]);
-    return [locations count];
+    NSLog(@"numRowsInSection %d", [items count]);
+    return [items count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *CellIdentifier = @"Cell";
     
-    searchLocationCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil) {
-        cell = [[searchLocationCell alloc] initWithReuseIdentifier:CellIdentifier];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    if (target == NMSearchTargetLocation) {
+        if (cell == nil) {
+            cell = [[searchLocationCell alloc] initWithReuseIdentifier:CellIdentifier];
+        }
+    } else if (target == NMSearchTargetUser) {
+        if (cell == nil) {
+            cell = [[searchUserCell alloc] initWithReuseIdentifier:CellIdentifier];
+        }
     }
-
-    if ([locations count] > indexPath.row) {
-        [cell setLocation:[locations objectAtIndex:indexPath.row]];
+    if ([items count] > indexPath.row) {
+        if (target == NMSearchTargetLocation)
+            [(searchLocationCell *)cell setLocation:[items objectAtIndex:indexPath.row]];
+        else if (target == NMSearchTargetUser)
+            [(searchUserCell *)cell setUser:[items objectAtIndex:indexPath.row] isMocked:NO];
     } else { 
         NSLog(@"There was no location at that index, that is ODD %d", indexPath.row); 
     }
@@ -163,9 +211,13 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if ([locations count] > indexPath.row) {
-        LocationDetailViewController *detail = [[LocationDetailViewController alloc] 
-                                                initWithLocation:[locations objectAtIndex:indexPath.row]];
+    if ([items count] > indexPath.row) {
+        UIViewController *detail = nil;
+        if (target == NMSearchTargetUser) {
+            detail = [[ConnectViewController alloc] initWithType:NMUserProfileTypeOther user:[items objectAtIndex:indexPath.row]];
+        } else if (target == NMSearchTargetLocation) {
+            detail = [[LocationDetailViewController alloc] initWithLocation:[items objectAtIndex:indexPath.row]];
+        }
         [self.navigationController pushViewController:detail animated:YES];
     }
 }

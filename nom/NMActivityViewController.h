@@ -31,6 +31,7 @@ typedef enum {
     
 	EGORefreshTableHeaderView *_refreshHeaderView;
 	BOOL _reloading;
+    BOOL hidden_nav_bar_flag;
     
     NMActivityType type;
     

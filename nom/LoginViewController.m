@@ -97,6 +97,7 @@
             @try {
                 NSDictionary *user = [[response objectForKey:@"results"] objectAtIndex:0];
                 [currentUser setUser:user];
+                [currentUser setDate:[NSDate date] forKey:@"current_user_detail_fetch_time"];
                 
             } @catch (NSException *exception) {
                 
