@@ -168,7 +168,6 @@
  #############################################################################
  #############################################################################
  */
-
 /** Location Based Services */
 
 + (void)here:(CGFloat)distance categories:(NSString *)categories cost:(NSString *)cost limit:(NSUInteger)limit

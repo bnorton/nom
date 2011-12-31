@@ -15,17 +15,6 @@
     [self setText:str];
     [self sizeToFit];
     return self.frame.size.height;
-    
-//    CGSize maximumLabelSize = CGSizeMake(296,9999);
-    
-//    CGSize expectedLabelSize = [self.text sizeWithFont:self.font 
-//                                      constrainedToSize:maximumLabelSize 
-//                                          lineBreakMode:self.lineBreakMode]; 
-//    CGRect newFrame = self.frame;
-//    newFrame.size.height = expectedLabelSize.height;
-//    self.frame = newFrame;
-    
-//    return newFrame.size.height;
 }
 
 

@@ -394,7 +394,7 @@
     if (location == CapLeftAndRight)
     {
         buttonWidth = BUTTON_WIDTH;
-        buttonImage = [[UIImage imageNamed:@"assets/nav-button.png"] stretchableImageWithLeftCapWidth:CAP_WIDTH topCapHeight:0.0];
+        buttonImage = [[UIImage imageNamed:@"assets/nav-button2a.png"] stretchableImageWithLeftCapWidth:CAP_WIDTH topCapHeight:0.0];
 //        buttonImage = [[UIImage imageNamed:@"assets/bar_button1b.png"] stretchableImageWithLeftCapWidth:CAP_WIDTH topCapHeight:0.0];
 //        buttonPressedImage = [[UIImage imageNamed:@"assets/nav-button-press.png"] stretchableImageWithLeftCapWidth:CAP_WIDTH topCapHeight:0.0];
     }
@@ -402,9 +402,9 @@
     {
         buttonWidth = BUTTON_SEGMENT_WIDTH;
         
-        buttonImage = [self image:[[UIImage imageNamed:@"assets/nav-button.png"] stretchableImageWithLeftCapWidth:CAP_WIDTH topCapHeight:0.0] withCap:location capWidth:CAP_WIDTH buttonWidth:buttonWidth];
+        buttonImage = [self image:[[UIImage imageNamed:@"assets/nav-button2a.png"] stretchableImageWithLeftCapWidth:CAP_WIDTH topCapHeight:0.0] withCap:location capWidth:CAP_WIDTH buttonWidth:buttonWidth];
 //        buttonImage = [self image:[[UIImage imageNamed:@"assets/bar_button1b.png"] stretchableImageWithLeftCapWidth:CAP_WIDTH topCapHeight:0.0] withCap:location capWidth:CAP_WIDTH buttonWidth:buttonWidth];
-        buttonPressedImage = [self image:[[UIImage imageNamed:@"assets/nav-button-press.png"] stretchableImageWithLeftCapWidth:CAP_WIDTH topCapHeight:0.0] withCap:location capWidth:CAP_WIDTH buttonWidth:buttonWidth];
+        buttonPressedImage = [self image:[[UIImage imageNamed:@"assets/nav-button-pressed2a.png"] stretchableImageWithLeftCapWidth:CAP_WIDTH topCapHeight:0.0] withCap:location capWidth:CAP_WIDTH buttonWidth:buttonWidth];
     }
     
     

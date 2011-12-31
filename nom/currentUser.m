@@ -7,7 +7,7 @@
 //
 
 #import "currentUser.h"
-#import "NSNull+length.h"
+
 @implementation currentUser
 
 static NSUserDefaults *defaults = nil;

@@ -21,7 +21,7 @@
 #define following_image @"icons-gray/112-group.png"
 #define settings_image @"icons-gray/123-id-card.png"
 #define search_image @"icons-gray/06-magnify.png"
-#define do_follow_image @"icons-gray/06-magnify.png"
+#define do_follow_image @"icons-gray/55-network.png"
 
 @class MBProgressHUD;
 

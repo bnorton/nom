@@ -76,6 +76,11 @@ static CGRect distance_frame;
     [distance setTextAlignment:UITextAlignmentLeft];
     [distance setTextColor:[UIColor darkGrayColor]];
 
+    image_frame = [[UIImageView alloc] initWithFrame:CGRectMake(5, 5, 96, 52)];
+    [image_frame setImage:[UIImage imageNamed:@"recommendation_image_frame1a.png"]];
+
+    image = [[UIImageView alloc] initWithFrame:CGRectMake(7, 7, 94, 50)];
+    
     [self setSelectionStyle:UITableViewCellSelectionStyleGray];
     
     location_nid = @"";
@@ -85,7 +90,7 @@ static CGRect distance_frame;
     [self addSubview:text];
     [self addSubview:when];
     [self addSubview:distance];
-    
+        
     return self;
 }
 - (void)reset {
@@ -96,6 +101,9 @@ static CGRect distance_frame;
 }
 
 - (CGFloat)setupForThumb:(NSDictionary *)thumb isMocked:(BOOL)mock {
+    [image_frame removeFromSuperview];
+    [image removeFromSuperview];
+    
     CGFloat height = 19;
     if (! mock) { [self reset]; }
     
@@ -131,12 +139,15 @@ static CGRect distance_frame;
 }
 
 - (CGFloat)setupForRecommendation:(NSDictionary *)recom isMocked:(BOOL)mock {
+    [image_frame removeFromSuperview];
+    [image removeFromSuperview];
+
     CGFloat height = 19;
     if (! mock) { [self reset]; }
     
     NSDictionary *location = [recom objectForKey:@"location"];
     NSDictionary *user = [recom objectForKey:@"user"];
-    NSDictionary *image = [recom objectForKey:@"image"];
+    NSDictionary *_image = [recom objectForKey:@"image"];
     
     NSString *lname = [location objectForKey:@"name"];
     
@@ -176,6 +187,19 @@ static CGRect distance_frame;
         location_nid = [location objectForKey:@"location_nid"];
     } else {
         [self reset];
+    }
+    
+    @try {
+        NSString *url = [_image objectForKey:@"url"];
+        if ([url length] > 0) {
+            [image setImage:[UIImage imageNamed:url]];
+            [self addSubview:image];
+            [self addSubview:image_frame];
+        }
+
+    }
+    @catch (NSException *exception) {
+        
     }
     
     return height + 5;

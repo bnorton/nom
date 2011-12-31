@@ -16,6 +16,9 @@
     
     NSString *location_nid;
     NSString *user_nid;
+    
+    UIImageView *image_frame;
+    UIImageView *image;
 }
 
 - (id)initWithReuseIdentifier:(NSString *)reuseIdentifier;

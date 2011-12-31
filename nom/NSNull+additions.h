@@ -8,6 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-@interface NSNull (length)
+@interface NSNull (additions)
 
 @end

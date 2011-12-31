@@ -6,9 +6,9 @@
 //  Copyright (c) 2011 Nom Inc. All rights reserved.
 //
 
-#import "NSNull+length.h"
+#import "NSNull+additions.h"
 
-@implementation NSNull (length)
+@implementation NSNull (additions)
 
 -(NSUInteger)length {
     return 0;
