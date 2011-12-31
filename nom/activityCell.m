@@ -50,7 +50,9 @@ static CGRect distance_frame;
 
     text = [[UILabel alloc] initWithFrame:text_frame];
     [text setBackgroundColor:[UIColor clearColor]];
-    [text setFont:[UIFont fontWithName:@"TrebuchetMS" size:13]];
+    [text setFont:[UIFont fontWithName:@"TrebuchetMS" size:15]];
+    [text setMinimumFontSize:9];
+    [text setAdjustsFontSizeToFitWidth:YES];
     [text setLineBreakMode:UILineBreakModeWordWrap];
     [text setNumberOfLines:0];
     [text setTextAlignment:UITextAlignmentLeft];
@@ -76,10 +78,10 @@ static CGRect distance_frame;
     [distance setTextAlignment:UITextAlignmentLeft];
     [distance setTextColor:[UIColor darkGrayColor]];
 
-    image_frame = [[UIImageView alloc] initWithFrame:CGRectMake(5, 5, 96, 52)];
-    [image_frame setImage:[UIImage imageNamed:@"recommendation_image_frame1a.png"]];
+    image_frame = [[UIImageView alloc] initWithFrame:IMG_FRAME(5)];
+    [image_frame setImage:[UIImage imageNamed:@"assets/recommendation_image_frame1a.png"]];
 
-    image = [[UIImageView alloc] initWithFrame:CGRectMake(7, 7, 94, 50)];
+    image = [[UIImageView alloc] initWithFrame:FRAME(5)];
     
     [self setSelectionStyle:UITableViewCellSelectionStyleGray];
     
@@ -126,7 +128,7 @@ static CGRect distance_frame;
     if (! mock) {
         title.text = str;
         text.text = @"";
-        title.frame = CGRectMake(10, (height - 17 - text.frame.size.height), text.frame.size.width, text.frame.size.height);
+        title.frame = CGRectMake(10, (height - 17 - title.frame.size.height), title.frame.size.width, title.frame.size.height);
         when.frame = CGRectMake(10, (height - 15), 300, 18);
         when.text = [util timeAgoFromRailsString:[thumb objectForKey:@"created_at"]];
         user_nid = [thumb objectForKey:@"user_nid"];
@@ -176,11 +178,28 @@ static CGRect distance_frame;
         txt_height = [text newFrameForText:txt];
         height += txt_height + 6;
     }
+    BOOL image_set_flag = NO;
     if (! mock) {
+        @try {
+            NSString *url = [_image objectForKey:@"url"];
+            if ([url length] > 0) {
+                [image setImageWithURL:[NSURL URLWithString:url]];
+                [image setFrame:IMG_FRAME(height - 52)];
+                [image_frame setFrame:FRAME(height - 52)];
+                [self addSubview:image];
+                [self addSubview:image_frame];
+                image_set_flag = YES;
+            }
+        } @catch (NSException *ex) { ; }
+
         title.text = str; 
         title.frame = CGRectMake(10, 5, title.frame.size.width, title.frame.size.height);
         text.text = txt;
-        text.frame = CGRectMake(10, (height - 17 - text.frame.size.height), text.frame.size.width, text.frame.size.height);
+        if (image_set_flag) {
+            text.frame = CGRectMake(10, (height - 17 - text.frame.size.height), (text.frame.size.width - 85), text.frame.size.height);
+        } else {
+            text.frame = CGRectMake(10, (height - 17 - text.frame.size.height), text.frame.size.width, text.frame.size.height);
+        }
         when.frame = CGRectMake(10, (height - 15), 300, 18);
         when.text = [util timeAgoFromRailsString:[recom objectForKey:@"created_at"]];
         user_nid = [user objectForKey:@"user_nid"];
@@ -188,20 +207,6 @@ static CGRect distance_frame;
     } else {
         [self reset];
     }
-    
-    @try {
-        NSString *url = [_image objectForKey:@"url"];
-        if ([url length] > 0) {
-            [image setImage:[UIImage imageNamed:url]];
-            [self addSubview:image];
-            [self addSubview:image_frame];
-        }
-
-    }
-    @catch (NSException *exception) {
-        
-    }
-    
     return height + 5;
 }
 

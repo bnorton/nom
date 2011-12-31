@@ -8,6 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
+#define FRAME(h) CGRectMake(220, h, 96, 52)
+#define IMG_FRAME(h) CGRectMake(220, h, 96, 52)
+
 @interface activityCell : UITableViewCell {
     UILabel *title;
     UILabel *text;

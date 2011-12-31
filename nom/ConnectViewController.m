@@ -157,9 +157,6 @@
     if ([(str = [user objectForKey:@"name"]) length] > 0) {
         name = str;
     }
-    if (type == NMUserProfileTypeOther && isCurrentUser) {
-        name = @"You";
-    }
     self.title = NSLocalizedString(name, @"User Profile page");
     
     if ([(str = [user objectForKey:@"name"]) length] > 0) {
@@ -204,12 +201,6 @@
         NSString *title = [user_name.text length] > 0 ? user_name.text : @"User";
         self.title = NSLocalizedString(title, @"User Name");
     }
-}
-
-- (void)viewWillDisappear:(BOOL)animated {
-    if (isCurrentUser) {
-        self.title = NSLocalizedString(@"You", @"User Name");
-    }    
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
