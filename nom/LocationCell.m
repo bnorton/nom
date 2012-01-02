@@ -164,13 +164,11 @@
         if ((image_obj = [images objectAtIndex:0])) {
             if ([(url = [image_obj objectForKey:@"url"]) length] > 0) {
                 set_image_url = YES;
-                NSLog(@"setting up the url %@", url);
                 [image setImageWithURL:[NSURL URLWithString:url] placeholderImage:[UIImage imageNamed:@"placeholder.png"]];
             }
         }
     }
     if (! set_image_url) {
-        NSLog(@"setting the image to default");
         [image setImage:[UIImage imageNamed:@"placeholder.png"]];
     }
     [image setNeedsDisplay];

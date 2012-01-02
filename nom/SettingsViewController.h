@@ -24,6 +24,8 @@ typedef enum {
     NMSettingsSource source;
     NSArray *labels;
     NSArray *links;
+    
+    BOOL tabbar_hidden;
 }
 
 - (id)initWithType:(NMSettingsSource)source;

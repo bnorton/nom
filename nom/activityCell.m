@@ -183,7 +183,7 @@ static CGRect distance_frame;
         @try {
             NSString *url = [_image objectForKey:@"url"];
             if ([url length] > 0) {
-                [image setImageWithURL:[NSURL URLWithString:url]];
+                [image setImageWithURL:[NSURL URLWithString:url] placeholderImage:[UIImage imageNamed:@"placeholder.png"]];
                 [image setFrame:IMG_FRAME(height - 52)];
                 [image_frame setFrame:FRAME(height - 52)];
                 [self addSubview:image];

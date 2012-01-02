@@ -13,8 +13,10 @@
 #define __distances @"¼ mile", @"½ mile", @"1 mile", @"2½ miles", @"5 miles", nil
 #define __distances_vals [NSNumber numberWithFloat:0.25f], [NSNumber numberWithFloat:0.5f], [NSNumber numberWithFloat:1.0f], [NSNumber numberWithFloat:2.5f], [NSNumber numberWithFloat:5.0f], nil
 
-#define BUTTON_WIDTH 54.0
-#define BUTTON_SEGMENT_WIDTH 51.0
+// #define BUTTON_WIDTH 54.0
+#define BUTTON_WIDTH 64.0
+//#define BUTTON_SEGMENT_WIDTH 51.0
+#define BUTTON_SEGMENT_WIDTH 61.0
 #define CAP_WIDTH 5.0
 
 @class cellCache;
@@ -27,10 +29,10 @@ typedef enum {
 } CapLocation;
 
 typedef enum {
-    NMLocationsFilterAll,
+    NMLocationsFilterDistance,
+    NMLocationsFilterRank,
     NMLocationsFilterCost,
-    NMLocationsFilterCategory,
-    NMLocationsFilterDistance
+    NMLocationsFilterTags,
 } NMLocationsFilter;
 
 typedef enum {
@@ -61,7 +63,9 @@ typedef enum {
     NSArray *categories;
     
     NSUInteger current_limit;
-    
+    NSNumber *current_distance;
+    NSString *current_cost;
+    NSString *current_category;
     EGORefreshTableHeaderView *_refreshHeaderView;
 	
 	//  Reloading var should really be your tableviews datasource

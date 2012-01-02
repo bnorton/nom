@@ -23,7 +23,7 @@
 @synthesize current_response;
 
 - (id)init {
-    return [self initFilteredBy:NMLocationsFilterAll];
+    return [self initFilteredBy:NMLocationsFilterRank];
 }
 
 - (id)initFilteredBy:(NMLocationsFilter)_filter {
@@ -49,8 +49,9 @@
     filtered_by_current_category = [[NSMutableArray alloc] initWithCapacity:20];
     
     current_limit = 25;
+    current_cost = @"$";
     
-    cache = [[cellCache alloc] initWithMaxCapacity:50];
+    cache = [[cellCache alloc] initWithMaxCapacity:25];
     
     return self;
 }
@@ -74,7 +75,7 @@
 //    UIButton* leftButton = (UIButton*)self.navigationItem.leftBarButtonItem.customView;
 //    [leftButton addTarget:self action:@selector(editAction:) forControlEvents:UIControlEventTouchUpInside];
     
-    segmentControlTitles = [NSArray arrayWithObjects:@"Rank", @"Cost", @"Tags", nil];
+    segmentControlTitles = [NSArray arrayWithObjects:@"Distance", @"Rank", @"Cost", @"Tags", nil];
     UIImage* dividerImage = [UIImage imageNamed:@"assets/view-control-divider.png"];
     id iid = [[CustomSegmentedControl alloc] initWithSegmentCount:segmentControlTitles.count segmentsize:CGSizeMake(BUTTON_SEGMENT_WIDTH, dividerImage.size.height) dividerImage:dividerImage tag:0 delegate:self];
     self.navigationItem.titleView = iid;
@@ -90,35 +91,6 @@
     [self.navigationController setNavigationBarHidden:NO animated:YES];
 }
 
-- (void)updateComplete {
-    [self doneLoadingTableViewData];
-    [self setupLocations];
-    [self preBuildCells];
-}
-
-- (void)fetchLocations {
-    [self fetchLocationsWithOptions:nil];
-}
-
-- (void)fetchLocationsWithOptions:(NSDictionary *)options {
-    [NMHTTPClient here:[[distance_values objectAtIndex:distance] floatValue] categories:nil cost:nil  limit:current_limit
-       success:^(NSDictionary *response) {
-           NSLog(@"INFO: here success callback : %@", response);
-           @try {
-               current_response = response;
-               filtered_by_all = [response objectForKey:@"results"];
-           } @catch (NSException *ex) {
-               [util showErrorInView:self.view message:@"Failed to parse items around here"];
-           }
-           [self updateComplete];
-           [self.tableView reloadData];
-       } 
-       failure:^(NSDictionary *response) {
-           [self updateComplete];
-           [util showErrorInView:self.view message:@"Failed to load items around here"];
-           NSLog(@"INFO: here failure callback");
-       }];
-}
 
 - (void)filter_by_cost:(NSString *)cost_str {
     if ([filtered_by_cost count] > 0) {
@@ -163,18 +135,51 @@
 - (void)filter_by_distance {
 }
 
+- (void)updateComplete {
+    [self doneLoadingTableViewData];
+    [self setupLocations];
+    [self filter_by_category:current_category];
+    [self filter_by_distance];
+    [self filter_by_cost:current_cost];
+    [self preBuildCells];
+    [self.tableView reloadData];
+}
+
+- (void)fetchLocations {
+    [self fetchLocationsWithOptions:nil];
+}
+
+- (void)fetchLocationsWithOptions:(NSDictionary *)options {
+    [NMHTTPClient here:[[distance_values objectAtIndex:distance] floatValue] categories:nil cost:nil  limit:current_limit
+               success:^(NSDictionary *response) {
+                   NSLog(@"INFO: here success callback : %@", response);
+                   @try {
+                       current_response = response;
+                       filtered_by_all = [response objectForKey:@"results"];
+                   } @catch (NSException *ex) {
+                       [util showErrorInView:self.view message:@"Failed to parse items around here"];
+                   }
+                   [self updateComplete];
+               } 
+               failure:^(NSDictionary *response) {
+                   [self updateComplete];
+                   [util showErrorInView:self.view message:@"Failed to load items around here"];
+                   NSLog(@"INFO: here failure callback");
+               }];
+}
+
 - (void)setupLocations {
     switch (filter) {
-        case NMLocationsFilterAll:
+        case NMLocationsFilterDistance:
+            locations = filtered_by_distance;
+            break;
+        case NMLocationsFilterRank:
             locations = filtered_by_all;
             break;
         case NMLocationsFilterCost:
             locations = filtered_by_cost;
             break;
-        case NMLocationsFilterDistance:
-            locations = filtered_by_distance;
-            break;
-        case NMLocationsFilterCategory:
+        case NMLocationsFilterTags:
             locations = filtered_by_current_category;
             break;
         default:
@@ -184,6 +189,7 @@
 
 - (void)preBuildCells {
     static NSString *iden = @"cached_location_cell";
+    NSString *url = nil;
     
     int i = 0;
     LocationCell *cell;
@@ -199,19 +205,17 @@
     }
     i=0;
     for (NSDictionary *l in locations) {
-        NSString *url = nil;
-        @try {
-            url = [[[l objectForKey:@"images"] objectAtIndex:0] objectForKey:@"url"];
+        NSArray *images = [l objectForKey:@"images"];
+        if ([images count] == 0) { continue; }
+        
+        if ((url = [currentLocation primaryImageUrlFromImages:images]) != nil) {
             [NMHTTPClient imageFetch:url];
             NSLog(@"image fetch kicked off for %@", url);
+            ++i;
+            if (i > 10) {
+                break;
+            }
         }
-        @catch (NSException *ex) {
-            NSLog(@"image not fetched %@ for %@",ex, url);
-        }
-        ++i;
-//        if (i > 10) {
-//            break;
-//        }
     }
 }
 
@@ -359,9 +363,11 @@
     return button;
 }
 
-- (void) touchDownAtSegmentIndex:(NSUInteger)segmentIndex
-{
-    
+- (void) touchDownAtSegmentIndex:(NSUInteger)segmentIndex {
+    NSLog(@"INFO locations index pressed %d", segmentIndex);
+    filter = segmentIndex;
+    [self setupLocations];
+    [self.tableView reloadData];
 }
 
 -(UIBarButtonItem*)woodBarButtonItemWithText:(NSString*)buttonText

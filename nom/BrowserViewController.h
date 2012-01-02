@@ -28,8 +28,8 @@
 //#import "MyApplication. h"
 
 // The names of the images for the 'back' and 'forward' buttons in the toolbar.
-#define PNG_BUTTON_FORWARD @"right.png"
-#define PNG_BUTTON_BACK @"left.png"
+#define PNG_BUTTON_FORWARD @"assets/right.png"
+#define PNG_BUTTON_BACK @"assets/left.png"
 
 // List of all strings used
 #define ACTION_CANCEL           @"Cancel"

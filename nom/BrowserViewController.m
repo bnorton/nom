@@ -82,6 +82,8 @@
     self.webView.delegate = self;
     self.url = u;
     
+    [self.view setFrame:CGRectMake(0, 0, 320, 480)];
+    
     activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0, 0, 20, 20)];
     
     self.forwardButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:PNG_BUTTON_FORWARD] 

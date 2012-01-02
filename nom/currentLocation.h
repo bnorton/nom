@@ -23,5 +23,6 @@
 - (CGFloat)accuracy;
 
 + (NSString *)howFarFromLat:(CGFloat)lat Long:(CGFloat)lng;
-
++ (NSString *)primaryImageUrlFromImages:(NSArray *)images;
++ (NSArray *)imageUrlsFromLocation:(NSArray *)images;
 @end

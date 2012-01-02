@@ -7,6 +7,7 @@
 //
 
 #import "SettingsViewController.h"
+#import "BrowserViewController.h"
 #import "current.h"
 #import "Util.h"
 @implementation SettingsViewController
@@ -19,6 +20,8 @@
 - (id)init {
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (!self) { return nil; }
+    
+    tabbar_hidden = NO;
     
     labels = [NSArray arrayWithObjects:settings_labels];
     links = [NSArray arrayWithObjects:settings_links];
@@ -37,6 +40,9 @@
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:NO animated:YES];
+    if (tabbar_hidden) {
+        [self showTabBar:self.tabBarController];
+    }
 }
 
 #pragma mark - View lifecycle
@@ -78,7 +84,6 @@
     [switc addTarget:self action:@selector(toggled:) forControlEvents:UIControlEventValueChanged];
     [cell setAccessoryView:switc];
     [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
-    
 }
 
 -(void)unMakeToggleCell:(UITableViewCell *)cell {
@@ -87,6 +92,36 @@
     [cell setSelectionStyle:UITableViewCellSelectionStyleGray];
 }
 
+#pragma mark - Hide tabbar
+
+// thanks to http://stackoverflow.com/questions/5272290/how-to-hide-uitabbarcontroller
+
+- (void) hideTabBar:(UITabBarController *) tabbarcontroller {
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationDuration:0.40];
+    for(UIView *view in tabbarcontroller.view.subviews) {
+        if([view isKindOfClass:[UITabBar class]]) {
+            [view setFrame:CGRectMake(view.frame.origin.x, 480, view.frame.size.width, view.frame.size.height)];
+        } else {
+            [view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, 480)];
+        }
+    }
+    [UIView commitAnimations];
+}
+
+- (void) showTabBar:(UITabBarController *) tabbarcontroller {
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationDuration:0.40];
+    for(UIView *view in tabbarcontroller.view.subviews) {
+        if([view isKindOfClass:[UITabBar class]]) {
+            [view setFrame:CGRectMake(view.frame.origin.x, 431, view.frame.size.width, view.frame.size.height)];
+            
+        } else {
+            [view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, 431)];
+        }
+    }
+    [UIView commitAnimations]; 
+}
 
 #pragma mark - Table view data source
 
@@ -144,7 +179,34 @@
 #pragma mark - Table view delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    
+
+    NSString *link = nil;
+    switch (indexPath.row) {
+        case 0:
+        case 1:
+        case 2:
+            break;
+        case 3:
+            link = [links objectAtIndex:0];
+            break;
+        case 4:
+            link = [links objectAtIndex:1];
+            break;
+        case 5:
+            link = [links objectAtIndex:2];
+            break;
+        case 6:
+            link = [links objectAtIndex:3];
+        default:
+            break;
+    }
+    if (link != nil) {
+        tabbar_hidden = YES;
+        BrowserViewController *brow = [[BrowserViewController alloc] initWithUrls:[NSURL URLWithString:link]];
+        [self hideTabBar:self.tabBarController];
+        [self.navigationController pushViewController:brow animated:YES];
+    }
+
 }
 
 @end

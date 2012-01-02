@@ -52,15 +52,17 @@
 
     AFJSONRequestOperation * operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request 
      success:^(NSURLRequest *request, NSURLResponse *response, id JSON) {
-        if (success) { 
-            NSLog(@"INFO: success callback for %@",path);
+         NSLog(@"INFO: success callback for %@",path);
+         if (success) { 
             success(JSON); 
         }
         else {NSLog(@"WARN: %@ has no success callback registered for patameters %@", path, parameters);}
      } failure:^(NSURLRequest *request, NSURLResponse *response, NSError *error, id JSON) {
-        if (failure) { NSLog(@"INFO failure callback %@ for %@ and %@",error, path, JSON);
+        if (failure) {
+            NSLog(@"INFO failure callback %@ for %@ and %@",error, path, JSON);
             failure(JSON);
-        } else {NSLog(@"WARN: %@ has no failure callback registered for patameters %@", path, parameters);}
+        } else {
+            NSLog(@"WARN: %@ has no failure callback registered for patameters %@", path, parameters);}
      }];
 
     [HTTPQueue addOperation:operation];

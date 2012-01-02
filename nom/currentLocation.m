@@ -68,32 +68,28 @@ static NSTimer *scheduledTimer = nil;
     CLLocation *old = [[CLLocation alloc] initWithLatitude:lat longitude:lng];
     CLLocation *now = [[CLLocation alloc] initWithLatitude:[[util currentLocation] lat] longitude:[[util currentLocation] lng]];
     NSString *format = [[util format_location] stringFromDistanceAndBearingFromLocation:now toLocation:old];
-    NSLog(@"INFO how far from %@", format);
     return format;
 }
 
 + (NSString *)primaryImageUrlFromImages:(NSArray *)images {
     NSDictionary *right;
-    @try {
-        if (([images count] > 0) && (right = [images objectAtIndex:0])) {
-            NSString *url;
-            if ([(url = [right objectForKey:@"url"]) length] > 0) {
-                return url;
-            }
-        }
-    } @catch (NSException *ex) {}
+    if (([images count] > 0) && ((right = [images objectAtIndex:0])) != nil) {
+        NSString *url;
+        if ([(url = [right objectForKey:@"url"]) length] > 0)
+            return url;
+    }
     return nil;
 }
 
 + (NSArray *)imageUrlsFromLocation:(NSArray *)images {
     NSMutableArray *arr = nil;
     NSString *url;
-    @try {
+    if(images != nil){
         for (NSDictionary *img in images) {
             if ([(url = [img objectForKey:@"url"]) length] > 0)
                 [arr addObject:url];
         }
-    } @catch (NSException *ex) {}
+    }
     return arr;
 }
 

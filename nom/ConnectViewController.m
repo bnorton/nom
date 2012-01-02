@@ -19,14 +19,6 @@
 @synthesize user_nid;
 
 - (id)init {
-//    NSDate *then = [currentUser getDateForKey:@"current_user_detail_fetch_time"];
-//    if (then != nil) {
-//        NSLog(@"init in ConnectView_Controller %f %@",[then timeIntervalSince1970], [[then class] description]);
-//        NSLog(@"time_ago %@", [then timeIntervalSinceDate:[NSDate date]]);
-//        if ([[currentUser getDateForKey:@"current_user_detail_fetch_time"] timeIntervalSince1970]) {
-//            return [self initWithType:NMUserProfileTypeMe user_nid:[currentUser getStringForKey:@"user_nid"]];
-//        }        
-//    }
     NSLog(@"init");
     return [self initWithType:NMUserProfileTypeMe user:[currentUser user]];
 }

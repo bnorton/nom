@@ -94,7 +94,7 @@
     str = @"";
 
     if ([(str = [user objectForKey:@"image_url"]) length] > 0) {
-        [user_image setImageWithURL:[NSURL URLWithString:str]];
+        [user_image setImageWithURL:[NSURL URLWithString:str] placeholderImage:[UIImage imageNamed:@"placeholder.png"]];
     } else {
         [user_image setImage:[UIImage imageNamed:@"placeholder.png"]];
     }
