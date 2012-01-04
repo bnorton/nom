@@ -187,9 +187,9 @@
 - (void)publish {
     NSString *url = @"", *nid = @"";
     @try {
-        NSDictionary *image = [[location objectForKey:@"images"] objectAtIndex:0]
-        url = [image objectForKey:@"url"];
-        nid = [image objectForKey:@"image_nid"];
+        NSDictionary *the_image = [[location objectForKey:@"images"] objectAtIndex:0];
+        url = [the_image objectForKey:@"url"];
+        nid = [the_image objectForKey:@"image_nid"];
     }
     @catch (NSException *ex) {;}
     FormTableController *form = [[FormTableController alloc] initWithLocation:location imageUrl:url imageNid:nid];
