@@ -19,7 +19,6 @@
 @synthesize user_nid;
 
 - (id)init {
-    NSLog(@"init");
     return [self initWithType:NMUserProfileTypeMe user:[currentUser user]];
 }
 
@@ -32,14 +31,11 @@
      
     self = [self initWithType:_type user:nil];
         
-    NSLog(@"INFO isCurrentUser1 %d", isCurrentUser);
-
     hud = [util showHudInView:self.view];
     [self.view addSubview:hud];
     
     [NMHTTPClient userDetail:user_nid success:^(NSDictionary *response) {
         [hud hide:YES];
-        NSLog(@"INFO user detail callback %@", response);
         @try {
             [self setupUserContent:[[response objectForKey:@"results"] objectAtIndex:0]];
             [currentUser setDate:[NSDate date] forKey:@"current_user_detail_fetch_time"];
@@ -56,8 +52,6 @@
 
 - (id)initWithType:(NMUserProfileType)_type user:(NSDictionary *)user {
     
-    NSLog(@"INFO: setting the user in the connect view %@",user);
-    
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (!self) { return nil; }
     
@@ -65,7 +59,6 @@
     if (user) { user_nid = [user objectForKey:@"user_nid"]; }
 
     isCurrentUser = [user_nid isEqualToString:[currentUser getStringForKey:@"user_nid"]];
-    NSLog(@"INFO isCurrentUser %@ %@ %d", user_nid, [currentUser getStringForKey:@"user_nid"], isCurrentUser);
 
     self.tabBarItem.image = [UIImage imageNamed:@"icons-gray/291-idcard.png"];
     
@@ -123,6 +116,7 @@
     
     user_image = [[UIImageView alloc] init];
     [user_image setFrame:CGRectMake(10, 10, 100, 100)];
+    [user_image setImage:[UIImage imageNamed:@"placeholder.png"]];
     
     if (type == NMUserProfileTypeMe) {
         // do stuff for uploading image and setup metadata for this being ME
@@ -147,29 +141,26 @@
     
     NSString *name = @"User", *str, *tmp;
     if ([(str = [user objectForKey:@"name"]) length] > 0) {
+        user_name.text = str;
+        name = str;
+    } else if ([(str = [user objectForKey:@"screen_name"]) length] > 0) {
+        user_name.text = str;
         name = str;
     }
     self.title = NSLocalizedString(name, @"User Profile page");
-    
-    if ([(str = [user objectForKey:@"name"]) length] > 0) {
-        user_name.text = str;
-    } else if ([(str = [user objectForKey:@"screen_name"]) length] > 0) {
-        user_name.text = str;
-    }
     user_location.text = [user objectForKey:@"city"];
     
     if ([(str = [user objectForKey:@"updated_at"]) length] > 0) {
-        NSLog(@"CONNECT INFO: last seen %@", str);
         if ([(tmp = [util timeAgoFromRailsString:str]) length] > 0) {        
             str = [NSString stringWithFormat:@"last seen: %@", tmp];
         }
         last_seen.text = str;
     }
     
-    follower_count.text = [NSString stringWithFormat:@"Followers %@", [user objectForKey:@"follower_count"]];
+    int fc = [[user objectForKey:@"follower_count"] intValue];
+    follower_count.text = [NSString stringWithFormat:@"Followers %d", fc];
     
     str = [user objectForKey:@"image_url"];
-    NSLog(@"INFO user detail image %@", str);
     [user_image setImageWithURL:[NSURL URLWithString:str] placeholderImage:[UIImage imageNamed:@"placeholder.png"]];
 
 }

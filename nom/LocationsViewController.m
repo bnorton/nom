@@ -164,7 +164,6 @@
                failure:^(NSDictionary *response) {
                    [self updateComplete];
                    [util showErrorInView:self.view message:@"Failed to load items around here"];
-                   NSLog(@"INFO: here failure callback");
                }];
 }
 

@@ -8,6 +8,7 @@
 
 #import "NMInitialConnectViewController.h"
 #import "LoginViewController.h"
+#import "NMBarButtonItem.h"
 #import "NMHTTPClient.h"
 
 @implementation NMInitialConnectViewController
@@ -37,49 +38,30 @@
     [self.view addSubview:facebook];
     [self.view addSubview:useEmail];
     
-    NSString *buttonText = @"cancel";
-    UIImage *buttonImage = [[UIImage imageNamed:@"assets/bar_button1c.png"] stretchableImageWithLeftCapWidth:5 topCapHeight:0];
-    UIButton* button = [UIButton buttonWithType:UIButtonTypeCustom];
-    button.frame = CGRectMake(0.0, 0.0, 54, 30);
-    button.titleLabel.font = [UIFont boldSystemFontOfSize:[UIFont smallSystemFontSize]];
-    button.titleLabel.textColor = [UIColor blackColor];
-    button.titleLabel.shadowOffset = CGSizeMake(0,-1);
-    button.titleLabel.shadowColor = [UIColor darkGrayColor];
-    
-    [button setTitle:buttonText forState:UIControlStateNormal];
-    [button setBackgroundImage:buttonImage forState:UIControlStateNormal];
-    [button addTarget:self.navigationController action:@selector(dismissModalViewControllerAnimated:) forControlEvents:UIControlEventTouchUpInside];
-    /*[button setBackgroundImage:buttonPressedImage forState:UIControlStateHighlighted];
-    [button setBackgroundImage:buttonPressedImage forState:UIControlStateSelected]; */
-    button.adjustsImageWhenHighlighted = NO;
-
-    
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+    NMBarButtonItem *item = [[NMBarButtonItem alloc] initWithText:@"Cancel" color:NMBarButtonItemColorRed];
+    [item addTarget:self.navigationController action:@selector(dismissModalViewControllerAnimated:)];
+    self.navigationItem.rightBarButtonItem = item;
     
     return self;
 }
 
 - (void)facebook {
-    NSLog(@"Facebook in NMInitialConnect");
     [[util fbmodel] authorizeWithSuccess:^{
-        NSLog(@"INFO: initial connect callback success");
         [self.navigationController dismissModalViewControllerAnimated:YES];
+        [util shouldShowMessage:@"Facebook connected!" subMessage:nil isError:NO];
     } failure:^{
-        
+        [util showErrorInView:self.view message:@"Facebook Connect failed or cancelled :("];
     }];
 }
 
 - (void)use_email {
-    NSLog(@"use_email in NMInitialConnect");
     LoginViewController *login = [[LoginViewController alloc] init];
     [self.navigationController pushViewController:login animated:YES];
 }
 
 #pragma mark - View lifecycle
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    // Return YES for supported orientations
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 

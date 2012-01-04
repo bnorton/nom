@@ -63,9 +63,7 @@
     if (show) {
         hud = [util showHudInView:self.tableView];
     }
-    NSLog(@"INFO: begin updateFollowers for %@", user_nid);
     [NMHTTPClient followersFor:user_nid withSuccess:^(NSDictionary *_response) {
-        NSLog(@"INFO: updateFollowers success %@",response);
         response = _response;
         if ([response objectForKey:@"status"] > 0) {
             follows = [response objectForKey:@"results"];
@@ -75,7 +73,6 @@
     } failure:^(NSDictionary *_response) {
         response = _response;
         follows = nil;
-        NSLog(@"INFO: updateFollowers failure for %@", user_nid);
         [self updateComplete];
         [hud hide:YES];
         [util showErrorInView:self.view message:@"Couldn't load followers"];
@@ -87,17 +84,14 @@
     if (show) {
         hud = [util showHudInView:self.tableView];
     }
-    NSLog(@"INFO: begin updateFollowing for %@", user_nid);
     [NMHTTPClient followingFor:user_nid withSuccess:^(NSDictionary *_response) {
         response = _response;
-        NSLog(@"INFO: updateFollowing success");
         if ([response objectForKey:@"status"] > 0) {
             follows = [response objectForKey:@"results"];
         }
         [self updateComplete];
         [hud hide:YES];
     } failure:^(NSDictionary *_response) {
-        NSLog(@"INFO: updateFollowing failure %@", user_nid);
         response = _response;
         follows = nil;
         [self updateComplete];
@@ -149,16 +143,6 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-/*  NSArray *people = nil;
-    if (type == NMFollowersType) {
-        people = [currentData followers];
-    } else if (type == NMFollowingType) {
-        people = [currentData following];
-    }
-    NSInteger ct = [people count];
-    NSLog(@"INFO number of Follows %d",ct);
-    return ct;
- */
     return [follows count];
 }
 
@@ -169,20 +153,9 @@
     if (cell == nil) {
         cell = [[FollowCell alloc] initWithReuseIdentifier:CellIdentifier];
     }
-/*
-    NSArray *people = nil;    
-    if (type == NMFollowersType) {
-        people = [currentData followers];
-    } else if (type == NMFollowingType) {
-        people = [currentData following];
-    }
-*/
-    
-    NSLog(@"FOLLOWERS: for row %d", indexPath.row);
     if ([follows count] > indexPath.row) {
         id _person = [follows objectAtIndex:indexPath.row];
         if ([_person isKindOfClass:[NSDictionary class]]) {
-            NSLog(@"INFO: follower is a dictionary");
             NSDictionary *person = (NSDictionary *)_person;
             [((FollowCell *)cell) setFollower:person];
         }
@@ -194,50 +167,25 @@
 #pragma mark - Table view delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-/*
-    NSArray *people = nil;
-    if (type == NMFollowersType) {
-        people = [currentData followers];
-    } else if (type == NMFollowingType) {
-        people = [currentData following];
-    }
-    
-    if ([people count] > indexPath.row) {
-        NSArray *people = nil;    
-        if (type == NMFollowersType) {
-            people = [currentData followers];
-        } else if (type == NMFollowingType) {
-            people = [currentData following];
-        }
-        UserDetailViewController *user = [[UserDetailViewController alloc] initWithUser:[people objectAtIndex:indexPath.row]]; 
- */
-        
     @try {
         NSDictionary *follower = [follows objectAtIndex:indexPath.row];
-        NSLog(@"INFO init the user for detail fro followers");
-        NSLog(@"INFO: person looks like %@", follower);
         ConnectViewController *user = [[ConnectViewController alloc] 
                                        initWithType:NMUserProfileTypeOther 
                                        user_nid:[follower objectForKey:@"user_nid"]];
         [self.navigationController pushViewController:user animated:YES];
     } @catch (NSException *ex) {
-        [util showErrorInView:self.view message:@"Couldn't parse User for detail"];
+        [util showErrorInView:self.view message:@"Couldn't parse user for detail"];
     }
 }
 
 #pragma mark -
 #pragma mark Data Source Loading / Reloading Methods
 
-- (void)reloadTableViewDataSource {
-	
-	//  should be calling your tableviews data source model to reload
-	//  put here just for demo
+- (void)reloadTableViewDataSource {	
 	_reloading = YES;
     if (type == NMFollowersType) {
-        NSLog(@"FOLLOWERS: updating followers");
         [self updateFollowersShowingHUD:NO];
     } else if (type == NMFollowingType) {
-        NSLog(@"FOLLOWERS: updating following");
         [self updateFollowingShowingHUD:NO];
     }
 	
@@ -286,8 +234,6 @@
 	
     // should return date data source was last changed
     return [currentUser getDateForKey:[NSString stringWithFormat:@"current_user_date_for_follow_type_%@", [self type_str]]];
-	
-	
 }
 
 

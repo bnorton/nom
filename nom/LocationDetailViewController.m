@@ -82,7 +82,7 @@
     add_image = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     [add_image setFrame:CGRectMake(20, 5, 280, 30)];
     [add_image addTarget:self action:@selector(attachImage) forControlEvents:UIControlEventTouchUpInside];
-    [add_image setTitle:@"Upload Image" forState:UIControlStateNormal];
+    [add_image setTitle:@"Upload an Image" forState:UIControlStateNormal];
     [add_image setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
     [add_image setTitleColor:[UIColor lightGrayColor] forState:UIControlStateSelected];
     [add_image setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
@@ -90,7 +90,7 @@
     publish = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     [publish setFrame:CGRectMake(20, 5, 280, 30)];
     [publish addTarget:self action:@selector(publish) forControlEvents:UIControlEventTouchUpInside];
-    [publish setTitle:@"Recommend this spot" forState:UIControlStateNormal];
+    [publish setTitle:@"Recommend to followers" forState:UIControlStateNormal];
     [publish setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
     [publish setTitleColor:[UIColor lightGrayColor] forState:UIControlStateSelected];
     [publish setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
@@ -98,7 +98,7 @@
     thumb = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     [thumb setFrame:CGRectMake(20, 5, 280, 30)];
     [thumb addTarget:self action:@selector(thumb) forControlEvents:UIControlEventTouchUpInside];
-    [thumb setTitle:@"How was it? (good/meh)" forState:UIControlStateNormal];
+    [thumb setTitle:@"How was it? (solid/meh)" forState:UIControlStateNormal];
     [thumb setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
     [thumb setTitleColor:[UIColor lightGrayColor] forState:UIControlStateSelected];
     [thumb setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
@@ -119,8 +119,6 @@
 - (void)setup {
     name.text = [location objectForKey:@"name"];
     address.text = [location objectForKey:@"address"];
-    
-    NSLog(@"INFO setting up location detail for %@", location);
     
     NSDictionary *metadata;
     metadata = [location objectForKey:@"metadata"];
@@ -144,7 +142,7 @@
         NSString *url = [[[location objectForKey:@"images"] objectAtIndex:0] objectForKey:@"url"];
         [image setImageWithURL:[NSURL URLWithString:url] placeholderImage:[UIImage imageNamed:@"placeholder.png"]];
     }
-    @catch (NSException *exception) {
+    @catch (NSException *ex) {
         
     }
 }
@@ -160,7 +158,7 @@
     } failure:^(NSDictionary *response) {
         [util showErrorInView:self.view message:[NSString stringWithFormat:@"Image upload failed%@", _name]];
     } progress:^(NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite) {
-        NSLog(@"image upload progress %d, %d", totalBytesWritten, totalBytesExpectedToWrite);
+        
     }];
 }
 
@@ -174,28 +172,26 @@
 
 - (void)thumb {
     NSString *title = [NSString stringWithFormat:@"%@ was...", name.text];
-    [UIActionSheet actionSheetWithTitle:title message:@"blah - subname" buttons:thumb_buttons showFromBar:self.tabBarController.tabBar 
+    [UIActionSheet actionSheetWithTitle:title message:nil buttons:thumb_buttons showFromBar:self.tabBarController.tabBar 
       onDismiss:^(int buttonIndex) {
-          NSLog(@"INFO thumb -> dismissed thumb with button index %d", buttonIndex);
           if (buttonIndex == 0) {
               [self thumbValue:@"1"];
           } else {
               [self thumbValue:@"2"];              
           }
     } onCancel:^{
-        NSLog(@"INFO :thumb canceled");
+        
     }];
 }
 
 - (void)publish {
     NSString *url = @"", *nid = @"";
     @try {
-        url = [[[location objectForKey:@"images"] objectAtIndex:0] objectForKey:@"url"];
-        nid = [[[location objectForKey:@"images"] objectAtIndex:0] objectForKey:@"image_nid"];
-        NSLog(@"INFO publishing with nid %@", nid);
+        NSDictionary *image = [[location objectForKey:@"images"] objectAtIndex:0]
+        url = [image objectForKey:@"url"];
+        nid = [image objectForKey:@"image_nid"];
     }
-    @catch (NSException *exception) {;}
-    NSLog(@"about to publish do we have an image url %@", url);
+    @catch (NSException *ex) {;}
     FormTableController *form = [[FormTableController alloc] initWithLocation:location imageUrl:url imageNid:nid];
     [self.navigationController pushViewController:form animated:YES];
 }
@@ -205,6 +201,7 @@
     if ([(title = [location objectForKey:@"name"]) length] > 0) {
         title = [NSString stringWithFormat:@"Add image to %@", title];
     } else { title = @"Pick and Image."; }
+    
     [UIActionSheet photoPickerWithTitle:title showFromBar:self.tabBarController.tabBar presentVC:self onPhotoPicked:^(UIImage *chosenImage) {
         NSData *imageData = UIImagePNGRepresentation(chosenImage);
         
@@ -226,7 +223,7 @@
                 }
             }
     } onCancel:^{
-        NSLog(@"INFO: did cancel the photo picker");
+        
     }];
     
 }

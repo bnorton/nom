@@ -111,7 +111,6 @@
     __block MBProgressHUD *hud = [util showHudInView:self.view]; [self.view addSubview:hud];
     [hud show:YES];
     
-    NSLog(@"submitting");
     text = textView_.text != nil ? textView_.text : text;
     name = nameField_.text != nil ? nameField_.text : name;
     address = addressField_.text != nil ? addressField_.text : address;

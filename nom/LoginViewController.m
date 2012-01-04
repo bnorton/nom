@@ -79,6 +79,23 @@
 - (void)screen_name_ended {
     [screen_name resignFirstResponder];
     [email becomeFirstResponder];
+    
+    [NMHTTPClient screenNameCheck:screen_name.text success:^(NSDictionary *response) {
+        NSString *title = @"Handle available and reserved", *sub = nil;
+        @try {
+            if ([[response objectForKey:@"status"] intValue] == -2) {
+                [util showErrorInView:self.view message:@"Sorry that Handle is taken :("];
+                return;
+            }
+//            NSString *rtime = [[[response objectForKey:@"results"] objectAtIndex:0] objectForKey:@"reserved_until"];
+            sub = @"for another 2 minutes";
+        }
+        @catch (NSException *ex) { }
+        [util showInfoInView:self.view isError:NO message:title subMessage:nil];
+        
+    } failure:^(NSDictionary *response) {
+        // do nothing here
+    }];
 }
 
 - (void)email_ended {
@@ -86,28 +103,31 @@
     [password becomeFirstResponder];
 }
 
--(void)password_ended {
-    NSLog(@"should be logging in %@, %@, %@", screen_name.text, email.text, password.text);
-    
+-(void)password_ended {    
     MBProgressHUD *hud = [util showHudInView:self.view];
     
     [NMHTTPClient registerUserEmail:email.text password:password.text screen_name:screen_name.text success:^(NSDictionary *response) {
-        NSLog(@"INFO registerUserEmail success callback: %@",response);
         if ([[response objectForKey:@"status"] integerValue] > 0) {
             @try {
                 NSDictionary *user = [[response objectForKey:@"results"] objectAtIndex:0];
                 [currentUser setUser:user];
                 [currentUser setDate:[NSDate date] forKey:@"current_user_detail_fetch_time"];
-                
-            } @catch (NSException *exception) {
+                [util shouldShowMessage:@"Nom Registration was successful." subMessage:nil isError:NO];
+                [self.navigationController dismissModalViewControllerAnimated:YES];
+                return;
+            } @catch (NSException *ex) {
                 
             }
-        } else {
-            
         }
+        NSString *msg = @"Your registration didn't go through.";
+        @try {
+            msg = [response objectForKey:@"message"];
+        }
+        @catch (NSException *ex) { }
+        [util showErrorInView:self.view message:msg];
         [hud hide:YES];
     } failure:^(NSDictionary *response) {
-        NSLog(@"hud hidden with failure on login");
+        [util showInfoInView:self.view isError:YES message:@"Registration Failed" subMessage:@"You may be disconnected from the network."];
         [hud hide:YES]; 
     }];
     
@@ -164,7 +184,7 @@
     
     switch (indexPath.row) {
         case 0:
-            cell.textLabel.text = @"Name";
+            cell.textLabel.text = @"Handle";
             if ([screen_name superview])
                 [screen_name removeFromSuperview];
             [cell addSubview:screen_name];            

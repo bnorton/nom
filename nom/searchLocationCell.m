@@ -57,9 +57,6 @@
 }
 
 - (void)setLocation:(NSDictionary *)location {
-    
-    NSLog(@"setting up the cell %@",[location objectForKey:@"name"]);
-    
     NSString *str, *tmp;
     if ([(str = [location objectForKey:@"name"]) length] > 0){
         name.text = str;

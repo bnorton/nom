@@ -40,8 +40,6 @@ static NSMutableDictionary *user = nil;
         
         [currentUser loadCurrentUser];
         [currentUser setLoggedIn];
-        
-        NSLog(@"INIT currentUser %@", user);
     }
 }
 
@@ -88,13 +86,10 @@ static NSMutableDictionary *user = nil;
 }
 
 + (void)setUser:(NSDictionary *)_user {
-    NSLog(@"setting user in currentUser with %@", _user);
     if (_user != nil) {
-        NSLog(@"setting user in currentUser IN");
         if ([[_user objectForKey:@"auth_token"] length] > 0) { [defaults setObject:[_user objectForKey:@"auth_token"] forKey:@"auth_token"]; }
         if ([[_user objectForKey:@"user_nid"] length] > 0)   { [defaults setObject:[_user objectForKey:@"user_nid"] forKey:@"user_nid"]; }
         if ([[_user objectForKey:@"email"] length] > 0)      { [defaults setObject:[_user objectForKey:@"email"] forKey:@"email"]; }
-//        if ([[_user objectForKey:@"last_seen"] length] > 0)  { [defaults setObject:[_user objectForKey:@"last_seen"] forKey:@"last_seen"]; }
         if ([[_user objectForKey:@"name"] length] > 0)       { [defaults setObject:[_user objectForKey:@"name"] forKey:@"name"]; }
         if ([[_user objectForKey:@"screen_name"] length] > 0){ [defaults setObject:[_user objectForKey:@"screen_name"] forKey:@"screen_name"]; }
         if ([[_user objectForKey:@"image_url"] length] > 0)  { [defaults setObject:[_user objectForKey:@"image_url"] forKey:@"image_url"]; }

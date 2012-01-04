@@ -98,8 +98,6 @@ static NSTimer *scheduledTimer = nil;
 - (void)locationManager:(CLLocationManager *)manager 
     didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
 {
-    NSLog(@"location : %f, %f, %f", newLocation.coordinate.latitude, newLocation.coordinate.longitude, newLocation.horizontalAccuracy);
-    
     CLLocationAccuracy accuracy = newLocation.horizontalAccuracy;
     if (accuracy < kCLLocationAccuracyHundredMeters){
         
@@ -110,31 +108,31 @@ static NSTimer *scheduledTimer = nil;
 - (void)locationManager:(CLLocationManager *)manager 
        didFailWithError:(NSError *)error
 {
-    NSLog(@"didFailWithError %@", error);
+//    NSLog(@"didFailWithError %@", error);
 }
 
 - (void)locationManager:(CLLocationManager *)manager 
          didEnterRegion:(CLRegion *)region
 {
-    NSLog(@"didEnterRegion %@", region);
+//    NSLog(@"didEnterRegion %@", region);
 }
 
 - (void)locationManager:(CLLocationManager *)manager 
           didExitRegion:(CLRegion *)region
 {
-    NSLog(@"didExitRegion %@", region);
+//    NSLog(@"didExitRegion %@", region);
 }
 
 - (void)locationManager:(CLLocationManager *)manager monitoringDidFailForRegion:(CLRegion *)region 
               withError:(NSError *)error
 {
-    NSLog(@"monitoringDidFailForRegion %@", region);
+//    NSLog(@"monitoringDidFailForRegion %@", region);
 }
 
 - (void)locationManager:(CLLocationManager *)manager 
 didChangeAuthorizationStatus:(CLAuthorizationStatus)status
 {
-    NSLog(@"didChangeAuthorizationStatus %d", status);
+//    NSLog(@"didChangeAuthorizationStatus %d", status);
 }
 
 

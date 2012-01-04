@@ -142,7 +142,6 @@ static MBProgressHUD *hud;
 
     _photoPickedBlock(editedImage);
     
-    NSLog(@"INFO: hiding the hud");
     [hud hide:YES];
     
 	[picker dismissModalViewControllerAnimated:YES];	

@@ -71,15 +71,10 @@
     [activities removeAllObjects];
     [activities addObjectsFromArray:thumbs];
     [activities addObjectsFromArray:recommends];
-    
-//    for (id item in thumbs) { [activities addObject:item]; }
-//    for (id item in recommends) { [activities addObject:item]; } 
-    
-    NSLog(@"INFO process_activity_list %@ ",activities);
-    
+    __block NSDate *one = nil, *two = nil;
+    __block NSString *str1 = nil, *str2 = nil;
     [activities sortUsingComparator:^NSComparisonResult(id obj1, id obj2) {
-        NSDate *one = nil, *two = nil;
-        NSString *str1 = nil, *str2 = nil;
+        one = nil, two = nil;
         if ([obj1 isKindOfClass:[NSDictionary class]] && 
             [obj1 respondsToSelector:@selector(objectForKey:)]) {
             str1 = [obj1 objectForKey:@"timestamp"];
@@ -92,30 +87,26 @@
             one = [util dateFromRailsString:str1]; 
             two = [util dateFromRailsString:str1]; 
         }
-        @catch (NSException *exception) {;}
+        @catch (NSException *ex) {;}
         
         if (one != nil && two != nil) { 
-            return [two compare:one]; 
+            return [one compare:two]; 
         }
         return 1;
     }];
-    
 }
 
 - (void)fetchActivities {
     if (type == NMActivityTypeByFollowing) {
         [NMHTTPClient activitiesWithSuccess:^(NSDictionary *response) {
             current_response = response;
-            NSLog(@"INFO Activity following response %@", response);
             if (([response objectForKey:@"status"]) > 0) {
                 NSArray *_recommends;
                 NSArray *_thumbs;
                 if ((_recommends = [response objectForKey:@"recommends"])) {
                     recommends = _recommends;
-                    NSLog(@"INFO Activity have recommendations");
                 }
                 if ((_thumbs = [response objectForKey:@"thumbs"])) {
-                    NSLog(@"INFO Activity have thumbs");
                     thumbs = _thumbs;
                 }
                 [self doneLoadingTableViewData:YES];
@@ -132,8 +123,6 @@
         
         [NMHTTPClient usersActivities:user_nid withSuccess:^(NSDictionary *response) {
             current_response = response;
-            NSLog(@"INFO Activity users response %@", response);
-            NSLog(@"activity fetch success by_user");
             if (([response objectForKey:@"status"]) > 0) {
                 NSArray *_recommends;
                 NSArray *_thumbs;
@@ -214,7 +203,6 @@
              }
         }
     } @catch (NSException *ex) {
-        NSLog(@"had some trouble setting up the cell for %d  EXCEPTION %@",indexPath.row, [ex description]);
     }
     return cell;
 }
@@ -231,7 +219,7 @@
             }
         }
     } @catch (NSException *ex) {
-        NSLog(@"had some trouble mocking the cell for %d EXCEPTION %@", indexPath.row, [ex description]);
+        
     }
     return height;
 }
@@ -251,7 +239,6 @@
     }
     [self.tableView reloadData];
 	_reloading = NO;
-    NSLog(@"SET activity fetched date %@",user_nid);
     [currentUser setDate:[NSDate date] forKey:[NSString stringWithFormat:@"activites_date_for_user_%@", user_nid]];
 	[_refreshHeaderView egoRefreshScrollViewDataSourceDidFinishedLoading:self.tableView];
 }
@@ -283,7 +270,6 @@
 }
 
 - (NSDate*)egoRefreshTableHeaderDataSourceLastUpdated:(EGORefreshTableHeaderView*)view{
-    NSLog(@"get activity date for %@",user_nid);
     return [currentUser getDateForKey:[NSString stringWithFormat:@"activites_date_for_user_%@", user_nid]];
 }
 

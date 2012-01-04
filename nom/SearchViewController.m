@@ -42,7 +42,6 @@
     [searchDisplayController setSearchResultsDataSource:self];
     
     for (id v in searchBar.subviews) {
-        NSLog(@"WE HAVE A CLASS %@", [[v class] description]);
         if ([v isKindOfClass:[UITextField class]]) {
             UITextField *tf = (UITextField *)v;
             search_field = tf;
@@ -89,20 +88,19 @@
 }
 
 - (void)searchBarChanged:(UITextField *)the_field {
-    NSLog(@"search bar changed %@", the_field.text);
+    
 }
 
 - (void)searchBarDidBegin:(UITextField *)the_field {
-    NSLog(@"search bar begin %@", the_field.text);
+    
 }
 
 - (void)cancelButtonPressed:(UIButton *)cancel {
-    NSLog(@"search bar canceled %@", cancel);
+    
     [search_field resignFirstResponder];
 }
 
 - (BOOL)textFieldShouldClear:(UITextField *)textField {
-    NSLog(@"textFieldShouldClear");
     [self cancelButtonPressed:nil];
     items = nil;
     [self setupCellsCache];
@@ -111,18 +109,16 @@
 
 - (void)searchLocation:(NSString *)query where:(NSString *)where {
     [NMHTTPClient searchLocation:query location:where success:^(NSDictionary *response) {
-        NSLog(@"INFO: success called back from location search query %@", response);
         @try {
             current_response = response;
             items = [response objectForKey:@"results"];
             [self setupCellsCache];
         }
-        @catch (NSException *exception) {
+        @catch (NSException *ex) {
             items = nil;
         }
         [hud hide:YES];
     } failure:^(NSDictionary *response) {
-        NSLog(@"INFO: failure called back from search query %@", response);
         [hud hide:YES];    
     }];
 
@@ -130,27 +126,23 @@
 
 -(void)searchUser:(NSString *)query {
     [NMHTTPClient searchUser:query success:^(NSDictionary *response) {
-        NSLog(@"INFO: success called back from user search query %@", response);
         @try {
             current_response = response;
             items = [response objectForKey:@"results"];
             [self setupCellsCache];
         }
-        @catch (NSException *exception) {
+        @catch (NSException *ex) {
             items = nil;
         }
         [hud hide:YES];
 
     } failure:^(NSDictionary *response) {
         items = nil;
-         NSLog(@"INFO: failure called back from user search query %@", response);
         [hud hide:YES];
     }];
 }
 
 - (void)fetchedBasedOn:(NSString *)query where:(NSString *)loc {
-    NSLog(@"INFO: based on location for query %@", query);
-
     hud = [util showHudInView:self.view];
     [self.view addSubview:hud];
     [hud show:YES];
@@ -175,7 +167,6 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    NSLog(@"numRowsInSection %d", [items count]);
     return [items count];
 }
 
@@ -198,7 +189,6 @@
         else if (target == NMSearchTargetUser)
             [(searchUserCell *)cell setUser:[items objectAtIndex:indexPath.row] isMocked:NO];
     } else { 
-        NSLog(@"There was no location at that index, that is ODD %d", indexPath.row); 
     }
     
     return cell;
@@ -223,27 +213,20 @@
 }
 
 - (void)filterContentForSearchText:(NSString*)searchText scope:(NSString*)scope {  
-//    [util showInfoInView:self.view message:@"filterContentForSearchText"];
 }     
 
 - (BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString {  
-      // Return YES to cause the search result table view to be reloaded.  
-//    [util showInfoInView:self.view message:@"shouldReloadTableForSearchString"];  
     return YES;  
 }  
 
 - (BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchScope:(NSInteger)searchOption {  
-    // Return YES to cause the search result table view to be reloaded.  
-//    [util showInfoInView:self.view message:@"shouldReloadTableForSearchScope"];  
     return YES;  
 }  
 
 - (void)searchDisplayControllerDidBeginSearch:(UISearchDisplayController *)controller {  
-//    [util showInfoInView:self.view message:@"searchDisplayControllerDidBeginSearch"];
 }  
 
 - (void)searchDisplayControllerDidEndSearch:(UISearchDisplayController *)controller {  
-//    [util showInfoInView:self.view message:@"searchDisplayControllerDidEndSearch"];
 }
 
 @end

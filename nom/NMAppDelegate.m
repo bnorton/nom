@@ -30,6 +30,9 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     
+    NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
+    [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
+    
     [[UIApplication sharedApplication] setStatusBarStyle: UIStatusBarStyleBlackOpaque];
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
@@ -64,13 +67,14 @@
     
     if ( ! [currentUser getBooleanForKey:@"logged_in_or_connected"]) {
         UIViewController *initialConnect = [[NMInitialConnectViewController alloc] init];
-        UINavigationController *isnav = [[UINavigationController alloc] initWithRootViewController:initialConnect];        [isnav.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] 
+        UINavigationController *isnav = [[UINavigationController alloc] initWithRootViewController:initialConnect];
+        [isnav.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] 
                                   forBarMetrics:UIBarMetricsDefault];
 
 
         [self performBlock:^{
             [self.tabBarController presentModalViewController:isnav animated:YES];
-        } afterDelay:.8];
+        } afterDelay:0.4f];
     }
     
     return YES;

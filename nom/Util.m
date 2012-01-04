@@ -52,7 +52,6 @@ static UIView *currently_set_view;
     if(!initialized)
     {
         initialized = YES;
-        NSLog(@"UTIL initialize");
 
         _fbmodel = [[NMFBModel alloc] init];
         _facebook = [[Facebook alloc] initWithAppId:FBAPPID andDelegate:_fbmodel];

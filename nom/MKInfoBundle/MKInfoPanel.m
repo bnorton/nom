@@ -81,8 +81,7 @@
     if(type == MKInfoPanelTypeError) {
         self.backgroundGradient.image = [[UIImage imageNamed:@"Red"] stretchableImageWithLeftCapWidth:1 topCapHeight:5];
         self.titleLabel.font = [UIFont boldSystemFontOfSize:14];
-        self.detailLabel.font = [UIFont fontWithName:@"Helvetica Neue" 
-                                                size:14];
+        self.detailLabel.font = [UIFont fontWithName:@"Helvetica Neue" size:14];
         self.thumbImage.image = [UIImage imageNamed:@"Warning"];
         self.detailLabel.textColor = [UIColor colorWithRed:1.f green:0.651f blue:0.651f alpha:1.f];
     }
@@ -90,6 +89,8 @@
     else if(type == MKInfoPanelTypeInfo) {
         self.backgroundGradient.image = [[UIImage imageNamed:@"Blue"] stretchableImageWithLeftCapWidth:1 topCapHeight:5];
         self.titleLabel.font = [UIFont boldSystemFontOfSize:15];
+        [self.titleLabel setMinimumFontSize:12];
+        [self.titleLabel setAdjustsFontSizeToFitWidth:YES];
         self.thumbImage.image = [UIImage imageNamed:@"Tick"];   
         self.detailLabel.textColor = RGBA(210, 210, 235, 1.0);
     }

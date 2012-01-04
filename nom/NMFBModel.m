@@ -34,7 +34,6 @@
 -(void)authorizeWithSuccess:(void (^)())success
                     failure:(void (^)())failure {
 
-    NSLog(@"INFO: authorizeWithSuccess");
     auth_success = success;
     auth_failure = failure;
     [self __authorize];
@@ -109,8 +108,6 @@
             [currentUser getStringForKey:@"fb_user_id"] :
             [currentUser getStringForKey:@"fb_user_name"]),@"feed"];
     
-    NSLog(@"INFO PATH for fb publish %@ params %@", path, params);
-    
     [[util facebook] requestWithGraphPath:path andParams:params 
                             andHttpMethod:@"POST" andDelegate:self];
     
@@ -120,42 +117,33 @@
 #pragma mark - FBSessionDelegate
 
 - (void)fbDidLogin {
-    NSLog(@"INFO fbDidLogin exp date %@", [[util facebook] expirationDate]);
-    
     [currentUser setString:[[util facebook] accessToken] ForKey:@"fb_access_token"];
     [currentUser setObject:[[util facebook] expirationDate] forKey:@"fb_expiration_date"];
     [currentUser setBoolean:YES ForKey:@"user_facebook_connected"];
-    
-    NSLog(@"INFO fbDidLogin access_token %@", [currentUser getStringForKey:@"fb_access_token"]);
-    NSLog(@"INFO fbDidLogin expiration_date %@", [currentUser getObjectForKey:@"fb_expiration_date"]);
     
     [util shouldShowMessage:FB_SUCCESS_MESSAGE subMessage:nil isError:NO];
     
     if (auth_success) {
         auth_success();
     }
-    
-    NSLog(@"INFO fbDidLogin calling /me");
     dispatch_async(dispatch_get_main_queue(), ^{
         [self meWithSuccess:nil failure:nil];
     });
 }
 
 -(void)fbDidNotLogin:(BOOL)cancelled {
-    NSLog(@"INFO: fbDidNotLogin");
     if (auth_failure) {
         auth_failure();
     }
 }
 
 - (void)fbDidLogout {
-    NSLog(@"INFO: fbDidLogout");
 }
 
 #pragma mark FBDialogDelegate
 
 - (void)dialogDidComplete:(FBDialog *)dialog {
-    NSLog(@"published successfully");
+    
 }
 
 - (void)fbDialogLogin:(NSString*)token expirationDate:(NSDate*)expirationDate {
@@ -172,11 +160,6 @@
 
 - (void)request:(FBRequest *)request didLoad:(id)result {
     
-    NSLog(@"INFO FB /me finsidhed with %@",result);
-    
-    NSLog(@"FBRequest url: %@ \nmethod: %@",request.url, 
-          request.httpMethod);
-    
     if ([request.url isEqual:[NSString stringWithFormat:@"%@%@", FB_BASE, FB_ME]]) {
         NSString *uid      = [result objectForKey:@"id"];
         NSString *uname    = [result objectForKey:@"username"];
@@ -187,7 +170,6 @@
         [currentUser setString:fullname ForKey:@"fb_full_name"];
         
         [NMHTTPClient registerUserFacebook:result success:^(NSDictionary *response) {
-            NSLog(@"INFO registerUserFacebook success %@", response);
             @try {
                 [currentUser setUser:[[response objectForKey:@"results"] objectAtIndex:0]];
             } @catch (NSException *ex) {;}
@@ -195,24 +177,21 @@
                 me_success(result);
             }
         } failure:^(NSDictionary *response) {
-            NSLog(@"INFO registerUserFacebook failure %@", response);
             if (me_failure) {
                 me_failure(result);
             }
         }];        
     }
     else if ([request.url isEqual:[NSString stringWithFormat:@"%@%@", FB_BASE, FB_FRIENDS]]){
-        NSLog(@"INFO me_friends success");
+       
     }
     else if ([[NSString stringWithFormat:@"%@",request.url] 
               rangeOfString:@"feed"].location != NSNotFound) {
-        NSLog(@"posted to my wall");
         if (publish_success) {
             publish_success();
         }
     }
     else {
-        NSLog(@"request.url for NMFBModel %@", request.url);
     }
     if ([result objectForKey:@"owner"]){
         NSLog(@"Photo upload Success");
@@ -220,8 +199,6 @@
 }
 
 - (void)request:(FBRequest *)request didFailWithError:(NSError *)error {
-    NSLog(@"ERROR NMFBModel request failed: %@ code : %d", [error description], [error code]);
-    
     if ([[NSString stringWithFormat:@"%@",request.url] 
          rangeOfString:@"feed"].location != NSNotFound) {
         if (publish_failure) {

@@ -52,17 +52,13 @@
 
     AFJSONRequestOperation * operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request 
      success:^(NSURLRequest *request, NSURLResponse *response, id JSON) {
-         NSLog(@"INFO: success callback for %@",path);
          if (success) { 
             success(JSON); 
         }
-        else {NSLog(@"WARN: %@ has no success callback registered for patameters %@", path, parameters);}
      } failure:^(NSURLRequest *request, NSURLResponse *response, NSError *error, id JSON) {
         if (failure) {
-            NSLog(@"INFO failure callback %@ for %@ and %@",error, path, JSON);
             failure(JSON);
-        } else {
-            NSLog(@"WARN: %@ has no failure callback registered for patameters %@", path, parameters);}
+        }
      }];
 
     [HTTPQueue addOperation:operation];
@@ -147,7 +143,7 @@
 +(void)screenNameCheck:(NSString *)screen_names success:(void (^)(NSDictionary * response))success 
                failure:(void (^)(NSDictionary * response))failure {
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObject:screen_names forKey:@"screen_name"];
-    [NMHTTPClient enqueueRequestWithMethod:@"POST" path:@"/users/check.json" parameters:parameters success:success failure:failure];
+    [NMHTTPClient enqueueRequestWithMethod:@"GET" path:@"/users/check.json" parameters:parameters success:success failure:failure];
 }
 
 +(void)userDetail:(NSString *)user_nid success:(void (^)(NSDictionary * response))success 
@@ -410,11 +406,11 @@
     }];
 
     AFJSONRequestOperation *operation = [[AFJSONRequestOperation alloc] initWithRequest:request];
-    [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) { NSLog(@"DONE %@", responseObject);
+    [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
         if (success) {
             success(responseObject);
         }
-    } failure:^(AFHTTPRequestOperation *operation, NSError *error) { NSLog(@"FAIL %@", error);
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         if (failure) {
             failure([(AFJSONRequestOperation *)operation responseJSON]);
         }
@@ -648,7 +644,6 @@
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjects:items forKeys:params];
     
     [NMHTTPClient addDefaultParams:parameters userParams:YES];
-    NSLog(@"formdata params %@", parameters);
     
     /**
      * Build the image and the image metadata
@@ -663,7 +658,7 @@
         NSString *path = [currentUser getStringForKey:image_filepath_key];
         NSFileManager *filemgr = [NSFileManager defaultManager];
         image_data = [filemgr contentsAtPath: path ];
-        NSLog(@"data size %d", [image_data length]);
+        
         
         if ([image_data length] > 0) {
             image_flag = TRUE;
@@ -684,35 +679,26 @@
         [formData appendPartWithFileData:image_data name:@"image[image]" fileName:target_file_name mimeType:@"image/png"];
     }];
     
-    NSLog(@"Image Upload Request %@", request);
     AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSURLResponse *response, id JSON) {
-        NSLog(@"INFO: image upload done: %@", JSON);
         NSFileManager *filemgr = [NSFileManager defaultManager];
         NSString *path = [currentUser getStringForKey:image_filepath_key];
-        if ([filemgr removeItemAtPath: path error: NULL]  == YES) {
-            NSLog (@"Remove successful"); 
-        } else {
-            NSLog (@"Remove failed"); 
-        }
+        [filemgr removeItemAtPath: path error:NULL];
         if (success) {
             success(JSON);
         }
     } failure:^(NSURLRequest *request, NSURLResponse *response, NSError *error, id JSON) {
-            NSLog(@"failure callback for imageUpload %@", JSON);
         if (failure){
             failure(JSON);
         }
     }];
         
     [operation setUploadProgressBlock:^(NSInteger bytesWritten, NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite) {
-        NSLog(@" %d Sent %d of %d bytes",bytesWritten, totalBytesWritten, totalBytesExpectedToWrite);
         if (progress) {
             progress(totalBytesWritten,totalBytesExpectedToWrite);
         }
     }];
 
     [HTTPQueue addOperation:operation];
-
 }
 
 @end

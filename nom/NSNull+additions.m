@@ -15,11 +15,15 @@
 }
 
 - (BOOL)isEqualToString:(NSString *)aString {
-    NSLog(@"NSNull isEqual to string");
     return [aString isKindOfClass:[NSNull class]] ? YES : NO;
 }
 
 - (CGFloat)floatValue {
     return 0.0f;
 }
+
+- (int)intValue {
+    return 0;
+}
+
 @end
