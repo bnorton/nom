@@ -108,31 +108,22 @@ static NSTimer *scheduledTimer = nil;
 - (void)locationManager:(CLLocationManager *)manager 
        didFailWithError:(NSError *)error
 {
-//    NSLog(@"didFailWithError %@", error);
 }
 
 - (void)locationManager:(CLLocationManager *)manager 
-         didEnterRegion:(CLRegion *)region
-{
-//    NSLog(@"didEnterRegion %@", region);
+         didEnterRegion:(CLRegion *)region {
 }
 
 - (void)locationManager:(CLLocationManager *)manager 
-          didExitRegion:(CLRegion *)region
-{
-//    NSLog(@"didExitRegion %@", region);
+          didExitRegion:(CLRegion *)region {
 }
 
 - (void)locationManager:(CLLocationManager *)manager monitoringDidFailForRegion:(CLRegion *)region 
-              withError:(NSError *)error
-{
-//    NSLog(@"monitoringDidFailForRegion %@", region);
+              withError:(NSError *)error {
 }
 
 - (void)locationManager:(CLLocationManager *)manager 
-didChangeAuthorizationStatus:(CLAuthorizationStatus)status
-{
-//    NSLog(@"didChangeAuthorizationStatus %d", status);
+didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
 }
 
 

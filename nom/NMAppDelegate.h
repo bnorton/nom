@@ -9,7 +9,15 @@
 #import <UIKit/UIKit.h>
 @class currentLocation;
 
-@interface NMAppDelegate : UIResponder <UIApplicationDelegate, UITabBarControllerDelegate>
+@interface NMAppDelegate : UIResponder <UIApplicationDelegate, UITabBarControllerDelegate> {
+    UINavigationController *activity;
+    UINavigationController *trending;
+    UINavigationController *locations;
+    UINavigationController *search;
+    UINavigationController *connect;
+}
+
+-(void)userIsNowActive;
 
 @property (strong, nonatomic) UIWindow *window;
 

@@ -39,6 +39,12 @@
     [self __authorize];
 }
 
+-(void)registerMeSeccuess:(void (^)())meSuccess
+                meFailure:(void (^)())meFailure {
+    me_success = meSuccess;
+    me_failure = meFailure;
+}
+
 -(void)meWithSuccess:(void (^)(NSDictionary * me))success
              failure:(void (^)(NSDictionary * me))failure {
     
@@ -121,19 +127,19 @@
     [currentUser setObject:[[util facebook] expirationDate] forKey:@"fb_expiration_date"];
     [currentUser setBoolean:YES ForKey:@"user_facebook_connected"];
     
-    [util shouldShowMessage:FB_SUCCESS_MESSAGE subMessage:nil isError:NO];
-    
     if (auth_success) {
         auth_success();
+        auth_success = nil;
     }
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self meWithSuccess:nil failure:nil];
+        [self meWithSuccess:me_success failure:me_failure];
     });
 }
 
 -(void)fbDidNotLogin:(BOOL)cancelled {
     if (auth_failure) {
         auth_failure();
+        auth_failure = nil;
     }
 }
 
@@ -147,6 +153,8 @@
 }
 
 - (void)fbDialogLogin:(NSString*)token expirationDate:(NSDate*)expirationDate {
+    [currentUser setString:token ForKey:@"fb_access_token"];
+    [currentUser setObject:expirationDate forKey:@"fb_expiration_date"];
     [self fbDidLogin];
     
 }
@@ -159,7 +167,6 @@
 #pragma mark FBRequestDelegate
 
 - (void)request:(FBRequest *)request didLoad:(id)result {
-    
     if ([request.url isEqual:[NSString stringWithFormat:@"%@%@", FB_BASE, FB_ME]]) {
         NSString *uid      = [result objectForKey:@"id"];
         NSString *uname    = [result objectForKey:@"username"];
@@ -175,10 +182,14 @@
             } @catch (NSException *ex) {;}
             if (me_success) {
                 me_success(result);
+                me_success = nil;
+                me_failure = nil;
             }
         } failure:^(NSDictionary *response) {
             if (me_failure) {
                 me_failure(result);
+                me_success = nil;
+                me_failure = nil;
             }
         }];        
     }
@@ -189,6 +200,8 @@
               rangeOfString:@"feed"].location != NSNotFound) {
         if (publish_success) {
             publish_success();
+            publish_success = nil;
+            publish_failure = nil;
         }
     }
     else {

@@ -181,7 +181,6 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    NSLog(@"INFO Activities rows %d", [activities count]);
     return [activities count];
 }
 

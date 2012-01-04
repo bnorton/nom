@@ -49,8 +49,11 @@
 - (void)authorizeWithSuccess:(void (^)())success
                     failure:(void (^)())failure;
 
+-(void)registerMeSeccuess:(void (^)())meSuccess
+                meFailure:(void (^)())meFailure;
+
 - (void)meWithSuccess:(void (^)(NSDictionary * response))success
-             failure:(void (^)(NSDictionary * response))failure;
+              failure:(void (^)(NSDictionary * response))failure;
 
 - (void)meFriendsWithSuccess:(void (^)(NSDictionary * response))success
                      failure:(void (^)(NSDictionary * response))failure;

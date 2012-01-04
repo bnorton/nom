@@ -37,24 +37,32 @@
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
-    UINavigationController *activity  = [self newNav:[[NMActivityViewController alloc] initWithType:NMActivityTypeByFollowing]];
+    activity  = [self newNav:[[NMActivityViewController alloc] initWithType:NMActivityTypeByFollowing]];
     [activity.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] forBarMetrics:UIBarMetricsDefault];
     
-    UINavigationController *trending  = [self newNav:[[TrendingLocationsViewController alloc] init]];
+    trending  = [self newNav:[[TrendingLocationsViewController alloc] init]];
     [trending.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] forBarMetrics:UIBarMetricsDefault];
     
-    UINavigationController *locations = [self newNav:[[LocationsViewController alloc] init]];
+    locations = [self newNav:[[LocationsViewController alloc] init]];
     [locations.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] forBarMetrics:UIBarMetricsDefault];
     
-    UINavigationController *search    = [self newNav:[[SearchViewController alloc] initWithSearchTarget:NMSearchTargetLocation]];
+    search    = [self newNav:[[SearchViewController alloc] initWithSearchTarget:NMSearchTargetLocation]];
     [search.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] forBarMetrics:UIBarMetricsDefault];
     
-    UINavigationController *connect   = [self newNav:[[ConnectViewController alloc] init]];
-    [connect.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] forBarMetrics:UIBarMetricsDefault];
     
     self.tabBarController = [[UITabBarController alloc] init];
+    
+    if ( ! [currentUser getBooleanForKey:@"logged_in_or_connected"]) {
+        connect   = [self newNav:[[NMInitialConnectViewController alloc] initLocatedAt:NMInitialConnectLocationTab]];
+        [connect.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] forBarMetrics:UIBarMetricsDefault];
+
+    } else {
+        connect   = [self newNav:[[ConnectViewController alloc] init]];
+        [connect.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] forBarMetrics:UIBarMetricsDefault];
+    }
 
     self.tabBarController.viewControllers = [NSArray arrayWithObjects:activity, trending, locations, search, connect, nil];
+
     [self.tabBarController.tabBar setBackgroundImage:[UIImage imageNamed:@"tab_bar4a.png"]];
 
     [self.tabBarController setSelectedIndex:2];
@@ -78,6 +86,14 @@
     }
     
     return YES;
+}
+
+-(void)userIsNowActive {
+    connect   = [self newNav:[[ConnectViewController alloc] init]];
+    [connect.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar4f.png"] forBarMetrics:UIBarMetricsDefault];
+    
+    self.tabBarController.viewControllers = [NSArray arrayWithObjects:activity, trending, locations, search, connect, nil];
+
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application

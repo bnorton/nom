@@ -13,8 +13,11 @@
     UITextField *screen_name;
     UITextField *email;
     UITextField *password;
+    
+    BOOL setupUserWhenDone;
 }
 
 - (id)init;
+- (id)initInTabbar;
 
 @end

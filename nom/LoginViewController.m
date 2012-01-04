@@ -10,6 +10,7 @@
 #import "NMHTTPClient.h"
 #import "currentUser.h"
 #import "MKInfoPanel.h"
+#import "NMAppDelegate.h"
 
 @implementation LoginViewController
 
@@ -76,6 +77,12 @@
     return self;
 }
 
+- (id)initInTabbar {
+    self = [self init];
+    setupUserWhenDone = YES;
+    return self;
+}
+
 - (void)screen_name_ended {
     [screen_name resignFirstResponder];
     [email becomeFirstResponder];
@@ -104,19 +111,25 @@
 }
 
 -(void)password_ended {    
-    MBProgressHUD *hud = [util showHudInView:self.view];
-    
+    __block MBProgressHUD *hud = [util showHudInView:self.view];
+
     [NMHTTPClient registerUserEmail:email.text password:password.text screen_name:screen_name.text success:^(NSDictionary *response) {
         if ([[response objectForKey:@"status"] integerValue] > 0) {
             @try {
                 NSDictionary *user = [[response objectForKey:@"results"] objectAtIndex:0];
                 [currentUser setUser:user];
                 [currentUser setDate:[NSDate date] forKey:@"current_user_detail_fetch_time"];
-                [util shouldShowMessage:@"Nom Registration was successful." subMessage:nil isError:NO];
-                [self.navigationController dismissModalViewControllerAnimated:YES];
-                return;
             } @catch (NSException *ex) {
                 
+            } @finally {
+                [util shouldShowMessage:@"Nom Registration was successful." subMessage:nil isError:NO];
+                [hud hide:YES];
+                if (setupUserWhenDone) {
+                    [((NMAppDelegate *)[[UIApplication sharedApplication] delegate]) userIsNowActive];
+                } else {
+                    [self.navigationController dismissModalViewControllerAnimated:YES];
+                }
+                return;
             }
         }
         NSString *msg = @"Your registration didn't go through.";

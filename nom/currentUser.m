@@ -17,7 +17,6 @@ static NSMutableDictionary *user = nil;
     if ([[defaults objectForKey:@"auth_token"] length] > 0) { [user setObject:[defaults objectForKey:@"auth_token"] forKey:@"auth_token"]; }
     if ([[defaults objectForKey:@"user_nid"] length] > 0)   { [user setObject:[defaults objectForKey:@"user_nid"] forKey:@"user_nid"]; }
     if ([[defaults objectForKey:@"email"] length] > 0)      { [user setObject:[defaults objectForKey:@"email"] forKey:@"email"]; }
-//    if ([[defaults objectForKey:@"last_seen"] length] > 0)  { [user setObject:[defaults objectForKey:@"last_seen"] forKey:@"last_seen"]; }
     if ([[defaults objectForKey:@"name"] length] > 0)       { [user setObject:[defaults objectForKey:@"name"] forKey:@"name"]; }
     if ([[defaults objectForKey:@"screen_name"] length] > 0){ [user setObject:[defaults objectForKey:@"screen_name"] forKey:@"screen_name"]; }
     if ([[defaults objectForKey:@"image_url"] length] > 0)  { [user setObject:[defaults objectForKey:@"image_url"] forKey:@"image_url"]; }

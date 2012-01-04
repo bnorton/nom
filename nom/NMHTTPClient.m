@@ -580,45 +580,6 @@
     
 }
 
-/*
-+ (void)imageUpload:(NSString *)location_nid
-            success:(void (^)(NSDictionary * response))success
-            failure:(void (^)(NSDictionary * response))failure
-           progress:(void (^)(NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite))progress {
-
-    NSMutableDictionary *params = [[NSMutableDictionary alloc] initWithCapacity:3];
-    [params setObject:@"user1" forKey:@"user_nid"];
-    [params setObject:@"location1" forKey:@"location_nid"];
-    NSData *data = UIImageJPEGRepresentation([UIImage imageNamed:@"blue_brian.jpg"], 0.5);
-
-//    [params setObject:[NSString stringWithFormat:@"%@.jpg", [data SHA1Sum]] forKey:@"image[original_filename]"];
-//    [params setObject:@"image/jpeg" forKey:@"image[content_type]"];
-//    [params setObject:[NSNumber numberWithInteger:[data length]] forKey:@"image[file_size]"];
-
-
-    NSMutableURLRequest *request = [HTTPClient multipartFormRequestWithMethod:@"POST" path:@"/image/create.json" parameters:params constructingBodyWithBlock: ^(id <AFMultipartFormData>formData) {
-        [formData appendPartWithFileData:data name:@"image[image]" fileName:[NSString stringWithFormat:@"%@.jpg", [data SHA1Sum]] mimeType:@"image/jpeg"];
-    }];
-
-    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSURLResponse *response, id JSON) {
-        NSLog(@"INFO: image upload done: %@", JSON);
-    } failure:^(NSURLRequest *request, NSURLResponse *response, NSError *error, id JSON) {
-        NSLog(@"failure callback for imageUpload %@", JSON);
-    }];
-
-    
-//    AFHTTPRequestOperation *operation = [AFHTTPRequestOperation operationWithRequest:request completion:^(NSURLRequest *request, NSHTTPURLResponse *response, NSData *data, NSError *error) {
-//        NSLog(@"Upload Complete");
-//    }];
-
-    [operation setUploadProgressBlock:^(NSInteger bytesWritten, NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite) {
-        NSLog(@"Sent %d of %d bytes", totalBytesWritten, totalBytesExpectedToWrite);
-    }];
-    
-    
-}
-*/
-
 /**
  * Upload Arbitrary Image
  ############################################################################
