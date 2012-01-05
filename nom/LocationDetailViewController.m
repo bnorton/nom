@@ -9,8 +9,11 @@
 #import "LocationDetailViewController.h"
 #import "UIActionSheet+MKBlockAdditions.h"
 #import "FormTableController.h"
+#import "MapViewController.h"
+#import "inlineMapView.h"
 #import "current.h"
 #import "Util.h"
+#import "UIAlertView+MKBlockAdditions.h"
 #include <stdlib.h>
 
 @implementation LocationDetailViewController
@@ -24,7 +27,7 @@
     location = _location;
     location_nid = [location objectForKey:@"location_nid"];
     
-    name = [[UILabel alloc] initWithFrame:CGRectMake(10, 5, 300, 24)];
+    name = [[UILabel alloc] initWithFrame:CGRectMake(10, 4, 300, 24)];
     [name setBackgroundColor:[UIColor clearColor]];
     [name setFont:[UIFont fontWithName:@"TrebuchetMS" size:22]];
     [name setAdjustsFontSizeToFitWidth:YES];
@@ -35,19 +38,19 @@
     [name setTextAlignment:UITextAlignmentLeft];
     [name setTextColor:[UIColor darkGrayColor]];
 
-    address = [[UILabel alloc] initWithFrame:CGRectMake(10, 5, 300, 20)];
-    [address setBackgroundColor:[UIColor lightGrayColor]];
-    [address setFont:[UIFont fontWithName:@"TrebuchetMS" size:18]];
+    address = [[UILabel alloc] initWithFrame:CGRectMake(10, 28, 300, 34)];
+    [address setBackgroundColor:[UIColor clearColor]];
+    [address setFont:[UIFont fontWithName:@"TrebuchetMS" size:13]];
     [address setAdjustsFontSizeToFitWidth:YES];
     [address setMinimumFontSize:11];
     [address setContentMode:UIViewContentModeCenter];
-    [address setLineBreakMode:UILineBreakModeTailTruncation];
-    [address setNumberOfLines:1];
+    [address setLineBreakMode:UILineBreakModeWordWrap];
+    [address setNumberOfLines:0];
     [address setTextAlignment:UITextAlignmentLeft];
     [address setTextColor:[UIColor darkGrayColor]];
 
     categories = [[UILabel alloc] initWithFrame:CGRectMake(10, 26, 190, 18)];
-    [categories setBackgroundColor:[UIColor lightGrayColor]];
+    [categories setBackgroundColor:[UIColor clearColor]];
     [categories setFont:[UIFont fontWithName:@"TrebuchetMS" size:16]];
     [categories setAdjustsFontSizeToFitWidth:YES];
     [categories setMinimumFontSize:12];
@@ -69,7 +72,7 @@
     [rank setTextColor:[UIColor darkGrayColor]];
 
     geolocation = [[UILabel alloc] initWithFrame:CGRectMake(120, 10, 190, 27)];
-    [geolocation setBackgroundColor:[UIColor lightGrayColor]];
+    [geolocation setBackgroundColor:[UIColor clearColor]];
     [geolocation setFont:[UIFont fontWithName:@"TrebuchetMS" size:25]];
     [geolocation setAdjustsFontSizeToFitWidth:YES];
     [geolocation setMinimumFontSize:12];
@@ -103,22 +106,58 @@
     [thumb setTitleColor:[UIColor lightGrayColor] forState:UIControlStateSelected];
     [thumb setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
 
+    phone = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    [phone setFrame:CGRectMake(20, 5, 280, 30)];
+    [phone addTarget:self action:@selector(phone) forControlEvents:UIControlEventTouchUpInside];
+    [phone setTitle:[NSString stringWithFormat:@"%@", [location objectForKey:@"phone"]] forState:UIControlStateNormal];
+    [phone setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
+    [phone setTitleColor:[UIColor lightGrayColor] forState:UIControlStateSelected];
+    [phone setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
+
 //    image_frame = [[UIImageView alloc] initWithFrame:CGRectMake(10, 5, 300, 160)];
 //    [image_frame setImage:[UIImage imageNamed:@"assets/image_frame1g.png"]];
     
     image = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 172)];
-    [image setImage:[UIImage imageNamed:@"placeholder.png"]];
+    [image setImage:[UIImage imageNamed:@"assets/placeholder6001a.png"]];
 
     [self performSelector:@selector(setup)];
     
     thumb_buttons = [NSArray arrayWithObjects:THUMB_BUTTONS];
     
+    mapFrame = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"assets/mapFrame1a.png"]];
+    [mapFrame setFrame:CGRectMake(0, 0, 320, 160)];
+    
+    mapView = [[MapViewController alloc] initWithFrame:CGRectMake(2, 2, 316, 126) location:location];
+    
     return self;
 }
 
 - (void)setup {
-    name.text = [location objectForKey:@"name"];
-    address.text = [location objectForKey:@"address"];
+    NSString *str, *tmp, *tmp2;
+
+    if ([(tmp = [location objectForKey:@"cost"]) length] > 0) {
+        str = [NSString stringWithFormat:@"%@ (%@)", [location objectForKey:@"name"], tmp];
+    } else {
+        str = [location objectForKey:@"name"];
+    }
+    name.text = str;
+    tmp = nil, str = nil;
+    
+    if ([(str = [location objectForKey:@"street"]) length] > 0) {
+        if ([(tmp = [location objectForKey:@"cross_street"]) length] > 0) {
+            if ([(tmp2 = [location objectForKey:@"city"]) length] > 0) {
+                str = [NSString stringWithFormat:@"%@ (%@) in %@", str, tmp, tmp2];
+                [address setFont:[UIFont fontWithName:@"TrebuchetMS" size:14]];
+            } else {
+                str = [NSString stringWithFormat:@"%@ (%@)", str, tmp];
+                [address setFont:[UIFont fontWithName:@"TrebuchetMS" size:15]];
+            }
+        } else if ([(tmp2 = [location objectForKey:@"city"]) length] > 0) {
+            str = [NSString stringWithFormat:@"%@ in %@", str, tmp2];
+            [address setFont:[UIFont fontWithName:@"TrebuchetMS" size:16]];
+        }
+        address.text = str;
+    }
     
     NSDictionary *metadata;
     metadata = [location objectForKey:@"metadata"];
@@ -126,25 +165,18 @@
         categories.text = [[util format_array] stringFromArray:[metadata objectForKey:@"categories"]];
     }
     
-    rank = [location objectForKey:@"rank"];
+    rank.text = [location objectForKey:@"rank"];
     
     NSDictionary *geol = [location objectForKey:@"geolocation"];
     CGFloat lat, lng;
     lat = [[geol objectForKey:@"lat"] floatValue];
     lng = [[geol objectForKey:@"lng"] floatValue];
-    if (lat && lng && lat > 0.0f && lng > 0.0f) {
+    if (lat != 0.0f && lng != 0.0f ) {
         geolocation.text = [NSString stringWithFormat:@"%@ at %f, %f", [currentLocation howFarFromLat:lat Long:lng], lat, lng];
-    } else {
-        geolocation.text = [currentLocation howFarFromLat:lat Long:lng];
     }
     
-    @try {
-        NSString *url = [[[location objectForKey:@"images"] objectAtIndex:0] objectForKey:@"url"];
-        [image setImageWithURL:[NSURL URLWithString:url] placeholderImage:[UIImage imageNamed:@"placeholder.png"]];
-    }
-    @catch (NSException *ex) {
-        
-    }
+    NSString *url = [currentLocation primaryImageUrlFromImages:[location objectForKey:@"images"]];
+    [image setImageWithURL:[NSURL URLWithString:url] placeholderImage:[UIImage imageNamed:@"assets/placeholder6001a.png"]];
 }
  
 - (void)sendImageReadyMessageNamed:(NSString *)inname {    
@@ -164,10 +196,27 @@
 
 - (void)thumbValue:(NSString *)value {
     [NMHTTPClient thumbLocation:location_nid value:value success:^(NSDictionary *response) {
-        [util showInfoInView:self.view message:@"Saved your perception."];
+        [util showInfoInView:self.view message:@"Saved your thumb."];
     } failure:^(NSDictionary *response) {
-        [util showErrorInView:self.view message:@"There was an issue saving your perception."];
+        [util showErrorInView:self.view message:@"There was an issue saving your thumb."];
     }];
+}
+
+- (void)phone {
+    NSString *phone_number = nil;
+    if ([(phone_number = [location objectForKey:@"phone"]) length] > 0) {
+        [UIAlertView alertViewWithTitle:[NSString stringWithFormat:@"Call %@?", phone_number] message:nil 
+                      cancelButtonTitle:@"Cancel" otherButtonTitles:[NSArray arrayWithObject:@"Call"] 
+          onDismiss:^(int buttonIndex) {
+            NSString *phoneNumber = [NSString stringWithFormat:@"tel://%@", phone_number];
+            NSString *encodedString = [phoneNumber stringByAddingPercentEscapesUsingEncoding:
+                                       NSUTF8StringEncoding];
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:encodedString]];            
+        } onCancel:^{
+            
+        }];
+    }
+
 }
 
 - (void)thumb {
@@ -246,7 +295,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section { 
-    return 5;
+    return 8;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -261,13 +310,21 @@
         } else {
             [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
         }
+    } else {
+        for (UIView *sub in [cell subviews]) {
+            [sub removeFromSuperview];
+        }
     }
     
     if (indexPath.row == 0) { // image + add image
         if ([name superview]) {
             [name removeFromSuperview];
         }
+        if ([address superview]) {
+            [address removeFromSuperview];
+        }
         [cell addSubview:name];
+        [cell addSubview:address];
     } 
     else if (indexPath.row == 1) { // basic info
         if ([image superview]) { 
@@ -290,11 +347,26 @@
         }
         [cell addSubview:thumb];
     }
-    else { // what else is there
+    else if (indexPath.row == 4){ // what else is there
         if ([publish superview]) {
             [publish removeFromSuperview];
         }
         [cell addSubview:publish];
+    } else if (indexPath.row == 5) {
+        //if ([mapView.view superview]) {
+            [mapView.view removeFromSuperview];
+        //}
+//        if ([mapFrame superview]) {
+//            [mapFrame removeFromSuperview];
+//        }
+        [cell addSubview:mapView.view];
+        [mapView.view setUserInteractionEnabled:NO];
+//        [cell.contentView addSubview:mapFrame];
+    } else if (indexPath.row == 6) {
+        if ([phone superview]) {
+            [phone removeFromSuperview];
+        }
+        [cell addSubview:phone];
     }
     return cell;
 }
@@ -303,9 +375,11 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.row == 0) {
-        return 32;
+        return 65;
     } else if (indexPath.row == 1) {
         return 173;
+    } else if (indexPath.row == 5) {
+        return 130;
     }
     return 40;
 }

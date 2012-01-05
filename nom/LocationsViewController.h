@@ -19,7 +19,7 @@
 #define BUTTON_SEGMENT_WIDTH 61.0
 #define CAP_WIDTH 5.0
 
-@class cellCache;
+@class cellCache, MBProgressHUD;
 
 typedef enum {
     CapLeft          = 0,
@@ -75,6 +75,8 @@ typedef enum {
     NSArray* segmentControlTitles;
     
     cellCache *cache;
+    
+    MBProgressHUD *hud;
 
 }
 

@@ -30,11 +30,14 @@
 @implementation CustomSegmentedControl
 @synthesize buttons;
 
-- (id) initWithSegmentCount:(NSUInteger)segmentCount segmentsize:(CGSize)segmentsize dividerImage:(UIImage*)dividerImage tag:(NSInteger)objectTag delegate:(NSObject <CustomSegmentedControlDelegate>*)customSegmentedControlDelegate
+- (id) initWithSegmentCount:(NSUInteger)segmentCount segmentsize:(CGSize)segmentsize 
+               dividerImage:(UIImage*)dividerImage tag:(NSInteger)objectTag 
+                   delegate:(NSObject <CustomSegmentedControlDelegate>*)customSegmentedControlDelegate 
+    initialHighlightedIndex:(NSInteger)initialHighlightedIndex
 {
     if (self = [super init])
     {
-        // The tag allows callers withe multiple controls to distinguish between them
+        // The tag allows callers with multiple controls to distinguish between them
         self.tag = objectTag;
         
         // Set the delegate
@@ -77,6 +80,14 @@
                 UIImageView* divider = [[[UIImageView alloc] initWithImage:dividerImage] autorelease];
                 divider.frame = CGRectMake(horizontalOffset + segmentsize.width, 0.0, dividerImage.size.width, dividerImage.size.height);
                 [self addSubview:divider];
+            }
+            
+            if (i == initialHighlightedIndex) {
+                button.selected = YES;
+                button.highlighted = NO;
+            } else {
+              //button.selected = YES;
+                button.highlighted = YES;                
             }
             
             // Advance the horizontal offset

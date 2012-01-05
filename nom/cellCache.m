@@ -51,4 +51,8 @@
     return acc;
 }
 
+- (BOOL)hasKey:(NSString *)key {
+    return [cached_cells objectForKey:key] != nil;
+}
+
 @end

@@ -179,15 +179,15 @@ static inline double CLLocationSpeedToMilesPerHour(CLLocationSpeed speed) {
             
         case TTTImperialSystem: {
             double feetDistance = CLLocationDistanceToFeet(distance);
-            double yardDistance = CLLocationDistanceToYards(distance);
+//            double yardDistance = CLLocationDistanceToYards(distance);
             double milesDistance = CLLocationDistanceToMiles(distance);
             
-            if (feetDistance < 300) {
+            if (feetDistance < 990) {
                 distanceString = [self.numberFormatter stringFromNumber:[NSNumber numberWithDouble:feetDistance]];
                 unitString = NSLocalizedString(@"ft", @"Feet Unit");
-            } else if (yardDistance < 500) {
-                distanceString = [self.numberFormatter stringFromNumber:[NSNumber numberWithDouble:yardDistance]];
-                unitString = NSLocalizedString(@"yds", @"Yard Unit");
+//            } else if (yardDistance < ) {
+//                distanceString = [self.numberFormatter stringFromNumber:[NSNumber numberWithDouble:yardDistance]];
+//                unitString = NSLocalizedString(@"yds", @"Yard Unit");
             } else {
                 distanceString = [self.numberFormatter stringFromNumber:[NSNumber numberWithDouble:milesDistance]];
                 unitString = (milesDistance > 1.0 && milesDistance < 1.1) ? NSLocalizedString(@"mile", @"Mile Unit (Singular)") : NSLocalizedString(@"miles", @"Mile Unit (Plural)");

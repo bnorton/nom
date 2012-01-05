@@ -25,6 +25,7 @@
 - (id)initWithType:(NMUserProfileType)_type user_nid:(NSString *)_user_nid {
     user_nid = _user_nid;
     isCurrentUser = [user_nid isEqualToString:[currentUser getStringForKey:@"user_nid"]];
+    
     if (isCurrentUser) {
         return [self initWithType:_type user:[currentUser user]]; // break the chain if I am me
     }
@@ -34,18 +35,7 @@
     hud = [util showHudInView:self.view];
     [self.view addSubview:hud];
     
-    [NMHTTPClient userDetail:user_nid success:^(NSDictionary *response) {
-        [hud hide:YES];
-        @try {
-            [self setupUserContent:[[response objectForKey:@"results"] objectAtIndex:0]];
-            [currentUser setDate:[NSDate date] forKey:@"current_user_detail_fetch_time"];
-        } @catch (NSException *ex) {
-            [util showErrorInView:self.view message:@"User detail parse failed"];
-        }
-    } failure:^(NSDictionary *response) {
-        [hud hide:YES];
-        [util showErrorInView:self.view message:@"Couldn't fetch user details"];        
-    }];
+    [self fetchUser];
     
     return self;
 }
@@ -54,9 +44,11 @@
     
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (!self) { return nil; }
-    
+
     type = _type;
     if (user) { user_nid = [user objectForKey:@"user_nid"]; }
+
+    [self fetchUser];
 
     isCurrentUser = [user_nid isEqualToString:[currentUser getStringForKey:@"user_nid"]];
 
@@ -104,7 +96,7 @@
     [user_location setTextAlignment:UITextAlignmentLeft];
     [user_location setTextColor:[UIColor darkGrayColor]];
     
-    last_seen = [[UILabel alloc] initWithFrame:CGRectMake(120, 62, 190, 18)];
+    last_seen = [[UILabel alloc] initWithFrame:CGRectMake(120, 63, 190, 18)];
     [last_seen setBackgroundColor:[UIColor clearColor]];
     [last_seen setFont:[UIFont fontWithName:@"TrebuchetMS" size:16]];
     [last_seen setAdjustsFontSizeToFitWidth:YES];
@@ -113,6 +105,16 @@
     [last_seen setNumberOfLines:1];
     [last_seen setTextAlignment:UITextAlignmentLeft];
     [last_seen setTextColor:[UIColor darkGrayColor]];
+
+    follower_count = [[UILabel alloc] initWithFrame:CGRectMake(120, 85, 190, 18)];
+    [follower_count setBackgroundColor:[UIColor clearColor]];
+    [follower_count setFont:[UIFont fontWithName:@"TrebuchetMS" size:15]];
+    [follower_count setAdjustsFontSizeToFitWidth:YES];
+    [follower_count setMinimumFontSize:11];
+    [follower_count setLineBreakMode:UILineBreakModeTailTruncation];
+    [follower_count setNumberOfLines:1];
+    [follower_count setTextAlignment:UITextAlignmentLeft];
+    [follower_count setTextColor:[UIColor darkGrayColor]];
     
     user_image = [[UIImageView alloc] init];
     [user_image setFrame:CGRectMake(10, 10, 100, 100)];
@@ -135,6 +137,23 @@
     return self;
 }
 
+- (void)fetchUser {
+    [NMHTTPClient userDetail:user_nid success:^(NSDictionary *response) {
+        [hud hide:YES];
+        @try {
+            [self setupUserContent:[[response objectForKey:@"results"] objectAtIndex:0]];
+            if (isCurrentUser) {
+                [currentUser setDate:[NSDate date] forKey:@"current_user_detail_fetch_time"];
+            }
+        } @catch (NSException *ex) {
+            [util showErrorInView:self.view message:@"User detail parse failed"];
+        }
+    } failure:^(NSDictionary *response) {
+        [hud hide:YES];
+        [util showErrorInView:self.view message:@"Couldn't fetch user details"];        
+    }];
+}
+
 - (void)setupUserContent:(NSDictionary *)user {
     
     user_nid = [user objectForKey:@"user_nid"];
@@ -151,14 +170,16 @@
     user_location.text = [user objectForKey:@"city"];
     
     if ([(str = [user objectForKey:@"updated_at"]) length] > 0) {
+        NSLog(@"LAST SEEN %@", str);
         if ([(tmp = [util timeAgoFromRailsString:str]) length] > 0) {        
             str = [NSString stringWithFormat:@"last seen: %@", tmp];
         }
         last_seen.text = str;
+        NSLog(@"LAST SEEN %@", str);
     }
     
     int fc = [[user objectForKey:@"follower_count"] intValue];
-    follower_count.text = [NSString stringWithFormat:@"Followers %d", fc];
+    follower_count.text = [NSString stringWithFormat:@"%d followers", fc];
     
     str = [user objectForKey:@"image_url"];
     [user_image setImageWithURL:[NSURL URLWithString:str] placeholderImage:[UIImage imageNamed:@"placeholder.png"]];
@@ -172,7 +193,14 @@
     [util viewDidAppear:self.view];
 }
 
-- (void)viewWillAppear:(BOOL)animated { 
+- (void)viewWillAppear:(BOOL)animated {
+    if (isCurrentUser) {
+        NSDate *old = [currentUser getDateForKey:@"current_user_detail_fetch_time"];
+        NSLog(@"SHOULD FETCH USER %f", [old timeIntervalSinceNow]);
+        if ([old timeIntervalSinceNow] < -21000.0f) {
+            [self fetchUser];
+        }
+    }
     [super viewWillAppear:animated];
     if (type == NMUserProfileTypeMe) {
         [self.navigationController setNavigationBarHidden:YES animated:YES];

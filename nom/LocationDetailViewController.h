@@ -10,6 +10,8 @@
 
 #define THUMB_BUTTONS @"Solid", @"Meh", nil
 
+@class MapViewController;
+
 @interface LocationDetailViewController : UITableViewController {
     NSDictionary *location;
     NSString *location_nid;
@@ -23,12 +25,16 @@
     UIButton *add_image;
     UIButton *publish;
     UIButton *thumb;
+    UIButton *phone;
     
     NSArray *thumb_buttons;
     
     UIImageView *image;
     UIImageView *image_frame;
+
+    UIImageView *mapFrame;
     
+    MapViewController *mapView;
 }
 
 @property (nonatomic,retain) NSDictionary *location;

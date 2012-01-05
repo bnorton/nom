@@ -3,7 +3,7 @@
 //  nom
 //
 //  Created by Brian Norton on 1/3/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2012 Nom Inc. All rights reserved.
 //
 
 #import "NMBarButtonItem.h"

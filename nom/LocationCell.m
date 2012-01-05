@@ -79,7 +79,7 @@
     [image_border setImage:[UIImage imageNamed:@"assets/image_frame1g.png"]];
     
     image = [[UIImageView alloc] initWithFrame:CGRectMake(10, 5, 300, 160)];
-    [image setImage:[UIImage imageNamed:@"placeholder.png"]];
+    [image setImage:[UIImage imageNamed:@"assets/placeholder6001b.png"]];
     
     shadow = [[UIImageView alloc] initWithFrame:CGRectMake(12, 7, 296, 60)];
     [shadow setImage:[UIImage imageNamed:@"assets/frame_shadow1b.png"]];
@@ -137,45 +137,32 @@
     if (((lat = [[geolocation objectForKey:@"lat"] floatValue]) != 0.0f) && 
         ((lng = [[geolocation objectForKey:@"lng"] floatValue]) != 0.0f)) {
         
-        if ([(str = [location objectForKey:@"neighborhoods"]) length] > 0) {
+        if ([(str = [location objectForKey:@"street"]) length] > 0) {
             tmp = [currentLocation howFarFromLat:lat Long:lng];
-            distance.text = [NSString stringWithFormat:@"%@ in %@", tmp, str];
+            distance.text = [NSString stringWithFormat:@"%@ at %@", tmp, str];
         } else {
             distance.text = [currentLocation howFarFromLat:lat Long:lng];
         }
         
-    } else if ((str = [location objectForKey:@"neighborhoods"])) {
-        distance.text = tmp;
+    } else if ((str = [location objectForKey:@"street"])) {
+        distance.text = str;
     }
     
     NSDictionary *thumb_count;
-    if ((thumb_count = [location objectForKey:@"thumb_count"])){
+    if ((thumb_count = [location objectForKey:@"thumb_count"]) != nil){
         up.text = [NSString stringWithFormat:@"%d",[[thumb_count objectForKey:@"up"] integerValue]];
         meh.text = [NSString stringWithFormat:@"%d",[[thumb_count objectForKey:@"meh"] integerValue]];
     } else {
         up.text = @"0"; meh.text = @"0";
     }
     
-    NSString *url;
-    NSArray *images;
-    BOOL set_image_url = NO;
-    if ([(images = [location objectForKey:@"images"]) count] > 0) {
-        NSDictionary *image_obj;
-        if ((image_obj = [images objectAtIndex:0])) {
-            if ([(url = [image_obj objectForKey:@"url"]) length] > 0) {
-                set_image_url = YES;
-                [image setImageWithURL:[NSURL URLWithString:url] placeholderImage:[UIImage imageNamed:@"placeholder.png"]];
-            }
-        }
-    }
-    if (! set_image_url) {
-        [image setImage:[UIImage imageNamed:@"placeholder.png"]];
+    NSString *url = [currentLocation primaryImageUrlFromImages:[location objectForKey:@"images"]];
+    if ([url length] > 0) {
+        [image setImageWithURL:[NSURL URLWithString:url] placeholderImage:[UIImage imageNamed:@"assets/placeholder6001b.png"]];
+    }else {
+        [image setImage:[UIImage imageNamed:@"assets/placeholder6001b.png"]];
     }
     [image setNeedsDisplay];
-}
-
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated
-{ [super setSelected:selected animated:animated];
 }
 
 @end

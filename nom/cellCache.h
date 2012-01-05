@@ -22,4 +22,6 @@
 - (UITableViewCell *)addCell:(UITableViewCell *)new_cell forKey:(NSString *)key;
 - (UITableViewCell *)cellForKey:(NSString *)key;
 
+- (BOOL)hasKey:(NSString *)key;
+
 @end

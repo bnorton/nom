@@ -43,6 +43,9 @@
 
 @property (nonatomic, retain) NSMutableArray* buttons;
 
-- (id) initWithSegmentCount:(NSUInteger)segmentCount segmentsize:(CGSize)segmentsize dividerImage:(UIImage*)dividerImage tag:(NSInteger)objectTag delegate:(NSObject <CustomSegmentedControlDelegate>*)customSegmentedControlDelegate;
+- (id) initWithSegmentCount:(NSUInteger)segmentCount segmentsize:(CGSize)segmentsize 
+               dividerImage:(UIImage*)dividerImage tag:(NSInteger)objectTag 
+                   delegate:(NSObject <CustomSegmentedControlDelegate>*)customSegmentedControlDelegate 
+    initialHighlightedIndex:(NSInteger)initialHighlightedIndex;
 
 @end

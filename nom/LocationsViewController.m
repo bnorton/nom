@@ -32,12 +32,13 @@
     if (! self) { return nil; }
     
     filter = _filter;
-    [self fetchLocations];
 
     distances = [NSArray arrayWithObjects:__distances];
     distance_values = [NSArray arrayWithObjects:__distances_vals];
     distance = NMFilterDistanceHalf;
     
+    [self fetchLocations];
+
     self.tabBarItem.image = [UIImage imageNamed:@"icons-gray/73-radar.png"];
     self.title = NSLocalizedString(@"Nearby", @"Places close to here");
     
@@ -48,7 +49,7 @@
     filtered_by_distance = [[NSMutableArray alloc] initWithCapacity:20];
     filtered_by_current_category = [[NSMutableArray alloc] initWithCapacity:20];
     
-    current_limit = 25;
+    current_limit = 40;
     current_cost = @"$";
     
     cache = [[cellCache alloc] initWithMaxCapacity:25];
@@ -75,9 +76,9 @@
 //    UIButton* leftButton = (UIButton*)self.navigationItem.leftBarButtonItem.customView;
 //    [leftButton addTarget:self action:@selector(editAction:) forControlEvents:UIControlEventTouchUpInside];
     
-    segmentControlTitles = [NSArray arrayWithObjects:@"Distance", @"Rank", @"Cost", @"Tags", nil];
+    segmentControlTitles = [NSArray arrayWithObjects:@"Distance", @"Rank", nil, @"Cost", @"Tags", nil];
     UIImage* dividerImage = [UIImage imageNamed:@"assets/view-control-divider.png"];
-    id iid = [[CustomSegmentedControl alloc] initWithSegmentCount:segmentControlTitles.count segmentsize:CGSizeMake(BUTTON_SEGMENT_WIDTH, dividerImage.size.height) dividerImage:dividerImage tag:0 delegate:self];
+    id iid = [[CustomSegmentedControl alloc] initWithSegmentCount:segmentControlTitles.count segmentsize:CGSizeMake(BUTTON_SEGMENT_WIDTH, dividerImage.size.height) dividerImage:dividerImage tag:0 delegate:self initialHighlightedIndex:1];
     self.navigationItem.titleView = iid;
 }
 
@@ -91,7 +92,6 @@
     [self.navigationController setNavigationBarHidden:NO animated:YES];
 }
 
-
 - (void)filter_by_cost:(NSString *)cost_str {
     if ([filtered_by_cost count] > 0) {
         [filtered_by_cost removeAllObjects];
@@ -104,8 +104,6 @@
             }
         }
     }
-    locations = filtered_by_cost;
-    NSLog(@"filter_by_cost %@", filtered_by_cost);
 }
 
 - (void)filter_by_category:(NSString *)category_nid {
@@ -129,19 +127,45 @@
             }
         }
     }
-    locations = filtered_by_current_category;
 }
 
 - (void)filter_by_distance {
+    __block CLLocation *dest, *origin;
+    __block NSDictionary *geo1, *geo2;
+    __block CLLocation *user = [[CLLocation alloc] initWithLatitude:[[util currentLocation] lat] longitude:[[util currentLocation] lng]];
+    filtered_by_distance = [filtered_by_all mutableCopy];
+    
+    [filtered_by_distance sortUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+        geo1 = [obj1 objectForKey:@"geolocation"];
+        geo2 = [obj2 objectForKey:@"geolocation"];
+        dest = [[CLLocation alloc] initWithLatitude:[[geo1 objectForKey:@"lat"] floatValue] longitude:[[geo1 objectForKey:@"lng"] floatValue]];
+        origin = [[CLLocation alloc] initWithLatitude:[[geo2 objectForKey:@"lat"] floatValue] longitude:[[geo2 objectForKey:@"lng"] floatValue]];
+        float one = [user distanceFromLocation:origin];
+        float two = [user distanceFromLocation:dest];
+        return one > two ? -1 : 1;
+    }];
 }
 
 - (void)updateComplete {
     [self doneLoadingTableViewData];
-    [self setupLocations];
     [self filter_by_category:current_category];
     [self filter_by_distance];
     [self filter_by_cost:current_cost];
+
+    
+    
+    
+    
+    
+    
+    [self setupLocations];
     [self preBuildCells];
+    
+    
+    
+    
+    
+    
     [self.tableView reloadData];
 }
 
@@ -151,20 +175,20 @@
 
 - (void)fetchLocationsWithOptions:(NSDictionary *)options {
     [NMHTTPClient here:[[distance_values objectAtIndex:distance] floatValue] categories:nil cost:nil  limit:current_limit
-               success:^(NSDictionary *response) {
-                   NSLog(@"INFO: here success callback : %@", response);
-                   @try {
-                       current_response = response;
-                       filtered_by_all = [response objectForKey:@"results"];
-                   } @catch (NSException *ex) {
-                       [util showErrorInView:self.view message:@"Failed to parse items around here"];
-                   }
-                   [self updateComplete];
-               } 
-               failure:^(NSDictionary *response) {
-                   [self updateComplete];
-                   [util showErrorInView:self.view message:@"Failed to load items around here"];
-               }];
+     success:^(NSDictionary *response) {
+         // NSLog(@"INFO: here success callback : %@", response);
+         @try {
+             current_response = response;
+             filtered_by_all = [response objectForKey:@"results"];
+         } @catch (NSException *ex) {
+             [util showErrorInView:self.view message:@"Failed to parse items around here"];
+         }
+         [self updateComplete];
+     } 
+     failure:^(NSDictionary *response) {
+         [self updateComplete];
+         [util showErrorInView:self.view message:@"Failed to load items around here"];
+     }];
 }
 
 - (void)setupLocations {
@@ -196,10 +220,11 @@
 //        if (i > 20) { NSLog(@"ERROR: tried to preBuild more then 20 cells");
 //            break;  
 //        }
-        cell = [[LocationCell alloc] initWithReuseIdentifier:iden];
-        [cell setLocation:l];
-        [cache addCell:cell forKey:[l objectForKey:@"location_nid"]];
-        
+        if (! [cache hasKey:[l objectForKey:@"location_nid"]]) {
+            cell = [[LocationCell alloc] initWithReuseIdentifier:iden];
+            [cell setLocation:l];
+            [cache addCell:cell forKey:[l objectForKey:@"location_nid"]];            
+        }
         ++i;
     }
     i=0;

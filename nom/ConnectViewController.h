@@ -55,5 +55,6 @@ typedef enum {
 - (id)initWithType:(NMUserProfileType)type user_nid:(NSString *)user_nid;
 
 - (void)setupUserContent:(NSDictionary *)user;
+- (void)fetchUser;
 
 @end

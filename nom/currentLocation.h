@@ -8,9 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
+#import <MapKit/MapKit.h>
 
-
-@interface currentLocation : NSObject <CLLocationManagerDelegate> {
+@interface currentLocation : NSObject <CLLocationManagerDelegate, MKMapViewDelegate> {
     CLLocationManager *locationManager;
 }
 
