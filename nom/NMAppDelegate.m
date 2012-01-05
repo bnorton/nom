@@ -71,8 +71,6 @@
     
    [self.window makeKeyAndVisible];
  
-    NSLog(@"logged in or connected %d", [currentUser getBooleanForKey:@"logged_in_or_connected"]);
-    
     if ( ! [currentUser getBooleanForKey:@"logged_in_or_connected"]) {
         UIViewController *initialConnect = [[NMInitialConnectViewController alloc] init];
         UINavigationController *isnav = [[UINavigationController alloc] initWithRootViewController:initialConnect];

@@ -24,7 +24,9 @@
     
     user_nid = _user_nid;
     name = _name;
-        
+    
+    hud = [util showHudInView:self.view];
+    
     self.tabBarItem.image = [UIImage imageNamed:@"icons-gray/259-list.png"];
     
     UIImageView *background = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"background4a.png"]];
@@ -73,27 +75,23 @@
     [activities addObjectsFromArray:recommends];
     __block NSDate *one = nil, *two = nil;
     __block NSString *str1 = nil, *str2 = nil;
-    [activities sortUsingComparator:^NSComparisonResult(id obj1, id obj2) {
-        one = nil, two = nil;
-        if ([obj1 isKindOfClass:[NSDictionary class]] && 
-            [obj1 respondsToSelector:@selector(objectForKey:)]) {
-            str1 = [obj1 objectForKey:@"timestamp"];
-        }
-        if ([obj2 isKindOfClass:[NSDictionary class]] && 
-            [obj2 respondsToSelector:@selector(objectForKey:)]) {
-            str2 = [obj2 objectForKey:@"timestamp"];
-        }
-        @try {
+    @try {
+        [activities sortUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+            one = nil, two = nil;
+            str1 = [obj1 objectForKey:@"created_at"];
+            str2 = [obj2 objectForKey:@"created_at"];
             one = [util dateFromRailsString:str1]; 
-            two = [util dateFromRailsString:str1]; 
-        }
-        @catch (NSException *ex) {;}
-        
-        if (one != nil && two != nil) { 
-            return [one compare:two]; 
-        }
-        return 1;
-    }];
+            two = [util dateFromRailsString:str2]; 
+            
+            if (one != nil && two != nil) { 
+                return [two timeIntervalSinceDate:one] > 0 ? 1 : -1;
+            }
+            return 1;
+        }];
+    }
+    @catch (NSException *ex) {
+        [util showInfoInView:self.view isError:YES message:@"Activity sort went awry" subMessage:@"Your timeline may be unordered"];
+    }
 }
 
 - (void)fetchActivities {
@@ -233,6 +231,11 @@
 }
 
 - (void)doneLoadingTableViewData:(BOOL)success {
+    if (hud) {
+        [hud hide:YES];
+        hud = nil;
+    }
+    
     if (success) {
         [self process_activity_list];
     }

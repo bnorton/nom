@@ -12,7 +12,7 @@
 @implementation NMHTTPClient
 
 + (void)showInfo:(NSString *)path params:(NSDictionary *)params request:(NSMutableURLRequest*)request {
-    NSLog(@"INFO: calling out to %@ with params %@ \n and request object %@\n\n================================",path,params,request);
+    //NSLog(@"INFO: calling out to %@ with params %@ \n and request object %@\n\n================================",path,params,request);
 }
 
 + (void)addDefaultParams:(NSMutableDictionary *)params userParams:(BOOL)user {
@@ -175,7 +175,7 @@
     NSMutableArray *items  = [[NSMutableArray alloc] initWithCapacity:4];
     NSMutableArray *params = [[NSMutableArray alloc] initWithCapacity:4];
     /* @optional */
-    NSLog(@"DISTANCE %f", distance);
+
     if (distance < 0.25) { distance = 0.24f;  }
     if (distance > 5.0f) { distance = 5.01f;  }
     if (limit < 6)  { limit = 6; }

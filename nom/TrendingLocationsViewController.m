@@ -27,8 +27,8 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [util showInfoInView:self.view message:@"Trending Items coming soon..."];
-    [util viewDidAppear:self.view];
+    [util showInfoInView:self.view message:@"Trending is coming soon..."];
+    // [util viewDidAppear:self.view];
 }
 
 - (void) viewWillAppear:(BOOL)animated {

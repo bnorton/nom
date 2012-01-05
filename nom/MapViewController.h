@@ -3,7 +3,7 @@
 //  nom
 //
 //  Created by Brian Norton on 1/4/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2012 Nom Inc. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

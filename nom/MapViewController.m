@@ -3,7 +3,7 @@
 //  nom
 //
 //  Created by Brian Norton on 1/4/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2012 Nom Inc. All rights reserved.
 //
 
 #import "MapViewController.h"
@@ -44,9 +44,6 @@
     float minLongitude = fminf([[util currentLocation] lng], lng);        
     float maxLongitude = fmaxf([[util currentLocation] lng], lng);        
     
-    NSLog(@"%f %f %f %f", [[util currentLocation] lat], lat,
-          [[util currentLocation] lng], lng);
-    
     MKCoordinateRegion region;
     region.center.latitude     = (minLatitude + maxLatitude)   / 2;
     region.center.longitude    = (minLongitude + maxLongitude) / 2;
@@ -54,8 +51,8 @@
     region.span.latitudeDelta  = (maxLatitude - minLatitude) * MAP_PADDING;
     
     region.span.latitudeDelta  = (region.span.latitudeDelta < MINIMUM_VISIBLE_LATITUDE)
-    ? MINIMUM_VISIBLE_LATITUDE 
-    : region.span.latitudeDelta;
+                    ? MINIMUM_VISIBLE_LATITUDE 
+                    : region.span.latitudeDelta;
     
     region.span.longitudeDelta = (maxLongitude - minLongitude) * MAP_PADDING;
     

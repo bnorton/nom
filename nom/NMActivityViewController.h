@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "EGORefreshTableHeaderView.h"
+#import "MBProgressHUD.h"
 
 @class activityCell;
 
@@ -34,6 +35,7 @@ typedef enum {
     BOOL hidden_nav_bar_flag;
     
     NMActivityType type;
+    MBProgressHUD *hud;
     
     activityCell *sampleCell;
 }

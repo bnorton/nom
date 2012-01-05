@@ -21,6 +21,8 @@
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (!self) { return nil; }
     
+    self.title = NSLocalizedString(@"Settings", @"Settings");
+    
     tabbar_hidden = NO;
     
     labels = [NSArray arrayWithObjects:settings_labels];
@@ -98,7 +100,7 @@
 
 - (void) hideTabBar:(UITabBarController *) tabbarcontroller {
     [UIView beginAnimations:nil context:NULL];
-    [UIView setAnimationDuration:0.40];
+    [UIView setAnimationDuration:0.60];
     for(UIView *view in tabbarcontroller.view.subviews) {
         if([view isKindOfClass:[UITabBar class]]) {
             [view setFrame:CGRectMake(view.frame.origin.x, 480, view.frame.size.width, view.frame.size.height)];
@@ -111,7 +113,7 @@
 
 - (void) showTabBar:(UITabBarController *) tabbarcontroller {
     [UIView beginAnimations:nil context:NULL];
-    [UIView setAnimationDuration:0.40];
+    [UIView setAnimationDuration:0.60];
     for(UIView *view in tabbarcontroller.view.subviews) {
         if([view isKindOfClass:[UITabBar class]]) {
             [view setFrame:CGRectMake(view.frame.origin.x, 431, view.frame.size.width, view.frame.size.height)];

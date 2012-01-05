@@ -33,6 +33,8 @@
     
     filter = _filter;
 
+    hud = [util showHudInView:self.view];
+    
     distances = [NSArray arrayWithObjects:__distances];
     distance_values = [NSArray arrayWithObjects:__distances_vals];
     distance = NMFilterDistanceHalf;
@@ -151,21 +153,15 @@
     [self filter_by_category:current_category];
     [self filter_by_distance];
     [self filter_by_cost:current_cost];
-
-    
-    
-    
-    
-    
     
     [self setupLocations];
     [self preBuildCells];
-    
-    
-    
-    
-    
-    
+
+    if (hud) {
+        [hud hide:YES];
+        hud = nil;
+    }
+
     [self.tableView reloadData];
 }
 
@@ -176,7 +172,6 @@
 - (void)fetchLocationsWithOptions:(NSDictionary *)options {
     [NMHTTPClient here:[[distance_values objectAtIndex:distance] floatValue] categories:nil cost:nil  limit:current_limit
      success:^(NSDictionary *response) {
-         // NSLog(@"INFO: here success callback : %@", response);
          @try {
              current_response = response;
              filtered_by_all = [response objectForKey:@"results"];
@@ -217,9 +212,6 @@
     int i = 0;
     LocationCell *cell;
     for (NSDictionary *l in locations) {
-//        if (i > 20) { NSLog(@"ERROR: tried to preBuild more then 20 cells");
-//            break;  
-//        }
         if (! [cache hasKey:[l objectForKey:@"location_nid"]]) {
             cell = [[LocationCell alloc] initWithReuseIdentifier:iden];
             [cell setLocation:l];
@@ -234,7 +226,6 @@
         
         if ((url = [currentLocation primaryImageUrlFromImages:images]) != nil) {
             [NMHTTPClient imageFetch:url];
-            NSLog(@"image fetch kicked off for %@", url);
             ++i;
             if (i > 10) {
                 break;
@@ -289,11 +280,9 @@
     bool success_flag;
     @try {
         cell = (LocationCell *)[cache cellForKey:[[locations objectAtIndex:indexPath.row] objectForKey:@"location_nid"]];
-        NSLog(@"Got the cell from the cache");
         if (cell != nil) { success_flag = true; }
     }
     @catch (NSException *ex) {
-        NSLog(@"cell from cache failed %@", ex);
         success_flag = false;
     }
     
@@ -302,8 +291,6 @@
         if (cell == nil) {
             cell = [[LocationCell alloc] initWithReuseIdentifier:CellIdentifier];
         }
-
-        NSLog(@"INFO locations controller set %d", indexPath.row);
         if ([locations count] > indexPath.row) {
             [cell setLocation:[locations objectAtIndex:indexPath.row]];
         }
@@ -388,7 +375,6 @@
 }
 
 - (void) touchDownAtSegmentIndex:(NSUInteger)segmentIndex {
-    NSLog(@"INFO locations index pressed %d", segmentIndex);
     filter = segmentIndex;
     [self setupLocations];
     [self.tableView reloadData];

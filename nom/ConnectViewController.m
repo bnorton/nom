@@ -170,12 +170,10 @@
     user_location.text = [user objectForKey:@"city"];
     
     if ([(str = [user objectForKey:@"updated_at"]) length] > 0) {
-        NSLog(@"LAST SEEN %@", str);
         if ([(tmp = [util timeAgoFromRailsString:str]) length] > 0) {        
             str = [NSString stringWithFormat:@"last seen: %@", tmp];
         }
         last_seen.text = str;
-        NSLog(@"LAST SEEN %@", str);
     }
     
     int fc = [[user objectForKey:@"follower_count"] intValue];
@@ -196,8 +194,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     if (isCurrentUser) {
         NSDate *old = [currentUser getDateForKey:@"current_user_detail_fetch_time"];
-        NSLog(@"SHOULD FETCH USER %f", [old timeIntervalSinceNow]);
-        if ([old timeIntervalSinceNow] < -21000.0f) {
+        if ([old timeIntervalSinceNow] > 250.0f) {
             [self fetchUser];
         }
     }
